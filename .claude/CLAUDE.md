@@ -53,6 +53,10 @@ Several agents work these repositories at the same time.
 4. Background subagent shells can die silently on this machine: treat an agent
    quiet for ~10 minutes as suspect and probe its process with `pgrep` instead
    of waiting longer.
+5. Before touching work another agent owns, check it has actually finished,
+   and explain the why in the commit body. A terse message on someone else's
+   work reads as an unauthorized commit — a peer has reverted one and reported
+   it as a security incident. (2026-07-26)
 
 # Git conventions
 From `~/.dotfiles/git/gitconfig` plus lessons that cost real time.
