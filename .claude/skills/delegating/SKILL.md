@@ -19,6 +19,10 @@ it does not do the delegated work itself. All scripts live in
    never exceeds 4 panes; sub-agent models per the global preference — Opus
    medium for search/coding/scripts, Opus high for planning; Fable only when
    the delegate must itself orchestrate).
+   Clear a reused session here, before sending: `scripts/clean-session <name>`
+   resets it to a known-empty context, and a session found idle carries
+   whatever the last delegation left in it. A session launched in this step is
+   already empty and needs no clear.
 3. `scripts/send-prompt <name> [--worktree]` — the script appends what the
    session cannot see: sibling-session collision warnings, the worktree
    convention, and a `DONE <name>` completion sentinel.
@@ -27,9 +31,11 @@ it does not do the delegated work itself. All scripts live in
    a session that went idle without its sentinel gets `scripts/read-session`
    and one re-request before escalating to the user. Fire-and-forget sends
    (surveys, curation) skip awaiting and are collected on a later tick.
-5. Report outcomes, ask the session to clean its repository (commit, remove
-   worktree), then `scripts/clean-session <name>` (/clear for reuse;
-   `--close` only for sessions this skill launched, only when requested).
+5. Report outcomes and ask the session to clean its repository (commit, remove
+   worktree). Leave its context standing — it is the evidence behind the
+   report, and the next delegation clears it in step 2. Retiring the pane
+   (`scripts/clean-session <name> --close`) is for sessions this skill
+   launched, only when the user asks.
 
 ## Worked example — "add object detection to camera"
 1. Not workspace-level work → this skill. Route: research → `notes`,
@@ -41,5 +47,6 @@ it does not do the delegated work itself. All scripts live in
 4. Launch one Fable-high session in `camera`: plan the next version and drive
    its own subagents for implementation and evaluation (`--worktree`).
 5. Loop until its sentinel: if it stops idle without `DONE`, read output and
-   re-request the remainder; then have it clean the repository; report the
-   summary and clear the sessions.
+   re-request the remainder; then have it clean the repository and report the
+   summary. The sessions stay as they are; the next delegation to `notes` or
+   `camera` clears them when it claims them.

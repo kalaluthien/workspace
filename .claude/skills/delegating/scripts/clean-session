@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Reset or retire a delegated session. Default resets the claude session with
-# /clear (pane and context survive for reuse). --close removes the pane —
+# /clear (pane survives for reuse). Reset when claiming a session for new work,
+# not when finishing the old — see SKILL.md step 2. --close removes the pane —
 # allowed only for sessions this skill launched (convention-named agents);
 # closing anything else needs --force and an explicit user request.
 #
