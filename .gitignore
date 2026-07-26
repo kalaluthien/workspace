@@ -1,0 +1,11 @@
+# The workspace root tracks only workspace-level tooling.
+# Project entries are independent git repositories and stay untracked here.
+/*
+
+# ...except these
+!/.gitignore
+!/.claude/
+!/scripts/
+
+# Machine-local Claude state never enters git.
+.claude/settings.local.json
