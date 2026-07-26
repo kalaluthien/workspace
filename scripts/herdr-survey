@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Show, for every repository under ~/workspace, which herdr agents hold it and
+# what its git checkout looks like. Read-only.
+#
+# Usage: herdr-survey [--json]
+#   --json  emit one JSON object per repository instead of the table
+set -euo pipefail
+
+WORKSPACE_ROOT="${WORKSPACE_ROOT:-$HOME/workspace}"
+
+as_json=false
+[ "${1:-}" = --json ] && as_json=true
+
+agents=$(herdr agent list 2>/dev/null || printf '{"result":{"agents":[]}}')
+
+for repo_path in "$WORKSPACE_ROOT"/*/; do
+  repo_path=${repo_path%/}
+  [ -d "$repo_path/.git" ] || continue
+  repo_name=$(basename "$repo_path")
+
+  branch=$(git -C "$repo_path" branch --show-current 2>/dev/null || true)
+  [ -n "$branch" ] || branch=$(git -C "$repo_path" rev-parse --short HEAD 2>/dev/null || echo '-')
+  dirty=$(git -C "$repo_path" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+  worktrees=$(git -C "$repo_path" worktree list --porcelain 2>/dev/null |
+    grep -c '^worktree ' || true)
+  ahead=$(git -C "$repo_path" rev-list --count '@{upstream}..HEAD' 2>/dev/null || echo 0)
+
+  repo_agents=$(printf '%s' "$agents" | jq -c --arg path "$repo_path" \
+    '[.result.agents[] | select(.cwd == $path or (.cwd | startswith($path + "/")))
+      | {name: (.name // .agent), status: .agent_status, pane: .pane_id}]')
+
+  if $as_json; then
+    jq -nc --arg repo "$repo_name" --arg branch "$branch" \
+      --argjson dirty "$dirty" --argjson worktrees "$worktrees" \
+      --argjson ahead "$ahead" --argjson agents "$repo_agents" \
+      '{repo: $repo, branch: $branch, dirty: $dirty, worktrees: $worktrees,
+        unpushed: $ahead, agents: $agents}'
+  else
+    printf '%-28s %-24s %s\n' "$repo_name" "$branch" \
+      "$(printf '%s' "$repo_agents" | jq -r 'if length == 0 then "no agent"
+        else map("\(.name):\(.status)") | join(", ") end')"
+    printf '  %s dirty file(s), %s worktree(s), %s unpushed commit(s)\n' \
+      "$dirty" "$worktrees" "$ahead"
+  fi
+done
