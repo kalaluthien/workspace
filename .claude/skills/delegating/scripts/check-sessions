@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Report the delegable sessions for one repository (or all of ~/workspace):
+# every agent pane with its name-encoded model/effort and status, plus each
+# tab's remaining pane capacity. The orchestrator reads this to decide reuse
+# (idle + matching name) versus launch (a tab with capacity, or a new tab).
+#
+# Usage: check-sessions [<repo>]
+# Output: one JSON object -> {repo, workspace_id, agents: [...], tabs: [...]}
+# per repository, one per line.
+source "$(dirname "$0")/_lib.sh"
+require_herdr
+
+scan() {
+  local path=$1 label ws
+  label=$(basename "$path")
+  ws=$(workspace_id_for_label "$label")
+  local agents='[]' tabs='[]'
+  if [ -n "$ws" ]; then
+    agents=$(herdr agent list | jq -c --arg path "$path" '
+      [.result.agents[]
+       | select(.cwd == $path or (.cwd | startswith($path + "/")))
+       | {name, agent, status: .agent_status, pane: .pane_id}]')
+    # Names encode model/effort; a null name means an unmanaged session.
+    agents=$(printf '%s' "$agents" | jq -c --arg m 'fable|opus|sonnet|haiku' \
+      --arg e 'low|med|high|xhigh' '
+      [.[] | . + (if (.name // "") | test("-(" + $m + ")-(" + $e + ")(-[0-9]+)?$")
+                  then {model: (.name | capture("-(?<x>" + $m + ")-") .x),
+                        effort: (.name | capture("-(?<x>" + $e + ")(-[0-9]+)?$") .x)}
+                  else {model: null, effort: null} end)]')
+    tabs=$(herdr tab list --workspace "$ws" |
+      jq -c '[.result.tabs[] | {tab: .tab_id, panes: .pane_count, free: (4 - .pane_count)}]')
+  fi
+  jq -nc --arg repo "$label" --arg ws "$ws" \
+    --argjson agents "$agents" --argjson tabs "$tabs" \
+    '{repo: $repo, workspace_id: (if $ws == "" then null else $ws end),
+      agents: $agents, tabs: $tabs}'
+}
+
+if [ $# -ge 1 ]; then
+  scan "$(repo_path "$1")"
+else
+  for p in "$WORKSPACE_ROOT"/*/; do
+    [ -d "$p/.git" ] && scan "${p%/}"
+  done
+fi

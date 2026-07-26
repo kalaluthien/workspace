@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Launch a named claude session for one repository, reusing the repository's
+# herdr workspace and the first tab with capacity (a tab never exceeds 4
+# panes; a full workspace gets a new tab). Blocks until the session is idle.
+#
+# Usage: launch-session <repo> --model <fable|opus|sonnet|haiku>
+#                       --effort <low|med|high|xhigh>
+#                       [--name NAME] [-- <extra claude args...>]
+# Output: {"name":..., "pane":..., "tab":..., "workspace":...}
+source "$(dirname "$0")/_lib.sh"
+require_herdr
+
+repo_arg=${1:?usage: launch-session <repo> --model M --effort E}; shift
+model= effort= name= extra=()
+while [ $# -gt 0 ]; do
+  case $1 in
+    --model)  model=${2:?}; shift 2 ;;
+    --effort) effort=${2:?}; shift 2 ;;
+    --name)   name=${2:?}; shift 2 ;;
+    --)       shift; extra=("$@"); break ;;
+    *)        die "unknown option: $1" ;;
+  esac
+done
+[ -n "$model" ] && [ -n "$effort" ] || die '--model and --effort are required'
+
+path=$(repo_path "$repo_arg")
+[ -d "$path" ] || die "no such directory: $path"
+label=$(basename "$path")
+
+ws=$(workspace_id_for_label "$label")
+if [ -z "$ws" ]; then
+  ws=$(herdr workspace create --cwd "$path" --label "$label" --no-focus |
+    jq -r '.result.workspace.workspace_id')
+  [ -n "$ws" ] || die "could not create a workspace for $label"
+fi
+
+tab=$(herdr tab list --workspace "$ws" |
+  jq -r 'first(.result.tabs[] | select(.pane_count < 4) | .tab_id) // empty')
+if [ -z "$tab" ]; then
+  tab=$(herdr tab create --workspace "$ws" --cwd "$path" --no-focus |
+    jq -r '.result.tab.tab_id')
+  [ -n "$tab" ] || die "could not create a tab in $ws"
+fi
+
+[ -n "$name" ] || name=$("$(dirname "$0")/name-session" make "$path" "$model" "$effort")
+
+# claude's effort flag takes the full word; session names abbreviate medium.
+effort_flag=$effort; [ "$effort" = med ] && effort_flag=medium
+
+started=$(herdr agent start "$name" \
+  --cwd "$path" --workspace "$ws" --tab "$tab" \
+  --split down --no-focus \
+  -- claude --model "$model" --effort "$effort_flag" \
+     ${extra[@]+"${extra[@]}"})
+pane=$(printf '%s' "$started" | jq -r '.result.agent.pane_id')
+[ -n "$pane" ] && [ "$pane" != null ] || die "agent start failed: $started"
+
+herdr wait agent-status "$pane" --status idle --timeout 90000 >/dev/null ||
+  die "session $name ($pane) did not become idle in 90s"
+
+jq -nc --arg n "$name" --arg p "$pane" --arg t "$tab" --arg w "$ws" \
+  '{name: $n, pane: $p, tab: $t, workspace: $w}'

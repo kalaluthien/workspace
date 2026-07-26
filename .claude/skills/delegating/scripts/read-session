@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Read a delegated session's recent output (for reports and stall diagnosis).
+#
+# Usage: read-session <target> [--lines N] [--visible]
+source "$(dirname "$0")/_lib.sh"
+require_herdr
+
+target=${1:?usage: read-session <target> [--lines N] [--visible]}; shift
+lines=120 source=recent-unwrapped
+while [ $# -gt 0 ]; do
+  case $1 in
+    --lines)   lines=${2:?}; shift 2 ;;
+    --visible) source=visible; shift ;;
+    *)         die "unknown option: $1" ;;
+  esac
+done
+herdr pane read "$(pane_of "$target")" --source "$source" --lines "$lines"

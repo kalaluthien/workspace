@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Reset or retire a delegated session. Default resets the claude session with
+# /clear (pane and context survive for reuse). --close removes the pane —
+# allowed only for sessions this skill launched (convention-named agents);
+# closing anything else needs --force and an explicit user request.
+#
+# Usage: clean-session <target> [--close [--force]]
+source "$(dirname "$0")/_lib.sh"
+require_herdr
+
+target=${1:?usage: clean-session <target> [--close [--force]]}; shift
+close=false force=false
+while [ $# -gt 0 ]; do
+  case $1 in
+    --close) close=true; shift ;;
+    --force) force=true; shift ;;
+    *)       die "unknown option: $1" ;;
+  esac
+done
+
+pane=$(pane_of "$target")
+if $close; then
+  name=$(agent_row "$target" | jq -r '.name // empty')
+  parsed=$("$(dirname "$0")/name-session" parse "${name:-none}" |
+    jq -r '.model // empty')
+  if [ -z "$parsed" ] && ! $force; then
+    die "'$target' is not a convention-named session; refuse to close without --force"
+  fi
+  herdr pane close "$pane" >/dev/null
+  jq -nc --arg p "$pane" '{closed: $p}'
+else
+  herdr pane send-text "$pane" "/clear"
+  sleep 1
+  herdr pane send-keys "$pane" Enter
+  jq -nc --arg p "$pane" '{cleared: $p}'
+fi

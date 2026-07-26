@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Deliver a prompt to a delegated session, enriched with the context the
+# session cannot see: sibling sessions in the same repository (collision
+# warning), the worktree convention, and a completion sentinel the
+# orchestrator can wait on.
+#
+# Usage: send-prompt <target> [--worktree] [--no-sentinel] [--prompt TEXT]
+#        echo "task" | send-prompt <target>
+# <target> is an agent name (preferred) or pane id.
+source "$(dirname "$0")/_lib.sh"
+require_herdr
+
+target=${1:?usage: send-prompt <target> [--worktree] [--no-sentinel] [--prompt TEXT]}
+shift
+worktree=false sentinel=true prompt=
+while [ $# -gt 0 ]; do
+  case $1 in
+    --worktree)    worktree=true; shift ;;
+    --no-sentinel) sentinel=false; shift ;;
+    --prompt)      prompt=${2:?}; shift 2 ;;
+    *)             die "unknown option: $1" ;;
+  esac
+done
+[ -n "$prompt" ] || prompt=$(cat)
+[ -n "$prompt" ] || die 'empty prompt'
+
+pane=$(pane_of "$target")
+row=$(agent_row "$target")
+cwd=$(printf '%s' "$row" | jq -r '.cwd // empty')
+
+# Sibling sessions in the same repository are collision candidates.
+if [ -n "$cwd" ]; then
+  siblings=$(herdr agent list | jq -r --arg cwd "$cwd" --arg p "$pane" '
+    [.result.agents[]
+     | select(.pane_id != $p)
+     | select(.cwd == $cwd or (.cwd | startswith($cwd + "/")))
+     | "\(.name // .agent) (\(.pane_id), \(.agent_status))"] | join(", ")')
+  [ -n "$siblings" ] && prompt="$prompt
+
+Other agents hold this repository right now: $siblings. Survey their
+uncommitted work before editing and do not touch their files."
+fi
+
+$worktree && prompt="$prompt
+
+Work from your own git worktree and branch, never the main checkout; keep
+commits atomic; rebase onto what lands instead of force-pushing."
+
+# The literal sentinel must never appear in the prompt itself, or a matching
+# wait would fire on the echoed prompt instead of the reply.
+$sentinel && prompt="$prompt
+
+When the whole task is finished, print one final line: the word DONE in
+capitals, then one space, then this session name: $target"
+
+herdr pane send-text "$pane" "$prompt"
+sleep 1
+herdr pane send-keys "$pane" Enter
+jq -nc --arg t "$target" --arg p "$pane" --argjson bytes "${#prompt}" \
+  '{sent: $t, pane: $p, bytes: $bytes}'
