@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# Check sweep-sessions against captured pane screens. The classifier reads a
+# terminal, so it breaks silently when the agent's screen markers change; the
+# case that matters is a session mid-turn with no assistant bullet yet, which
+# an earlier draft called empty and would have closed with live work in it.
+#
+# A stub herdr on PATH feeds each fixture to sweep-sessions and the verdict is
+# compared with the expected one. Nothing real is read, and --close is never
+# passed, so this touches no session.
+#
+# Usage: verify-verdicts        (exit 0 when every case passes)
+set -euo pipefail
+here=$(cd "$(dirname "$0")" && pwd)
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+mkdir -p "$tmp/bin" "$tmp/panes" "$tmp/root/repo/.git"
+
+# Fixtures: <pane> <expected> <<screen. Names are the pane ids the stub serves.
+fixture() {
+  printf '%s %s\n' "$1" "$2" >> "$tmp/cases"
+  cat > "$tmp/panes/$1.txt"
+}
+
+fixture blank unknown </dev/null
+
+fixture fresh empty <<'EOF'
+ ▐▛███▜▌   Claude Code v2.1.220
+▝▜█████▛▘  Opus 5 with medium effort · Claude Max
+❯
+EOF
+
+fixture cleared empty <<'EOF'
+ ▐▛███▜▌   Claude Code v2.1.220
+❯ /clear
+❯
+EOF
+
+fixture midturn pending <<'EOF'
+❯ Research survey for the wiki. Report the path when you finish.
+✢ Befuddling… (12s · ↓ 219 tokens · thinking with medium effort)
+❯
+EOF
+
+fixture answered pending <<'EOF'
+❯ Where does the sidebar tagline come from?
+⏺ Both live in the site repository, not in the vault.
+❯
+EOF
+
+fixture finished done <<'EOF'
+❯ Index the docs as numbered chapters.
+⏺ Merged, pushed, worktree removed.
+
+  DONE repo-opus-high
+❯
+EOF
+
+fixture reopened pending <<'EOF'
+❯ Index the docs as numbered chapters.
+⏺ Merged, worktree removed.
+
+  DONE repo-opus-high
+❯ push.
+⏺ Pushed to main.
+❯
+EOF
+
+# The stub answers only what sweep-sessions asks: the agent roster, and one
+# pane read per agent. Every fixture is idle, so every one reaches the reader.
+{
+  echo '#!/bin/sh'
+  echo 'case "$1 $2" in'
+  echo '  "agent list") cat "'"$tmp"'/agents.json" ;;'
+  echo '  "pane read")  cat "'"$tmp"'/panes/$3.txt" ;;'
+  echo '  *) echo "stub herdr: unexpected: $*" >&2; exit 1 ;;'
+  echo 'esac'
+} > "$tmp/bin/herdr"
+chmod +x "$tmp/bin/herdr"
+
+# One agent per fixture, all named repo-opus-high so the sentinel case matches.
+awk '{print $1}' "$tmp/cases" |
+  jq -R -s --arg cwd "$tmp/root/repo" '
+    {result: {agents: [split("\n")[] | select(. != "")
+      | {name: "repo-opus-high", pane_id: ., cwd: $cwd, agent_status: "idle"}]}}' \
+  > "$tmp/agents.json"
+
+got=$(PATH="$tmp/bin:$PATH" WORKSPACE_ROOT="$tmp/root" HERDR_ENV=1 \
+  "$here/sweep-sessions" repo | jq -r '"\(.pane) \(.verdict)"')
+
+fail=0
+while read -r pane want; do
+  have=$(printf '%s\n' "$got" | awk -v p="$pane" '$1 == p {print $2}')
+  if [ "$have" = "$want" ]; then
+    printf 'ok   %-10s %s\n' "$pane" "$want"
+  else
+    printf 'FAIL %-10s want %s, got %s\n' "$pane" "$want" "${have:-<none>}"
+    fail=1
+  fi
+done < "$tmp/cases"
+exit $fail

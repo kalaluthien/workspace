@@ -36,6 +36,17 @@ it does not do the delegated work itself. All scripts live in
    report, and the next delegation clears it in step 2. Retiring the pane
    (`scripts/clean-session <name> --close`) is for sessions this skill
    launched, only when the user asks.
+6. When the user asks for a session clean-up, `scripts/sweep-sessions` reads
+   every pane and prints a verdict: `empty`, `done`, `pending`, or the herdr
+   status of a pane too busy to read. Adding `--close` retires the empty and
+   done ones and nothing else, because a `pending` session is either waiting
+   on an answer or finished without a sentinel and the screen cannot tell
+   which. Report the pending ones and let the user decide. Run it dry first
+   when the sweep covers sessions whose output has not been collected yet —
+   closing a `done` session discards the report behind it.
+   `scripts/verify-verdicts` checks the classifier against captured screens;
+   run it when a session is misclassified, since the agent's screen markers
+   are the only evidence it has.
 
 ## Worked example — "add object detection to camera"
 1. Not workspace-level work → this skill. Route: research → `notes`,
