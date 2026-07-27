@@ -52,7 +52,7 @@ Several agents work these repositories at the same time.
 There is no global `user.name`/`user.email` — identity is per-repo. Confirm
 `git config user.email` inside a repository before its first commit there.
 Other git config defaults are in the `setup-git` memory; worktree and release-
-tag rules are in `~/.claude/rules/craft.md`.
+tag rules are in `~/.claude/CLAUDE.md`, "Craft".
 
 # Machine setup
 Machine and tool facts (Android/JVM toolchain, uv-only Python, shell aliases
