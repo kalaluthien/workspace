@@ -18,6 +18,38 @@ Route by intent, then read that entry's own documents first — everything about
 A request that spans entries (research + implementation, multi-repo work) is an
 orchestration request: load the `/delegating` skill.
 
+# Technical knowledge
+`notes/` is the one cache for technical survey knowledge. `wiki/index.md` lists
+every page with a one-line summary, `wiki/*.md` are the timeless concept pages,
+and `journal/YYYY-MM-DD-slug.md` are the dated survey reports the pages
+distill. Read the cache before the web, and write the web back into it. An
+answer that stays in chat history is lost.
+
+1. Read the wiki first. Before any technical survey or web search, read
+   `notes/wiki/index.md` in this session, then the concept pages it names.
+   These are plain file reads and need no delegation. Cite the page you used,
+   for example "per `notes/wiki/on-device-ml-runtimes.md`", so the reader can
+   check it.
+2. Judge the gap yourself. The wiki answers the question, answers it partly or
+   stale, or does not cover it. Only the last two conditions reach the web.
+   - The wiki answers it: answer from the page and stop. No survey.
+3. Delegate every web survey to `notes`. Load the `/delegating` skill and send
+   one survey prompt per question. This session does not run the survey itself,
+   even for a single search, because the answer must land in the vault and only
+   an agent in `notes` can commit it there.
+4. Ask for the write-back in the prompt. A survey prompt that asks only for an
+   answer gets an answer in chat and leaves the cache empty. Name the outputs:
+   one dated report in `journal/`, plus the concept pages and `wiki/index.md`
+   updated.
+5. Report the paths with the answer. Name the journal and wiki files the survey
+   produced, so the next agent starts at step 1 instead of at the web.
+
+A survey prompt carries four things: the question in one sentence, the wiki
+pages already read and what they miss, the decision the answer feeds, and the
+required outputs from step 4. It carries nothing about *how* the report is
+shaped — front matter, filenames, links, and commits are the `notes` entry's
+own conventions, and restating them in a prompt only competes with them.
+
 # Herdr sessions
 Herdr is the one terminal interface over these repositories. The session
 lifecycle — find, name, launch, send, await, report, clean — is owned by the
