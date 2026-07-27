@@ -52,13 +52,20 @@ pane_of() {
 # Whether a session is free to claim or retire. Status alone cannot say:
 # herdr reports a quiet pane as idle, and a pane goes quiet whenever the
 # session pauses mid-turn, so only working, blocked and unknown are trusted
-# as-is and reported unread. The rest is read off the screen by two markers.
-# The assistant bullet says the session produced output, and a prompt line
-# carrying anything but a slash command says it was given work; both absent
-# is empty. The DONE sentinel counts only when no later prompt line reopened
-# the session, and an unnamed session carries no sentinel to match. Splitting
-# on a marker avoids assuming its byte width, and a read that comes back with
-# nothing is a failed read, not an empty session.
+# as-is and reported unread. The rest is read off the screen by three markers.
+# The assistant bullet says the session produced output, a prompt line
+# carrying anything but a slash command says it was given work, and the
+# welcome banner says the session is fresh or freshly cleared.
+#
+# Every verdict rests on a marker that is present, never on one that is
+# absent, because the screen is a lossy record: a pane repaints as it runs
+# and the transcript above the fold is gone from the emulator, not merely
+# unread. So empty means the banner is showing with nothing after it, and a
+# screen holding none of the three markers is unknown — the session may have
+# finished hours ago with its sentinel long scrolled away. The DONE sentinel
+# counts only when no later prompt line reopened the session, and an unnamed
+# session carries no sentinel to match. Splitting on a marker avoids assuming
+# its byte width, and a read that comes back with nothing is a failed read.
 session_verdict() {
   case $3 in
     idle|done) ;;
@@ -69,6 +76,7 @@ session_verdict() {
       BEGIN { sentinel = (name == "" ? "" : "DONE " name) }
       { seen = NR }
       index($0, "\342\217\272") { output = 1 }                   # the assistant bullet
+      index($0, "\342\226\220\342\226\233") { banner = 1 }       # the welcome banner
       sentinel != "" && index($0, sentinel) { done_at = NR }
       {
         if (index($0, "\342\235\257")) {                         # the prompt marker
@@ -80,7 +88,8 @@ session_verdict() {
       END {
         if (!seen)                                  print "unknown"
         else if (done_at > 0 && done_at > input_at) print "done"
-        else if (!output && !input_at)              print "empty"
-        else                                        print "pending"
+        else if (output || input_at)                print "pending"
+        else if (banner)                            print "empty"
+        else                                        print "unknown"
       }'
 }

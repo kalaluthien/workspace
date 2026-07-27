@@ -56,6 +56,15 @@ fixture finished done <<'EOF'
 ❯
 EOF
 
+# A long-lived session whose screen has repainted past everything that proves
+# what it did. Absence of markers is not evidence of an empty session.
+fixture faded unknown <<'EOF'
+✻ Churned for 4m 58s
+
+※ recap: wrote the survey and left it uncommitted.
+❯
+EOF
+
 # The read window holds only the tail of a long session: the sentinel is in
 # it, but the bullet and the prompt that produced it have scrolled away.
 fixture scrolled done <<'EOF'
