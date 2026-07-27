@@ -38,9 +38,9 @@ Several agents work these repositories at the same time.
 
 1. Survey before editing, and scope edits so they do not collide with other
    worktrees, sessions, and uncommitted changes.
-2. Work in your own worktree and branch; keep commits atomic; rebase onto what
-   landed instead of force-pushing over it. An agent that assumes exclusive
-   ownership silently reverts work it never read.
+2. Rebase your branch onto what landed instead of force-pushing over it. An
+   agent that assumes exclusive ownership silently reverts work it never read.
+   The branch-per-patch rule itself is in `~/.claude/CLAUDE.md`, "Code to work".
 3. Before touching work another agent owns, check it has actually finished,
    and explain the why in the commit body. A terse message on someone else's
    work reads as an unauthorized commit — a peer has reverted one and reported
