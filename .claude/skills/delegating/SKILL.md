@@ -28,11 +28,23 @@ it does not do the delegated work itself. All scripts live in
 3. `scripts/send-prompt <name> [--worktree]` — the script appends what the
    session cannot see: sibling-session collision warnings, the worktree
    convention, and a `DONE <name>` completion sentinel.
-4. Monitor as a loop, not a blocking workflow: on each tick,
-   `scripts/await-session <name> --match "DONE <name>" --timeout <short>`;
-   a session that went idle without its sentinel gets `scripts/read-session`
-   and one re-request before escalating to the user. Fire-and-forget sends
-   (surveys, curation) skip awaiting and are collected on a later tick.
+4. Wait with the harness, not with the turn. `scripts/watch-sessions <name>...`
+   prints one line per session the moment it stops needing the orchestrator —
+   `done` on its sentinel, `blocked` on a permission prompt, `gone` on a
+   closed pane, `pending` when it goes quiet without finishing — and exits
+   when the last one lands. Run it two ways, by how many wake-ups the wait
+   needs:
+   - One session: a background `Bash` call. It exits on the single event and
+     the harness re-invokes this session with the line.
+   - Several: the `Monitor` tool. Each session that lands is a notification,
+     and the watch ends itself when all of them have.
+   Neither blocks the turn, and neither needs the user to prompt again. Do not
+   foreground a wait and do not end a turn asking the user to check back — a
+   foreground wait burns the turn holding a `sleep`, and a timeout ends it
+   with nothing delivered. `scripts/await-session` remains for a deliberate
+   blocking wait that also prints the pane tail.
+   A `pending` or `blocked` session gets `scripts/read-session` and one
+   re-request before escalating to the user.
 5. Report outcomes and ask the session to clean its repository (commit, remove
    worktree). Leave its context standing — it is the evidence behind the
    report, and the next delegation clears it in step 2. Retiring the pane
@@ -53,13 +65,15 @@ it does not do the delegated work itself. All scripts live in
 ## Worked example — "add object detection to camera"
 1. Not workspace-level work → this skill. Route: research → `notes`,
    implementation → `camera`.
-2. Launch two Opus-med sessions in `notes`; fire-and-forget: survey
-   license-free TFLite detection models; survey frequent photo subjects.
-3. When both sentinels appear, send a third prompt: curate the wiki from the
-   two survey outputs.
+2. Launch two Opus-med sessions in `notes` and send both surveys: license-free
+   TFLite detection models; frequent photo subjects. Put both under one
+   `Monitor` watch and carry on with other work.
+3. Each survey arrives as its own notification. When the second lands, send a
+   third prompt: curate the wiki from the two survey outputs.
 4. Launch one Fable-high session in `camera`: plan the next version and drive
-   its own subagents for implementation and evaluation (`--worktree`).
-5. Loop until its sentinel: if it stops idle without `DONE`, read output and
-   re-request the remainder; then have it clean the repository and report the
-   summary. The sessions stay as they are; the next delegation to `notes` or
-   `camera` clears them when it claims them.
+   its own subagents for implementation and evaluation (`--worktree`). One
+   session, so watch it with a background `Bash` call.
+5. Its line arrives as `done`, or as `pending` when it stopped early — then
+   read the output and re-request the remainder. Have it clean the repository
+   and report the summary. The sessions stay as they are; the next delegation
+   to `notes` or `camera` clears them when it claims them.

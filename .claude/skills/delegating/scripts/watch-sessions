@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# Emit one line per delegated session as it stops needing the orchestrator,
+# and exit when every named session has. Written for the Monitor tool, which
+# turns each stdout line into a notification and ends the watch on exit, so
+# several delegations can be awaited at once without blocking a turn. For a
+# single session, await-session in a background Bash call is enough.
+#
+# Usage: watch-sessions <target>... [--interval S] [--stall N]
+# Output: one JSON object per session -> {name, pane, verdict}
+#
+# A session is reported at `done` (its sentinel), `blocked` (it is holding a
+# prompt for the user), `gone` (its pane closed), and `pending` (quiet with no
+# sentinel — it stopped early and needs a re-request). Anything else is still
+# running and is not reported.
+#
+# `pending` waits for --stall consecutive polls because a session pausing
+# mid-turn reads exactly like one that stopped early; the other three are
+# unambiguous on the first poll and fire at once.
+source "$(dirname "$0")/_lib.sh"
+require_herdr
+
+targets=() interval=15 stall=3
+while [ $# -gt 0 ]; do
+  case $1 in
+    --interval) interval=${2:?}; shift 2 ;;
+    --stall)    stall=${2:?}; shift 2 ;;
+    -*)         die "unknown option: $1" ;;
+    *)          targets+=("$1"); shift ;;
+  esac
+done
+[ ${#targets[@]} -gt 0 ] || die 'usage: watch-sessions <target>... [--interval S] [--stall N]'
+
+# bash 3.2 has no associative arrays; quiet[i] counts consecutive pending
+# polls for targets[i], and an emptied target marks one already reported.
+quiet=()
+for i in $(seq 0 $((${#targets[@]} - 1))); do quiet[$i]=0; done
+
+report() {
+  jq -nc --arg n "$1" --arg p "$2" --arg v "$3" \
+    '{name: $n, pane: $p, verdict: $v}'
+}
+
+left=${#targets[@]}
+while [ "$left" -gt 0 ]; do
+  for i in $(seq 0 $((${#targets[@]} - 1))); do
+    t=${targets[$i]}
+    [ -n "$t" ] || continue
+
+    row=$(agent_row "$t")
+    if [ -z "$row" ]; then
+      report "$t" "" gone
+      targets[$i]= ; left=$((left - 1))
+      continue
+    fi
+
+    pane=$(printf '%s' "$row" | jq -r '.pane_id')
+    name=$(printf '%s' "$row" | jq -r '.name // ""')
+    v=$(session_verdict "$pane" "$name" \
+          "$(printf '%s' "$row" | jq -r '.agent_status')")
+
+    case $v in
+      done|blocked)
+        report "$t" "$pane" "$v"
+        targets[$i]= ; left=$((left - 1)) ;;
+      pending)
+        quiet[$i]=$((${quiet[$i]} + 1))
+        if [ "${quiet[$i]}" -ge "$stall" ]; then
+          report "$t" "$pane" pending
+          targets[$i]= ; left=$((left - 1))
+        fi ;;
+      *)
+        quiet[$i]=0 ;;
+    esac
+  done
+  if [ "$left" -gt 0 ]; then sleep "$interval"; fi
+done
+exit 0
