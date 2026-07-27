@@ -46,3 +46,41 @@ pane_of() {
     esac
   fi
 }
+
+# session_verdict <pane> <name> <status> -> empty | done | pending | <status>
+#
+# Whether a session is free to claim or retire. Status alone cannot say:
+# herdr reports a quiet pane as idle, and a pane goes quiet whenever the
+# session pauses mid-turn, so only working, blocked and unknown are trusted
+# as-is and reported unread. The rest is read off the screen by two markers.
+# The assistant bullet says the session produced output, and a prompt line
+# carrying anything but a slash command says it was given work; both absent
+# is empty. The DONE sentinel counts only when no later prompt line reopened
+# the session, and an unnamed session carries no sentinel to match. Splitting
+# on a marker avoids assuming its byte width, and a read that comes back with
+# nothing is a failed read, not an empty session.
+session_verdict() {
+  case $3 in
+    idle|done) ;;
+    *) printf '%s\n' "$3"; return ;;
+  esac
+  herdr pane read "$1" --source recent-unwrapped --lines "${SESSION_READ_LINES:-200}" |
+    awk -v name="$2" '
+      BEGIN { sentinel = (name == "" ? "" : "DONE " name) }
+      { seen = NR }
+      index($0, "\342\217\272") { output = 1 }                   # the assistant bullet
+      sentinel != "" && index($0, sentinel) { done_at = NR }
+      {
+        if (index($0, "\342\235\257")) {                         # the prompt marker
+          n = split($0, part, "\342\235\257")
+          rest = part[n]; gsub(/[[:space:]]/, "", rest)
+          if (rest != "" && substr(rest, 1, 1) != "/") input_at = NR
+        }
+      }
+      END {
+        if (!seen)                                  print "unknown"
+        else if (done_at > 0 && done_at > input_at) print "done"
+        else if (!output && !input_at)              print "empty"
+        else                                        print "pending"
+      }'
+}

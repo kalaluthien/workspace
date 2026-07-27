@@ -13,8 +13,10 @@ it does not do the delegated work itself. All scripts live in
 1. Route the request to repository entries with the workspace catalogue
    (`~/workspace/.claude/CLAUDE.md`).
 2. `scripts/check-sessions <repo>` — live sessions with name-encoded
-   model/effort, status, and tab capacity. Reuse an idle session whose name
-   matches the needed model and effort; otherwise
+   model/effort, status, verdict, and tab capacity. Reuse a session whose name
+   matches the needed model and effort and whose verdict is `empty` or `done`;
+   the verdict decides, not the status, because a session that pauses mid-turn
+   reports idle and claiming it would clear work still running. Otherwise
    `scripts/launch-session <repo> --model <m> --effort <e>` (capacity: a tab
    never exceeds 4 panes; sub-agent models per the global preference — Opus
    medium for search/coding/scripts, Opus high for planning; Fable only when

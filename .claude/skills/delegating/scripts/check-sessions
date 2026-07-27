@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Report the delegable sessions for one repository (or all of ~/workspace):
-# every agent pane with its name-encoded model/effort and status, plus each
-# tab's remaining pane capacity. The orchestrator reads this to decide reuse
-# (idle + matching name) versus launch (a tab with capacity, or a new tab).
+# every agent pane with its name-encoded model/effort, status and verdict,
+# plus each tab's remaining pane capacity. The orchestrator reads this to
+# decide reuse (a free verdict + matching name) versus launch (a tab with
+# capacity, or a new tab). A session is free to claim when its verdict is
+# empty or done; see session_verdict in _lib.sh for why status is not enough.
 #
 # Usage: check-sessions [<repo>]
 # Output: one JSON object -> {repo, workspace_id, agents: [...], tabs: [...]}
@@ -27,6 +29,19 @@ scan() {
                   then {model: (.name | capture("-(?<x>" + $m + ")-") .x),
                         effort: (.name | capture("-(?<x>" + $e + ")(-[0-9]+)?$") .x)}
                   else {model: null, effort: null} end)]')
+    # Reuse follows the verdict, not the status: a session that pauses
+    # mid-turn reports idle, and claiming it clears work still running.
+    local merged='[]' row v
+    while IFS= read -r row; do
+      [ -n "$row" ] || continue
+      v=$(session_verdict \
+            "$(printf '%s' "$row" | jq -r '.pane')" \
+            "$(printf '%s' "$row" | jq -r '.name // ""')" \
+            "$(printf '%s' "$row" | jq -r '.status')")
+      merged=$(printf '%s' "$merged" |
+        jq -c --argjson a "$row" --arg v "$v" '. + [$a + {verdict: $v}]')
+    done <<< "$(printf '%s' "$agents" | jq -c '.[]')"
+    agents=$merged
     tabs=$(herdr tab list --workspace "$ws" |
       jq -c '[.result.tabs[] | {tab: .tab_id, panes: .pane_count, free: (4 - .pane_count)}]')
   fi

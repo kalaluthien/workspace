@@ -18,48 +18,15 @@
 source "$(dirname "$0")/_lib.sh"
 require_herdr
 
-repo_arg= close=false lines=200
+repo_arg= close=false
 while [ $# -gt 0 ]; do
   case $1 in
     --close) close=true; shift ;;
-    --lines) lines=${2:?}; shift 2 ;;
+    --lines) SESSION_READ_LINES=${2:?}; shift 2 ;;
     -*)      die "unknown option: $1" ;;
     *)       repo_arg=$1; shift ;;
   esac
 done
-
-# verdict <pane> <name> -> empty | done | pending | unknown
-#
-# The pane text is the only evidence: the agent record carries a status, never
-# a turn count. Two markers carry the classification — the assistant bullet
-# says the session produced output, and a prompt line carrying anything but a
-# slash command says it was given work. Both must be absent for empty, because
-# herdr reports a quiet pane as idle and a session thinking through its first
-# turn has the prompt and no bullet yet. The sentinel counts only when no later
-# prompt line reopened the session, and an unnamed session carries no sentinel
-# to match. Splitting on a marker avoids assuming its byte width, and a read
-# that comes back with nothing is a failed read, not an empty session.
-verdict() {
-  herdr pane read "$1" --source recent-unwrapped --lines "$lines" |
-    awk -v name="$2" '
-      BEGIN { sentinel = (name == "" ? "" : "DONE " name) }
-      { seen = NR }
-      index($0, "\342\217\272") { output = 1 }                   # the assistant bullet
-      sentinel != "" && index($0, sentinel) { done_at = NR }
-      {
-        if (index($0, "\342\235\257")) {                         # the prompt marker
-          n = split($0, part, "\342\235\257")
-          rest = part[n]; gsub(/[[:space:]]/, "", rest)
-          if (rest != "" && substr(rest, 1, 1) != "/") input_at = NR
-        }
-      }
-      END {
-        if (!seen)                                  print "unknown"
-        else if (!output && !input_at)              print "empty"
-        else if (done_at > 0 && done_at > input_at) print "done"
-        else                                        print "pending"
-      }'
-}
 
 sweep() {
   local path=$1 label rows
@@ -77,14 +44,7 @@ sweep() {
     status=$(printf '%s' "$row" | jq -r '.status')
     [ "$pane" = "${HERDR_PANE_ID:-}" ] && continue
 
-    # herdr reports idle|working|blocked|done|unknown. Only a quiet pane is
-    # worth reading: working is mid-turn, blocked is holding a permission
-    # prompt, and unknown means the detector could not tell — none of them may
-    # be closed on the strength of what the screen happens to show.
-    case $status in
-      idle|done) v=$(verdict "$pane" "$name") ;;
-      *)         v=$status ;;
-    esac
+    v=$(session_verdict "$pane" "$name" "$status")
 
     closed=false
     if $close && { [ "$v" = empty ] || [ "$v" = done ]; }; then

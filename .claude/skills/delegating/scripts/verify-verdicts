@@ -56,6 +56,15 @@ fixture finished done <<'EOF'
 ❯
 EOF
 
+# The read window holds only the tail of a long session: the sentinel is in
+# it, but the bullet and the prompt that produced it have scrolled away.
+fixture scrolled done <<'EOF'
+  DONE repo-opus-high
+
+✻ Churned for 4m 58s
+❯
+EOF
+
 fixture reopened pending <<'EOF'
 ❯ Index the docs as numbered chapters.
 ⏺ Merged, worktree removed.
