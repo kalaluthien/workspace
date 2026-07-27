@@ -5,7 +5,8 @@
 #
 # Usage: name-session make <repo> <model> <effort>   -> prints a free name
 #        name-session parse <name>                   -> prints {repo,model,effort,index}
-# Models: fable|opus|sonnet|haiku   Efforts: low|med|high|xhigh
+# Models: fable|opus|sonnet|haiku   Efforts: low|medium|high|xhigh
+# Names abbreviate medium to med; make accepts either spelling.
 source "$(dirname "$0")/_lib.sh"
 
 MODELS='fable|opus|sonnet|haiku'
@@ -16,6 +17,8 @@ case $mode in
   make)
     repo=$(basename "$(repo_path "${1:?make needs <repo>}")")
     model=${2:?make needs <model>}; effort=${3:?make needs <effort>}
+    # The official keyword is "medium"; names carry the abbreviation.
+    [ "$effort" = medium ] && effort=med
     printf '%s' "$model" | grep -Eqx "$MODELS" || die "unknown model: $model"
     printf '%s' "$effort" | grep -Eqx "$EFFORTS" || die "unknown effort: $effort"
     suffix="-$model-$effort"

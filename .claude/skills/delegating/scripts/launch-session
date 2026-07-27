@@ -4,7 +4,7 @@
 # panes; a full workspace gets a new tab). Blocks until the session is idle.
 #
 # Usage: launch-session <repo> --model <fable|opus|sonnet|haiku>
-#                       --effort <low|med|high|xhigh>
+#                       --effort <low|medium|high|xhigh>  (med also accepted)
 #                       [--name NAME] [-- <extra claude args...>]
 # Output: {"name":..., "pane":..., "tab":..., "workspace":...}
 source "$(dirname "$0")/_lib.sh"
