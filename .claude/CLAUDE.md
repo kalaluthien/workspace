@@ -12,6 +12,7 @@ Route by intent, then read that entry's own documents first — everything about
 | `notes/` | research, surveys, study notes, wiki curation, blog writing or publishing, Obsidian | `.claude/CLAUDE.md` |
 | `camera/` | the Android camera app: features, bugs, specs, releases, APK install, emulator tests | `.claude/CLAUDE.md`, then `docs/README.md` |
 | `mabinogi-mobile-automation/` | the 마비노기 모바일 game window: park, show, screenshot, start, quit | `.claude/CLAUDE.md` |
+| `claude-memory-viewer/` | the memory-observer web app: its views, server, host bridge, ticket flow, container, tailscale exposure | `.claude/CLAUDE.md`, then `docs/INDEX.md` |
 | `kalaluthien.github.io/` | site theme, Jekyll config, deployment — content itself is synced from `notes/`, edit it there | `_config.yml` |
 | `scripts/` | workspace-level herdr tooling (`herdr-survey`, `herdr-spawn-claude`) | script headers |
 
