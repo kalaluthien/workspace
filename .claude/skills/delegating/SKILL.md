@@ -75,6 +75,11 @@ it does not do the delegated work itself. All scripts live in
    which. Report the pending ones and let the user decide. Run it dry first
    when the sweep covers sessions whose output has not been collected yet —
    closing a `done` session discards the report behind it.
+   `--shells` widens the same sweep to panes holding no session at all. A bare
+   shell reads as `shell` when its foreground process group is the shell
+   itself and `shell-busy` while a command holds it, and only the idle ones
+   close. Empty tabs and workspaces need no step of their own — herdr retires
+   a tab when its last pane closes, and a workspace when its last tab does.
    `scripts/verify-verdicts` checks the classifier against captured screens;
    run it when a session is misclassified, since the agent's screen markers
    are the only evidence it has.

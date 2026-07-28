@@ -7,24 +7,37 @@
 # entries, so sessions in the container root are out of reach, and the calling
 # pane ($HERDR_PANE_ID) is skipped so a sweep cannot close itself.
 #
-# Usage: sweep-sessions [<repo>] [--close] [--lines N]
+# --shells adds the panes holding no session at all: a bare shell left behind
+# after its work, anywhere under the workspace root including the container
+# root. A shell is idle when its foreground process group is the shell itself,
+# and running something otherwise; only the idle one is retired. The scope is
+# opt-in because a shell is not a delegated session and the default sweep
+# answers a question about sessions. The focused pane is skipped for the same
+# reason the calling pane is.
+#
+# A tab needs no handling: herdr retires one when its last pane closes, and a
+# workspace when its last tab does.
+#
+# Usage: sweep-sessions [<repo>] [--close] [--shells] [--lines N]
 # Output: one JSON object per session, one per line ->
 #         {repo, name, pane, verdict, closed}
 # Verdicts: empty | done | pending, for a quiet pane, plus the herdr status
-#           (working | blocked | unknown) for a pane not worth reading.
-#           --close acts on empty and done. A pending session is waiting on an
-#           answer or finished without a sentinel, so its fate is a judgement
-#           this script does not make.
+#           (working | blocked | unknown) for a pane not worth reading, plus
+#           shell and shell-busy under --shells.
+#           --close acts on empty, done, and shell. A pending session is
+#           waiting on an answer or finished without a sentinel, so its fate is
+#           a judgement this script does not make.
 source "$(dirname "$0")/_lib.sh"
 require_herdr
 
-repo_arg= close=false
+repo_arg= close=false shells=false
 while [ $# -gt 0 ]; do
   case $1 in
-    --close) close=true; shift ;;
-    --lines) SESSION_READ_LINES=${2:?}; shift 2 ;;
-    -*)      die "unknown option: $1" ;;
-    *)       repo_arg=$1; shift ;;
+    --close)  close=true; shift ;;
+    --shells) shells=true; shift ;;
+    --lines)  SESSION_READ_LINES=${2:?}; shift 2 ;;
+    -*)       die "unknown option: $1" ;;
+    *)        repo_arg=$1; shift ;;
   esac
 done
 
@@ -58,10 +71,47 @@ sweep() {
   done <<< "$rows"
 }
 
+# A pane with no agent holds a shell. Its repo label is the entry its cwd sits
+# in, and the container root labels as itself, so a stray shell is reported
+# where it lives rather than filed under the nearest repository.
+sweep_shells() {
+  local root=$1 rows row pane cwd label v closed
+  rows=$(herdr pane list | jq -c --arg root "$root" '
+    .result.panes[]
+    | select(.agent == null)
+    | select(.focused != true)
+    | select(.cwd == $root or (.cwd | startswith($root + "/")))
+    | {pane: .pane_id, cwd: .cwd}')
+
+  while IFS= read -r row; do
+    [ -n "$row" ] || continue
+    pane=$(printf '%s' "$row" | jq -r '.pane')
+    cwd=$(printf '%s' "$row" | jq -r '.cwd')
+    [ "$pane" = "${HERDR_PANE_ID:-}" ] && continue
+
+    label=${cwd#"$WORKSPACE_ROOT"/}
+    label=${label%%/*}
+    [ "$cwd" = "$WORKSPACE_ROOT" ] && label=$(basename "$WORKSPACE_ROOT")
+
+    v=$(shell_verdict "$pane")
+
+    closed=false
+    if $close && [ "$v" = shell ]; then
+      herdr pane close "$pane" >/dev/null
+      closed=true
+    fi
+    jq -nc --arg repo "$label" --arg pane "$pane" --arg v "$v" \
+      --argjson closed "$closed" \
+      '{repo: $repo, name: null, pane: $pane, verdict: $v, closed: $closed}'
+  done <<< "$rows"
+}
+
 if [ -n "$repo_arg" ]; then
   sweep "$(repo_path "$repo_arg")"
+  if $shells; then sweep_shells "$(repo_path "$repo_arg")"; fi
 else
   for p in "$WORKSPACE_ROOT"/*/; do
     if [ -d "$p/.git" ]; then sweep "${p%/}"; fi
   done
+  if $shells; then sweep_shells "$WORKSPACE_ROOT"; fi
 fi

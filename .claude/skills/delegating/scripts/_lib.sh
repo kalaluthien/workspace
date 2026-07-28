@@ -88,6 +88,21 @@ pane_of() {
   fi
 }
 
+# shell_verdict <pane> -> shell | shell-busy
+#
+# Whether a pane holding no session is safe to retire. A shell that sits at its
+# prompt is its own foreground process group; anything it launched takes that
+# group over, so the two ids differ for exactly as long as the command runs.
+# Idle is claimed only when both ids are present and equal, so a pane that
+# cannot be read reports busy and survives the sweep.
+shell_verdict() {
+  herdr pane process-info --pane "$1" |
+    jq -r '.result.process_info
+           | if (.shell_pid != null and .foreground_process_group_id != null
+                 and .shell_pid == .foreground_process_group_id)
+             then "shell" else "shell-busy" end' 2>/dev/null || printf 'shell-busy\n'
+}
+
 # session_verdict <pane> <name> <status> -> empty | done | pending | <status>
 #
 # Whether a session is free to claim or retire. Status alone cannot say:
