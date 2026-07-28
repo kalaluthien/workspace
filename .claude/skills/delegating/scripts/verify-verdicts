@@ -52,7 +52,7 @@ fixture finished done <<'EOF'
 ❯ Index the docs as numbered chapters.
 ⏺ Merged, pushed, worktree removed.
 
-  DONE repo-opus-high
+  DONE curate-doc-chapters
 ❯
 EOF
 
@@ -68,7 +68,7 @@ EOF
 # The read window holds only the tail of a long session: the sentinel is in
 # it, but the bullet and the prompt that produced it have scrolled away.
 fixture scrolled done <<'EOF'
-  DONE repo-opus-high
+  DONE curate-doc-chapters
 
 ✻ Churned for 4m 58s
 ❯
@@ -78,7 +78,7 @@ fixture reopened pending <<'EOF'
 ❯ Index the docs as numbered chapters.
 ⏺ Merged, worktree removed.
 
-  DONE repo-opus-high
+  DONE curate-doc-chapters
 ❯ push.
 ⏺ Pushed to main.
 ❯
@@ -96,11 +96,11 @@ EOF
 } > "$tmp/bin/herdr"
 chmod +x "$tmp/bin/herdr"
 
-# One agent per fixture, all named repo-opus-high so the sentinel case matches.
+# One agent per fixture, all named curate-doc-chapters so the sentinel matches.
 awk '{print $1}' "$tmp/cases" |
   jq -R -s --arg cwd "$tmp/root/repo" '
     {result: {agents: [split("\n")[] | select(. != "")
-      | {name: "repo-opus-high", pane_id: ., cwd: $cwd, agent_status: "idle"}]}}' \
+      | {name: "curate-doc-chapters", pane_id: ., cwd: $cwd, agent_status: "idle"}]}}' \
   > "$tmp/agents.json"
 
 got=$(PATH="$tmp/bin:$PATH" WORKSPACE_ROOT="$tmp/root" HERDR_ENV=1 \

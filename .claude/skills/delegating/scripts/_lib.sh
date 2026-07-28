@@ -17,6 +17,47 @@ repo_path() {
   esac
 }
 
+# role_of <name> -> the role prefix of a session name
+role_of() { printf '%s\n' "${1%%-*}"; }
+
+# role_launch <role> -> "<model> <effort>"
+#
+# The role decides the model, so the name never has to carry it. The mapping is
+# the global sub-agent preference: search, coding and script runs get Opus
+# medium; planning and other knowledge work Opus high; a delegate that must
+# orchestrate its own sub-agents gets Fable. An unlisted role reads as ordinary
+# work and gets the medium default — launch-session prints what it picked, so a
+# mistyped role shows up in the launch output instead of in the bill.
+role_launch() {
+  case $1 in
+    plan|curate) printf 'opus high\n' ;;
+    drive)       printf 'fable high\n' ;;
+    *)           printf 'opus medium\n' ;;
+  esac
+}
+
+# free_name <requested> -> a herdr-legal agent name no live session holds
+#
+# Session names read <role>-<task>, so the request must carry both. herdr
+# requires [a-z][a-z0-9_-]{0,31} and uniqueness across the server, so the
+# request is folded to lower-case kebab, cut to leave room for a "-NN" suffix,
+# and disambiguated against the live roster.
+free_name() {
+  local base name n taken
+  base=$(printf '%s' "$1" | tr 'A-Z' 'a-z' |
+    sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//' | cut -c1-29)
+  case $base in
+    [a-z]*-?*) ;;
+    *) die "a session name must read <role>-<task> and start with a letter: '$1'" ;;
+  esac
+  taken=$(herdr agent list | jq -r '.result.agents[].name // empty')
+  name=$base; n=2
+  while printf '%s\n' "$taken" | grep -qx "$name"; do
+    name="$base-$n"; n=$((n + 1))
+  done
+  printf '%s\n' "$name"
+}
+
 # workspace_id_for_label <label> -> workspace id or empty
 workspace_id_for_label() {
   herdr workspace list |

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Report the delegable sessions for one repository (or all of ~/workspace):
-# every agent pane with its name-encoded model/effort, status and verdict,
-# plus each tab's remaining pane capacity. The orchestrator reads this to
-# decide reuse (a free verdict + matching name) versus launch (a tab with
+# every agent pane with its name, role, status and verdict, plus each tab's
+# remaining pane capacity. The orchestrator reads this to decide reuse (a free
+# verdict, and a role whose model suits the new task) versus launch (a tab with
 # capacity, or a new tab). A session is free to claim when its verdict is
 # empty or done; see session_verdict in _lib.sh for why status is not enough.
 #
@@ -22,13 +22,11 @@ scan() {
       [.result.agents[]
        | select(.cwd == $path or (.cwd | startswith($path + "/")))
        | {name, agent, status: .agent_status, pane: .pane_id}]')
-    # Names encode model/effort; a null name means an unmanaged session.
-    agents=$(printf '%s' "$agents" | jq -c --arg m 'fable|opus|sonnet|haiku' \
-      --arg e 'low|med|high|xhigh' '
-      [.[] | . + (if (.name // "") | test("-(" + $m + ")-(" + $e + ")(-[0-9]+)?$")
-                  then {model: (.name | capture("-(?<x>" + $m + ")-") .x),
-                        effort: (.name | capture("-(?<x>" + $e + ")(-[0-9]+)?$") .x)}
-                  else {model: null, effort: null} end)]')
+    # A name reads <role>-<task>; the role says what the pane was launched for
+    # and therefore which model it runs. A null name means an unmanaged session.
+    agents=$(printf '%s' "$agents" | jq -c '
+      [.[] | . + {role: (if (.name // "") | test("^[a-z]+-.")
+                         then (.name | split("-")[0]) else null end)}]')
     # Reuse follows the verdict, not the status: a session that pauses
     # mid-turn reports idle, and claiming it clears work still running.
     local merged='[]' row v

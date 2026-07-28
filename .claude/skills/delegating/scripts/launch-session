@@ -3,29 +3,42 @@
 # herdr workspace and the first tab with capacity (a tab never exceeds 4
 # panes; a full workspace gets a new tab). Blocks until the session is idle.
 #
-# Usage: launch-session <repo> --model <fable|opus|sonnet|haiku>
-#                       --effort <low|medium|high|xhigh>  (med also accepted)
-#                       [--name NAME] [-- <extra claude args...>]
-# Output: {"name":..., "pane":..., "tab":..., "workspace":...}
+# The name says what the session is for — <role>-<task>, for example
+# survey-tflite-detectors or build-preview-crash — and the role picks the model
+# and effort (see role_launch in _lib.sh). Pass --model or --effort only to
+# override that mapping for one session.
+#
+# Usage: launch-session <repo> <role>-<task>
+#                       [--model fable|opus|sonnet|haiku]
+#                       [--effort low|medium|high|xhigh]
+#                       [-- <extra claude args...>]
+# Output: {"name":..., "role":..., "model":..., "effort":...,
+#          "pane":..., "tab":..., "workspace":...}
 source "$(dirname "$0")/_lib.sh"
 require_herdr
 
-repo_arg=${1:?usage: launch-session <repo> --model M --effort E}; shift
-model= effort= name= extra=()
+repo_arg=${1:?usage: launch-session <repo> <role>-<task>}
+want=${2:?usage: launch-session <repo> <role>-<task>}
+shift 2
+model= effort= extra=()
 while [ $# -gt 0 ]; do
   case $1 in
     --model)  model=${2:?}; shift 2 ;;
     --effort) effort=${2:?}; shift 2 ;;
-    --name)   name=${2:?}; shift 2 ;;
     --)       shift; extra=("$@"); break ;;
     *)        die "unknown option: $1" ;;
   esac
 done
-[ -n "$model" ] && [ -n "$effort" ] || die '--model and --effort are required'
 
 path=$(repo_path "$repo_arg")
 [ -d "$path" ] || die "no such directory: $path"
 label=$(basename "$path")
+
+name=$(free_name "$want")
+role=$(role_of "$name")
+read -r role_model role_effort <<< "$(role_launch "$role")"
+[ -n "$model" ] || model=$role_model
+[ -n "$effort" ] || effort=$role_effort
 
 ws=$(workspace_id_for_label "$label")
 if [ -z "$ws" ]; then
@@ -42,15 +55,10 @@ if [ -z "$tab" ]; then
   [ -n "$tab" ] || die "could not create a tab in $ws"
 fi
 
-[ -n "$name" ] || name=$("$(dirname "$0")/name-session" make "$path" "$model" "$effort")
-
-# claude's effort flag takes the full word; session names abbreviate medium.
-effort_flag=$effort; [ "$effort" = med ] && effort_flag=medium
-
 started=$(herdr agent start "$name" \
   --cwd "$path" --workspace "$ws" --tab "$tab" \
   --split down --no-focus \
-  -- claude --model "$model" --effort "$effort_flag" \
+  -- claude --model "$model" --effort "$effort" \
      ${extra[@]+"${extra[@]}"})
 pane=$(printf '%s' "$started" | jq -r '.result.agent.pane_id')
 [ -n "$pane" ] && [ "$pane" != null ] || die "agent start failed: $started"
@@ -58,5 +66,7 @@ pane=$(printf '%s' "$started" | jq -r '.result.agent.pane_id')
 herdr wait agent-status "$pane" --status idle --timeout 90000 >/dev/null ||
   die "session $name ($pane) did not become idle in 90s"
 
-jq -nc --arg n "$name" --arg p "$pane" --arg t "$tab" --arg w "$ws" \
-  '{name: $n, pane: $p, tab: $t, workspace: $w}'
+jq -nc --arg n "$name" --arg r "$role" --arg m "$model" --arg e "$effort" \
+  --arg p "$pane" --arg t "$tab" --arg w "$ws" \
+  '{name: $n, role: $r, model: $m, effort: $e,
+    pane: $p, tab: $t, workspace: $w}'

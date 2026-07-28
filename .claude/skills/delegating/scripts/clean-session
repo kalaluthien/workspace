@@ -1,37 +1,57 @@
 #!/usr/bin/env bash
 # Reset or retire a delegated session. Default resets the claude session with
 # /clear (pane survives for reuse). Reset when claiming a session for new work,
-# not when finishing the old — see SKILL.md step 2. --close removes the pane —
-# allowed only for sessions this skill launched (convention-named agents);
-# closing anything else needs --force and an explicit user request.
+# not when finishing the old — see SKILL.md step 3. --rename belongs to the same
+# claim: a pane named for the task it just finished lies about the task it is
+# about to run, so a reused pane is renamed as it is cleared. The new name must
+# keep the old role. A role names the model and effort the pane runs, the pane
+# keeps what `claude` started with, and a claim does not drive claude's own
+# `/model` and `/effort` switches — so a task in another role needs its own pane.
+# --close removes the pane — allowed only for sessions this skill launched (a
+# herdr agent name exists only where a script started one); closing anything
+# else needs --force and an explicit user request.
 #
-# Usage: clean-session <target> [--close [--force]]
+# Usage: clean-session <target> [--rename <role>-<task>] [--close [--force]]
 source "$(dirname "$0")/_lib.sh"
 require_herdr
 
-target=${1:?usage: clean-session <target> [--close [--force]]}; shift
-close=false force=false
+target=${1:?usage: clean-session <target> [--rename <role>-<task>] [--close]}; shift
+close=false force=false rename=
 while [ $# -gt 0 ]; do
   case $1 in
-    --close) close=true; shift ;;
-    --force) force=true; shift ;;
-    *)       die "unknown option: $1" ;;
+    --close)  close=true; shift ;;
+    --force)  force=true; shift ;;
+    --rename) rename=${2:?}; shift 2 ;;
+    *)        die "unknown option: $1" ;;
   esac
 done
 
 pane=$(pane_of "$target")
 if $close; then
+  [ -n "$rename" ] && die '--rename and --close are opposite ends of a claim'
   name=$(agent_row "$target" | jq -r '.name // empty')
-  parsed=$("$(dirname "$0")/name-session" parse "${name:-none}" |
-    jq -r '.model // empty')
-  if [ -z "$parsed" ] && ! $force; then
-    die "'$target' is not a convention-named session; refuse to close without --force"
+  if [ -z "$name" ] && ! $force; then
+    die "'$target' is not a named session; refuse to close without --force"
   fi
   herdr pane close "$pane" >/dev/null
   jq -nc --arg p "$pane" '{closed: $p}'
 else
+  # Settle the new name before clearing: a rename refused after the /clear
+  # would leave an emptied pane still answering to the finished task's name.
+  name=
+  if [ -n "$rename" ]; then
+    was=$(agent_row "$target" | jq -r '.name // empty')
+    [ -n "$was" ] || die "'$target' has no name to rename; launch a session"
+    name=$(free_name "$rename")
+    old_role=$(role_of "$was") new_role=$(role_of "$name")
+    [ "$old_role" = "$new_role" ] ||
+      die "a $old_role pane cannot take $new_role work: it keeps its launch model"
+  fi
+
   herdr pane send-text "$pane" "/clear"
   sleep 1
   herdr pane send-keys "$pane" Enter
-  jq -nc --arg p "$pane" '{cleared: $p}'
+  [ -n "$name" ] && herdr agent rename "$pane" "$name" >/dev/null
+  jq -nc --arg p "$pane" --arg n "$name" \
+    '{cleared: $p, name: (if $n == "" then null else $n end)}'
 fi

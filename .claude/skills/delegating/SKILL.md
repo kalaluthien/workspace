@@ -12,23 +12,40 @@ it does not do the delegated work itself. All scripts live in
 ## Decision loop
 1. Route the request to repository entries with the workspace catalogue
    (`~/workspace/.claude/CLAUDE.md`).
-2. `scripts/check-sessions <repo>` — live sessions with name-encoded
-   model/effort, status, verdict, and tab capacity. Reuse a session whose name
-   matches the needed model and effort and whose verdict is `empty` or `done`;
-   the verdict decides, not the status, because a session that pauses mid-turn
-   reports idle and claiming it would clear work still running. Otherwise
-   `scripts/launch-session <repo> --model <m> --effort <e>` (capacity: a tab
-   never exceeds 4 panes; sub-agent models per the global preference — Opus
-   medium for search/coding/scripts, Opus high for planning; Fable only when
-   the delegate must itself orchestrate).
-   Clear a reused session here, before sending: `scripts/clean-session <name>`
-   resets it to a known-empty context, and a session found idle carries
-   whatever the last delegation left in it. A session launched in this step is
-   already empty and needs no clear.
-3. `scripts/send-prompt <name> [--worktree]` — the script appends what the
+2. Name the session for the work, `<role>-<task>` — `survey-tflite-detectors`,
+   `build-preview-crash`, `plan-camera-v3`. The name is the routing key for
+   every later step, so it must say what the pane is for; a reader of
+   `herdr agent list` learns the repository from the pane's `cwd` and the model
+   from the role, and neither belongs in the name. The role is one of five, and
+   it decides the model, per the global sub-agent preference:
+
+   | role | the work | launched as |
+   | --- | --- | --- |
+   | `survey` | web research, reading, search | Opus medium |
+   | `build` | implementation, fixes, script runs | Opus medium |
+   | `plan` | design and planning | Opus high |
+   | `curate` | organizing knowledge already gathered | Opus high |
+   | `drive` | a delegate that orchestrates its own sub-agents | Fable high |
+
+3. `scripts/check-sessions <repo>` — live sessions with name, role, status,
+   verdict, and tab capacity. Reuse a session of the role the new task needs
+   whose verdict is `empty` or `done`; the verdict decides, not the status,
+   because a session that pauses mid-turn reports idle and claiming it would
+   clear work still running. Otherwise
+   `scripts/launch-session <repo> <role>-<task>` (capacity: a tab never exceeds
+   4 panes; `--model`/`--effort` override the role's mapping for one session).
+   Claim a reused session here, before sending:
+   `scripts/clean-session <name> --rename <role>-<task>` resets it to a
+   known-empty context and renames the pane for the new task, because a session
+   found idle carries both the last delegation's context and its name. The role
+   has to stay the same — the pane keeps the model and effort `claude` started
+   with, and a claim does not switch them — so a task in another role is a new
+   session, however free the pane looks. A session launched in this step arrives
+   clean and correctly named.
+4. `scripts/send-prompt <name> [--worktree]` — the script appends what the
    session cannot see: sibling-session collision warnings, the worktree
    convention, and a `DONE <name>` completion sentinel.
-4. Wait with the harness, not with the turn. `scripts/watch-sessions <name>...`
+5. Wait with the harness, not with the turn. `scripts/watch-sessions <name>...`
    prints one line per session the moment it stops needing the orchestrator —
    `done` on its sentinel, `blocked` on a permission prompt, `gone` on a
    closed pane, `pending` when it goes quiet without finishing — and exits
@@ -45,12 +62,12 @@ it does not do the delegated work itself. All scripts live in
    blocking wait that also prints the pane tail.
    A `pending` or `blocked` session gets `scripts/read-session` and one
    re-request before escalating to the user.
-5. Report outcomes and ask the session to clean its repository (commit, remove
+6. Report outcomes and ask the session to clean its repository (commit, remove
    worktree). Leave its context standing — it is the evidence behind the
-   report, and the next delegation clears it in step 2. Retiring the pane
-   (`scripts/clean-session <name> --close`) is for sessions this skill
+   report, and the next delegation clears and renames it in step 3. Retiring
+   the pane (`scripts/clean-session <name> --close`) is for sessions this skill
    launched, only when the user asks.
-6. When the user asks for a session clean-up, `scripts/sweep-sessions` reads
+7. When the user asks for a session clean-up, `scripts/sweep-sessions` reads
    every pane and prints a verdict: `empty`, `done`, `pending`, or the herdr
    status of a pane too busy to read. Adding `--close` retires the empty and
    done ones and nothing else, because a `pending` session is either waiting
@@ -65,15 +82,20 @@ it does not do the delegated work itself. All scripts live in
 ## Worked example — "add object detection to camera"
 1. Not workspace-level work → this skill. Route: research → `notes`,
    implementation → `camera`.
-2. Launch two Opus-med sessions in `notes` and send both surveys: license-free
-   TFLite detection models; frequent photo subjects. Put both under one
+2. Launch `survey-tflite-detectors` and `survey-photo-subjects` in `notes` and
+   send both surveys: license-free TFLite detection models; frequent photo
+   subjects. The `survey` role puts both on Opus medium. Put them under one
    `Monitor` watch and carry on with other work.
-3. Each survey arrives as its own notification. When the second lands, send a
-   third prompt: curate the wiki from the two survey outputs.
-4. Launch one Fable-high session in `camera`: plan the next version and drive
-   its own subagents for implementation and evaluation (`--worktree`). One
-   session, so watch it with a background `Bash` call.
+3. Each survey arrives as its own notification. A third question goes to a pane
+   already there: `clean-session survey-photo-subjects --rename
+   survey-model-licences` claims it, same role, new task. The write-up is
+   `curate` work and Opus high, so it gets its own pane — `launch-session notes
+   curate-detection-wiki` — with the two survey outputs in its prompt.
+4. Launch `drive-camera-detection` in `camera`: the `drive` role gives it Fable
+   high, so it can plan the next version and drive its own subagents for
+   implementation and evaluation (`--worktree`). One session, so watch it with a
+   background `Bash` call.
 5. Its line arrives as `done`, or as `pending` when it stopped early — then
    read the output and re-request the remainder. Have it clean the repository
    and report the summary. The sessions stay as they are; the next delegation
-   to `notes` or `camera` clears them when it claims them.
+   to `notes` or `camera` clears and renames them when it claims them.
