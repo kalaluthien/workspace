@@ -1,11 +1,27 @@
-# Workspace catalogue
-`~/workspace` is a container: each entry is its own git repository with its own
-context. The container root is itself a whitelist git repository that tracks
-only `.claude/` and `scripts/` (workspace tooling); never run one git command
-across project entries, and never commit an entry's files to the root repo.
+# Workspace layout
+`~/workspace` is a container holding two kinds of directory. The kind decides
+which git repository a change lands in, so identify it before any git command.
 
-Route by intent, then read that entry's own documents first — everything about
-*how* to work in an entry lives in the entry.
+**Workspace-owned directories** belong to the container root — itself a
+whitelist git repository whose `.gitignore` ignores `/*` and re-admits only
+these. A change here is committed to the root repository:
+
+| directory | holds | read first |
+| --- | --- | --- |
+| `.claude/` | workspace instructions, skills, output styles | this file |
+| `docs/` | workspace-level proposals and how-to guides | `docs/README.md` |
+| `scripts/` | workspace-level herdr tooling (`herdr-survey`, `herdr-spawn-claude`) | script headers |
+
+A document request whose topic belongs to no project entry lands in `docs/`,
+as one of its two chapters — never in a project entry it does not fit, and
+never in chat alone. A document about one project entry still belongs in that
+entry's own document store.
+
+**Project entries** are independent git repositories, each with its own
+context, all git-ignored by the root. Never run one git command across
+entries, and never commit an entry's files to the root repository. Route by
+intent, then read that entry's own documents first — everything about *how*
+to work in an entry lives in the entry:
 
 | entry | route here when the request is about | read first |
 | --- | --- | --- |
@@ -14,7 +30,6 @@ Route by intent, then read that entry's own documents first — everything about
 | `mabinogi-mobile-automation/` | the 마비노기 모바일 game window: park, show, screenshot, start, quit | `.claude/CLAUDE.md` |
 | `claude-memory-viewer/` | the memory-observer web app: its views, server, host bridge, ticket flow, container, tailscale exposure | `.claude/CLAUDE.md`, then `docs/INDEX.md` |
 | `kalaluthien.github.io/` | site theme, Jekyll config, deployment — content itself is synced from `notes/`, edit it there | `_config.yml` |
-| `scripts/` | workspace-level herdr tooling (`herdr-survey`, `herdr-spawn-claude`) | script headers |
 
 A request that spans entries (research + implementation, multi-repo work) is an
 orchestration request: load the `/delegating` skill.
