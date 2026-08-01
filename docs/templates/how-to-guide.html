@@ -1,0 +1,150 @@
+<!doctype html>
+<!--
+  Template for a document in the How-to guides chapter (docs/INDEX.md) — one
+  path walked through a procedure at a known commit. Copy to
+  docs/<kebab-title>.html and fill in; update the same file in place on
+  re-render. Delete every comment, including this one.
+
+  Self-contained by rule, and so is this template: inline <style>, no
+  JavaScript, no webfonts, no CDN. The document must open from file:// with no
+  network, forever. The template carries the whole skeleton rather than
+  pointing at a shared one, because an author copies a template exactly once
+  and then owns the result — a shared skeleton is an indirection paid on every
+  read to save a duplication nobody maintains (2026-07-28, owner decision).
+
+  A guide is the concrete record of a workspace procedure. The normative
+  rules live in .claude/CLAUDE.md and the skills, free of transient detail;
+  the guide gives the exact commands, the exact output, and the one path that
+  works today. That is why it is a view: pinned to a commit and expected to
+  go stale. When a guide and the tooling disagree, the guide is stale — fix
+  the guide, or retire it.
+
+  A guide owes no figure. "The diagram is the conclusion" binds the chapters
+  whose subject is a relation; here the conclusion is the goal, and the Goal
+  field carries it before the first step. Add a figure only where a step turns
+  on a spatial relation.
+
+  Write for someone who has the workspace and nothing else. A step that
+  cannot be run as written is a bug in the guide, not a gap in the reader.
+
+  The contract below is the author's checklist: no hook checks it in this
+  repository, so check the document against it before commit.
+
+  required-fields: Category, Goal, Source, Updated, Commit
+  required-sections: Prerequisites, Steps, Acceptance
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><!-- Title --> — workspace</title>
+<style>
+  /* Charter ships with macOS, Georgia everywhere else, so the page needs no
+     font download. Tufte's #fffff8 / #111 instead of pure black-on-white:
+     nearly indistinguishable, without the harsh contrast. */
+  html { font-size: 16px; }
+  body {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 8rem;
+    background: #fffff8;
+    color: #111;
+    font-family: Charter, "Bitstream Charter", Georgia, serif;
+    line-height: 1.62;
+    overflow-wrap: break-word;
+  }
+
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
+  h2 { font-size: 1.3rem; margin: 3rem 0 .5rem; font-weight: 600; }
+  h3 { font-size: 1.02rem; margin: 2rem 0 .3rem; font-weight: 600; }
+  p, li { margin: .7rem 0; }
+  ul, ol { padding-left: 1.2rem; }
+  a { color: inherit; text-decoration-color: #aaa; }
+  strong { font-weight: 600; }
+
+  code, pre, .provenance dd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85em;
+  }
+  /* Wide content scrolls inside itself; the page never scrolls sideways. */
+  pre {
+    overflow-x: auto;
+    background: #f2f2ea;
+    padding: 1rem;
+    line-height: 1.45;
+    margin: 1.4rem 0;
+  }
+
+  table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e2e2d8; }
+  th { font-weight: 600; }
+  /* phone-width table scroll: below the body's own max-width a multi-column
+     table would crush to one word per line (width:100% leaves nothing to
+     overflow, so nothing scrolls). The cell minimum keeps columns readable
+     and pushes the table wide; display:block lets it pan inside its own box. */
+  @media (max-width: 42rem) {
+    table { display: block; overflow-x: auto; }
+    th, td { min-width: 9rem; }
+  }
+
+  /* Header block — the same fields in every view document, plus the one
+     field this chapter adds. */
+  .provenance {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: .15rem 1rem;
+    margin: 0;
+    font-size: .85rem;
+    color: #555;
+  }
+  .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
+  .provenance dd { margin: 0; }
+
+  figure { margin: 2.6rem 0; }
+  figure svg { display: block; width: 100%; height: auto; }
+  figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
+</style>
+</head>
+<body>
+<article>
+
+  <header>
+    <h1><!-- The task, as the reader would ask for it --></h1>
+    <dl class="provenance">
+      <dt>Category</dt> <dd>how-to-guide</dd>
+      <dt>Goal</dt>     <dd><!-- what the reader will have done when the last step passes --></dd>
+      <dt>Source</dt>   <dd>.claude/CLAUDE.md &sect;&lt;section&gt;; code: scripts/&lt;script&gt;</dd>
+      <dt>Updated</dt>  <dd>YYYY-MM-DD</dd><!-- last walked date -->
+      <dt>Commit</dt>   <dd>&lt;short-sha&gt;</dd><!-- the tree the walk was done on -->
+    </dl>
+  </header>
+
+  <section>
+    <h2>Prerequisites</h2>
+    <ul>
+      <!-- What must already be true: tools installed, a device attached, a
+           permission granted. Name the memory or document that gets the reader
+           each one, rather than restating it. -->
+    </ul>
+
+    <h2>Steps</h2>
+    <ol>
+      <li>
+        <!-- One step per item, in full sentences, with the command verbatim in
+             a <pre> and what a working run prints under it. A branch is a
+             labelled sub-item under the step that branches, never a new
+             numbered step. -->
+      </li>
+    </ol>
+
+    <h2>Acceptance</h2>
+    <p>
+      <!-- How the reader knows the goal is met: the observable end state, not
+           "the command succeeded". Name what to do when it is not met, if the
+           answer is not obvious from the step that failed. -->
+    </p>
+  </section>
+
+</article>
+</body>
+</html>

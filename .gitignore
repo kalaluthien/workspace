@@ -5,6 +5,7 @@
 # ...except these
 !/.gitignore
 !/.claude/
+!/docs/
 !/scripts/
 
 # Machine-local Claude state never enters git.
