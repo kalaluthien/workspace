@@ -26,6 +26,14 @@ it carries no state, verdict, or measurement, because updating in place makes
 any of those false; and it names the slice of the workspace it owns, not the
 genre, which the chapter already carries.
 
+The workspace is a control plane over two planes at once — **agents**, held by
+the catalogue and the `delegating` skill, and **services**, the long-running
+things its repositories expose. A slice name alone does not say which one a
+document owns, so every filename carries the plane as a prefix:
+`agent-<slice>.html` or `service-<slice>.html`. The chapter says what kind of
+document it is; the prefix says which half of the control plane it governs, and
+that is the split a reader routes by first.
+
 ## Chapters and templates
 
 | chapter | template | holds |

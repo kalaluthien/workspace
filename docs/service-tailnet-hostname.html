@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Giving a service its own tailnet hostname — workspace</title>
+<style>
+  html { font-size: 16px; }
+  body {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 8rem;
+    background: #fffff8;
+    color: #111;
+    font-family: Charter, "Bitstream Charter", Georgia, serif;
+    line-height: 1.62;
+    overflow-wrap: break-word;
+  }
+
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
+  h2 { font-size: 1.3rem; margin: 3rem 0 .5rem; font-weight: 600; }
+  h3 { font-size: 1.02rem; margin: 2rem 0 .3rem; font-weight: 600; }
+  p, li { margin: .7rem 0; }
+  ul, ol { padding-left: 1.2rem; }
+  a { color: inherit; text-decoration-color: #aaa; }
+  strong { font-weight: 600; }
+
+  code, pre, .provenance dd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85em;
+  }
+  pre {
+    overflow-x: auto;
+    background: #f2f2ea;
+    padding: 1rem;
+    line-height: 1.45;
+    margin: 1.4rem 0;
+  }
+
+  table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e2e2d8; }
+  th { font-weight: 600; }
+  @media (max-width: 42rem) {
+    table { display: block; overflow-x: auto; }
+    th, td { min-width: 9rem; }
+  }
+
+  .provenance {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: .15rem 1rem;
+    margin: 0;
+    font-size: .85rem;
+    color: #555;
+  }
+  .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
+  .provenance dd { margin: 0; }
+
+  figure { margin: 2.6rem 0; }
+  figure svg { display: block; width: 100%; height: auto; }
+  figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
+</style>
+</head>
+<body>
+<article>
+
+  <header>
+    <h1>Giving a service its own tailnet hostname</h1>
+    <dl class="provenance">
+      <dt>Category</dt> <dd>how-to-guide</dd>
+      <dt>Goal</dt>     <dd>A service reachable at <code>https://&lt;name&gt;.&lt;tailnet&gt;.ts.net</code> on its own tailnet node, installable on a phone beside every other service, with no handler left on the machine node.</dd>
+      <dt>Source</dt>   <dd>.claude/CLAUDE.md &sect;Workspace layout; knowledge: <code>notes/wiki/tailscale-in-containers.md</code></dd>
+      <dt>Updated</dt>  <dd>2026-08-02</dd>
+      <dt>Commit</dt>   <dd>0f7190d</dd>
+    </dl>
+  </header>
+
+  <section>
+    <h2>Prerequisites</h2>
+    <ul>
+      <li>colima running with the docker CLI, per the <code>setup-colima</code> memory in the global pool. The sidecar is a container like any other.</li>
+      <li>The service already answering on a host loopback port — for example <code>127.0.0.1:8300</code>. The sidecar publishes an existing port; it does not start the service.</li>
+      <li>MagicDNS and HTTPS certificates enabled for the tailnet, per <code>notes/wiki/tailscale.md</code>. Without them the node hangs on certificate provisioning.</li>
+      <li>A Tailscale auth key that is <strong>reusable and not ephemeral</strong>, saved at <code>~/.config/ts-sidecar/authkey</code> with mode 600. An ephemeral key deletes the device when it goes offline, which destroys the identity the node exists to hold. Only the user creates this; an agent never prints it or puts it on a command line.</li>
+    </ul>
+
+    <h2>Why a node rather than a port</h2>
+    <p>
+      A tailnet node carries exactly one <code>*.ts.net</code> name. There is no
+      alias, MagicDNS accepts no custom record, and <code>tailscale cert</code>
+      is bound to the node's own certificate domains, so a second name always
+      means a second node. Publishing two services as two ports on one node
+      looks equivalent and is not: Android matches an installed web app to a URL
+      by scheme and host and <em>ignores the port</em>, so the app installed
+      first claims the second service's URL, and the browser offers "open the
+      other app" where the install entry belongs. One node per service is what
+      makes both installable.
+    </p>
+
+    <h2>Steps</h2>
+    <ol>
+      <li>
+        <p>Choose the node name — it becomes the hostname, so name it after the
+        service, not after the machine. Write the serve configuration for it,
+        pointing at the loopback port the service already answers on.</p>
+<pre>app=board          # → board.&lt;tailnet&gt;.ts.net
+port=8300          # the service's existing host port
+
+mkdir -p ~/.config/ts-sidecar/$app
+cat &gt; ~/.config/ts-sidecar/$app/serve.json &lt;&lt;JSON
+{
+  "TCP": { "443": { "HTTPS": true } },
+  "Web": {
+    "\${TS_CERT_DOMAIN}:443": {
+      "Handlers": { "/": { "Proxy": "http://host.docker.internal:$port" } }
+    }
+  }
+}
+JSON</pre>
+        <p><code>host.docker.internal</code> reaches a macOS loopback-only bind
+        under colima; <code>--network host</code> would mean the Linux VM and
+        would not. The <code>${TS_CERT_DOMAIN}</code> placeholder is substituted
+        by the container at startup.</p>
+      </li>
+
+      <li>
+        <p>Start the sidecar node.</p>
+<pre>docker run -d --name "ts-$app" --restart unless-stopped \
+  -v "$HOME/.local/state/ts-$app:/var/lib/tailscale" \
+  -v "$HOME/.config/ts-sidecar:/config:ro" \
+  -e TS_AUTHKEY="file:/config/authkey" \
+  -e TS_AUTH_ONCE=true \
+  -e TS_HOSTNAME="$app" \
+  -e TS_STATE_DIR=/var/lib/tailscale \
+  -e TS_SERVE_CONFIG="/config/$app/serve.json" \
+  tailscale/tailscale:stable</pre>
+        <p><strong><code>TS_STATE_DIR</code> is not optional.</strong> Omitting
+        it makes the container pass <code>--state=mem:</code>, which registers
+        the node as ephemeral: the control plane deletes it when it stops, and
+        the replacement can take the name <code>&lt;name&gt;-1</code>
+        permanently. The same directory holds the TLS certificates, so losing it
+        also re-issues from Let's Encrypt on every restart.</p>
+        <p>Two variable names people reach for do not exist:
+        <code>TS_AUTHKEY_FILE</code> and <code>TS_SERVE_PORT</code>. The real
+        mechanisms are the <code>file:</code> prefix on the
+        <code>TS_AUTHKEY</code> value and <code>TS_SERVE_CONFIG</code>. Mount the
+        directory holding <code>serve.json</code>, never the file: the watch is
+        on the directory.</p>
+      </li>
+
+      <li>
+        <p>Verify the node before changing anything else. The first certificate
+        takes up to a minute.</p>
+<pre>docker logs "ts-$app" | tail -20
+tailscale status | grep "$app"
+curl -sI "https://$app.$(tailscale status --json | /usr/bin/python3 -c \
+  'import json,sys; print(json.load(sys.stdin)["Self"]["DNSName"].rstrip(".").split(".", 1)[1])')/" | head -1</pre>
+        <p>A working run prints <code>HTTP/2 200</code> and a status line whose
+        name is exactly the one chosen, with no <code>-1</code> suffix.</p>
+        <ul>
+          <li><strong>400 instead of 200:</strong> the service has its own host
+          allowlist and still accepts only the old name. Move it to the node
+          name and redeploy the service — see "Move the service's own host
+          settings" below.</li>
+          <li><strong>No response at all:</strong> the certificate is still
+          being issued, or the tailnet lacks HTTPS certificates.</li>
+        </ul>
+      </li>
+
+      <li>
+        <p>Move the service's own host settings. Two kinds exist, and both bind
+        a hostname that has just changed.</p>
+        <ul>
+          <li>An <strong>allowlist of accepted Host headers</strong>. Derive it
+          from the node name plus the tailnet suffix, never from the machine
+          node's own FQDN — reading <code>Self.DNSName</code> whole re-pins the
+          retired name and answers 400 to every phone request.</li>
+          <li>An <strong>identity gate</strong>. It keeps working: the proxy now
+          arrives from a container rather than the host loopback, but the tailnet
+          identity of the requesting device still reaches the service. Verified
+          2026-08-02 by sending a message through Collie's phone app across its
+          sidecar with its trusted-user setting unchanged.</li>
+        </ul>
+      </li>
+
+      <li>
+        <p>Retire the old mount on the machine node, one port at a time, and
+        only once the new hostname answers 200.</p>
+<pre>tailscale serve --https=8443 off
+tailscale serve status</pre>
+        <p><strong>Never <code>tailscale serve reset</code></strong> — it removes
+        every handler on the host, including other services'. If a check fails,
+        restore the mount that was just removed and stop.</p>
+      </li>
+
+      <li>
+        <p>Prove the identity survives a restart, which is what the state volume
+        is for.</p>
+<pre>docker restart "ts-$app"
+tailscale status | grep "$app"</pre>
+        <p>The name must come back unchanged. A <code>-1</code> suffix means the
+        state directory is not persisted, and the hostname every installed app
+        was built against has just moved.</p>
+      </li>
+
+      <li>
+        <p>Reinstall the app on the phone from the new URL. An installed web app
+        belongs to its origin, so the old install is a different app and will not
+        follow the move.</p>
+      </li>
+    </ol>
+
+    <h2>Acceptance</h2>
+    <p>
+      Each service answers 200 at its own <code>https://&lt;name&gt;.&lt;tailnet&gt;.ts.net</code>,
+      <code>tailscale serve status</code> on the machine node reports no
+      configuration for them, both nodes keep their names across a container
+      restart, and each app installs from the phone on its own — the outcome a
+      shared hostname made impossible. When one of them 400s after a service
+      redeploy, its host allowlist has fallen back to the machine FQDN; fix the
+      derivation in the service's own launch script rather than by hand, or the
+      next deploy repeats it.
+    </p>
+  </section>
+
+</article>
+</body>
+</html>

@@ -9,7 +9,10 @@ Conventions: `README.md`.
 
 Template: `templates/how-to-guide.html`
 
-(none yet)
+- [`service-tailnet-hostname.html`](service-tailnet-hostname.html) — giving a
+  service its own tailnet node and hostname with a `tailscale/tailscale`
+  sidecar, so several services stay installable as phone apps at once; the
+  state-directory trap, the host-allowlist move, and retiring the old mount.
 
 ## Proposals
 
