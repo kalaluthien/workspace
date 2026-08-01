@@ -16,16 +16,25 @@ it does not do the delegated work itself. All scripts live in
    `build-preview-crash`, `plan-camera-v3`. The name is the routing key for
    every later step, so it must say what the pane is for; a reader of
    `herdr agent list` learns the repository from the pane's `cwd` and the model
-   from the role, and neither belongs in the name. The role is one of five, and
-   it decides the model, per the global sub-agent preference:
+   from the role, and neither belongs in the name. The role is one of five:
 
-   | role | the work | launched as |
-   | --- | --- | --- |
-   | `survey` | web research, reading, search | Opus medium |
-   | `build` | implementation, fixes, script runs | Opus medium |
-   | `plan` | design and planning | Opus high |
-   | `curate` | organizing knowledge already gathered | Opus high |
-   | `drive` | a delegate that orchestrates its own sub-agents | Fable high |
+   | role | the work |
+   | --- | --- |
+   | `survey` | web research, reading, search |
+   | `build` | implementation, fixes, script runs |
+   | `plan` | design and planning |
+   | `curate` | organizing knowledge already gathered |
+   | `drive` | a delegate that orchestrates its own sub-agents |
+
+   Model and effort follow the global preference (`~/.claude/CLAUDE.md`,
+   "Claude Code"): every session launches as Opus, whatever its role, because
+   a session owns decisions — what to try, what to commit — and Fable stays
+   with this orchestrator, never below it. Effort is per task, not per role:
+   it measures breadth. Pass `--effort high` (or `xhigh`) when the task spans
+   many exceptional cases or a large state space; keep the default `medium`
+   (or drop to `low`) when the scope is narrow. Subagents a session spawns
+   follow the same preference — Opus where they decide, Sonnet where they
+   search, classify, or summarize.
 
 3. `scripts/check-sessions <repo>` — live sessions with name, role, status,
    verdict, and tab capacity. Reuse a session of the role the new task needs
@@ -33,18 +42,24 @@ it does not do the delegated work itself. All scripts live in
    because a session that pauses mid-turn reports idle and claiming it would
    clear work still running. Otherwise
    `scripts/launch-session <repo> <role>-<task>` (capacity: a tab never exceeds
-   4 panes; `--model`/`--effort` override the role's mapping for one session).
+   4 panes; pick `--effort` from the task's breadth per step 2; `--model` is an
+   escape hatch for one session).
    Claim a reused session here, before sending:
    `scripts/clean-session <name> --rename <role>-<task>` resets it to a
    known-empty context and renames the pane for the new task, because a session
    found idle carries both the last delegation's context and its name. The role
-   has to stay the same — the pane keeps the model and effort `claude` started
-   with, and a claim does not switch them — so a task in another role is a new
-   session, however free the pane looks. A session launched in this step arrives
-   clean and correctly named.
+   has to stay the same, and the new task's breadth has to fit the effort the
+   pane launched with — the pane keeps the model and effort `claude` started
+   with, and a claim does not switch them — so a task in another role, or one
+   much wider than the pane's effort, is a new session, however free the pane
+   looks. A session launched in this step arrives clean and correctly named.
 4. `scripts/send-prompt <name> [--worktree]` — the script appends what the
    session cannot see: sibling-session collision warnings, the worktree
-   convention, and a `DONE <name>` completion sentinel.
+   convention, and a `DONE <name>` completion sentinel. A task shaped as a
+   mission with completion criteria opens with `/goal` on the prompt's first
+   line — `/goal <mission, then the criteria>` — so the session loops on its
+   own until its judge model reports the criteria met; the appended sentinel
+   rides inside the goal text and still prints when the goal clears.
 5. Wait with the harness, not with the turn. `scripts/watch-sessions <name>...`
    prints one line per session the moment it stops needing the orchestrator —
    `done` on its sentinel, `blocked` on a permission prompt, `gone` on a
@@ -89,16 +104,19 @@ it does not do the delegated work itself. All scripts live in
    implementation → `camera`.
 2. Launch `survey-tflite-detectors` and `survey-photo-subjects` in `notes` and
    send both surveys: license-free TFLite detection models; frequent photo
-   subjects. The `survey` role puts both on Opus medium. Put them under one
-   `Monitor` watch and carry on with other work.
+   subjects. Both questions are narrow, so the default effort stands. Put them
+   under one `Monitor` watch and carry on with other work.
 3. Each survey arrives as its own notification. A third question goes to a pane
    already there: `clean-session survey-photo-subjects --rename
-   survey-model-licences` claims it, same role, new task. The write-up is
-   `curate` work and Opus high, so it gets its own pane — `launch-session notes
-   curate-detection-wiki` — with the two survey outputs in its prompt.
-4. Launch `drive-camera-detection` in `camera`: the `drive` role gives it Fable
-   high, so it can plan the next version and drive its own subagents for
-   implementation and evaluation (`--worktree`). One session, so watch it with a
+   survey-model-licences` claims it — same role, similar breadth, new task. The
+   write-up is `curate` work, another role, so it gets its own pane —
+   `launch-session notes curate-detection-wiki` — with the two survey outputs
+   in its prompt.
+4. Launch `drive-camera-detection` in `camera` with `--effort high`: the
+   mission spans planning, implementation, and evaluation — a wide state
+   space — and it has criteria, so the prompt opens with `/goal`. The session
+   drives its own subagents in a worktree (`--worktree`): Opus where they
+   decide, Sonnet where they search. One session, so watch it with a
    background `Bash` call.
 5. Its line arrives as `done`, or as `pending` when it stopped early — then
    read the output and re-request the remainder. Have it clean the repository

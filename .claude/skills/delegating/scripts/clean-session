@@ -4,9 +4,10 @@
 # not when finishing the old — see SKILL.md step 3. --rename belongs to the same
 # claim: a pane named for the task it just finished lies about the task it is
 # about to run, so a reused pane is renamed as it is cleared. The new name must
-# keep the old role. A role names the model and effort the pane runs, the pane
-# keeps what `claude` started with, and a claim does not drive claude's own
-# `/model` and `/effort` switches — so a task in another role needs its own pane.
+# keep the old role. The pane keeps the model and effort `claude` started with,
+# and a claim does not drive claude's own `/model` and `/effort` switches — so
+# work of another role, or of a breadth the launch effort does not fit, needs
+# its own pane.
 # --close removes the pane — allowed only for sessions this skill launched (a
 # herdr agent name exists only where a script started one); closing anything
 # else needs --force and an explicit user request.

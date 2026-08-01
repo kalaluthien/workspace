@@ -20,22 +20,6 @@ repo_path() {
 # role_of <name> -> the role prefix of a session name
 role_of() { printf '%s\n' "${1%%-*}"; }
 
-# role_launch <role> -> "<model> <effort>"
-#
-# The role decides the model, so the name never has to carry it. The mapping is
-# the global sub-agent preference: search, coding and script runs get Opus
-# medium; planning and other knowledge work Opus high; a delegate that must
-# orchestrate its own sub-agents gets Fable. An unlisted role reads as ordinary
-# work and gets the medium default — launch-session prints what it picked, so a
-# mistyped role shows up in the launch output instead of in the bill.
-role_launch() {
-  case $1 in
-    plan|curate) printf 'opus high\n' ;;
-    drive)       printf 'fable high\n' ;;
-    *)           printf 'opus medium\n' ;;
-  esac
-}
-
 # free_name <requested> -> a herdr-legal agent name no live session holds
 #
 # Session names read <role>-<task>, so the request must carry both. herdr

@@ -4,9 +4,11 @@
 # panes; a full workspace gets a new tab). Blocks until the session is idle.
 #
 # The name says what the session is for — <role>-<task>, for example
-# survey-tflite-detectors or build-preview-crash — and the role picks the model
-# and effort (see role_launch in _lib.sh). Pass --model or --effort only to
-# override that mapping for one session.
+# survey-tflite-detectors or build-preview-crash. Every session launches as
+# Opus (a session owns decisions; Fable stays with the orchestrator, per
+# ~/.claude/CLAUDE.md "Claude Code"). Pass --effort per the task's breadth —
+# the default medium fits a narrow scope. --model is an escape hatch for one
+# session.
 #
 # Usage: launch-session <repo> <role>-<task>
 #                       [--model fable|opus|sonnet|haiku]
@@ -36,9 +38,8 @@ label=$(basename "$path")
 
 name=$(free_name "$want")
 role=$(role_of "$name")
-read -r role_model role_effort <<< "$(role_launch "$role")"
-[ -n "$model" ] || model=$role_model
-[ -n "$effort" ] || effort=$role_effort
+[ -n "$model" ] || model=opus
+[ -n "$effort" ] || effort=medium
 
 ws=$(workspace_id_for_label "$label")
 if [ -z "$ws" ]; then
