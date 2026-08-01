@@ -1,0 +1,161 @@
+<!doctype html>
+<!--
+  Template for a document in the Benchmarks chapter (docs/INDEX.md) — a
+  measurement pinned to its commit. Copy to docs/<kebab-title>.html and fill
+  in; update the same file in place on re-render. Delete every comment,
+  including this one.
+
+  Self-contained by rule, and so is this template: inline <style>, no
+  JavaScript, no webfonts, no CDN. The document must open from file:// with no
+  network, forever. The template carries the whole skeleton rather than
+  pointing at a shared one, because an author copies a template exactly once
+  and then owns the result — a shared skeleton is an indirection paid on every
+  read to save a duplication nobody maintains (2026-07-28, owner decision).
+
+  A benchmark is a claim someone else must be able to re-run. Protocol and
+  Results are required for exactly that reason: without the protocol the
+  numbers cannot be reproduced, and without the results the protocol was never
+  run. Add an "App version" field whenever the run measures a build rather
+  than the source tree, and one Commit field per half when the halves were
+  measured at different trees.
+
+  Report a median with its min–max range, never a single number, and say what
+  counts as a real difference before showing one. A decision that follows from
+  the numbers is recorded in a .md, not here.
+
+  The contract below is machine-read: script/check-docs.py hard-fails a commit
+  whose document misses a required field, and the docs export flags a document
+  that misses required structure.
+
+  required-fields: Category, Source, Updated, Commit
+  required-sections: Protocol, Results
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><!-- Title --> — camera</title>
+<style>
+  /* Charter ships with macOS, Georgia everywhere else, so the page needs no
+     font download. Tufte's #fffff8 / #111 instead of pure black-on-white:
+     nearly indistinguishable, without the harsh contrast. */
+  html { font-size: 16px; }
+  body {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 8rem;
+    background: #fffff8;
+    color: #111;
+    font-family: Charter, "Bitstream Charter", Georgia, serif;
+    line-height: 1.62;
+    overflow-wrap: break-word;
+  }
+
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
+  h2 { font-size: 1.3rem; margin: 3rem 0 .5rem; font-weight: 600; }
+  h3 { font-size: 1.02rem; margin: 2rem 0 .3rem; font-weight: 600; }
+  p, li { margin: .7rem 0; }
+  ul, ol { padding-left: 1.2rem; }
+  a { color: inherit; text-decoration-color: #aaa; }
+  strong { font-weight: 600; }
+
+  code, pre, .provenance dd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85em;
+  }
+  /* Wide content scrolls inside itself; the page never scrolls sideways. */
+  pre {
+    overflow-x: auto;
+    background: #f2f2ea;
+    padding: 1rem;
+    line-height: 1.45;
+    margin: 1.4rem 0;
+  }
+
+  table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e2e2d8; }
+  th { font-weight: 600; }
+  /* phone-width table scroll: below the body's own max-width a multi-column
+     table would crush to one word per line (width:100% leaves nothing to
+     overflow, so nothing scrolls). The cell minimum keeps columns readable
+     and pushes the table wide; display:block lets it pan inside its own box. */
+  @media (max-width: 42rem) {
+    table { display: block; overflow-x: auto; }
+    th, td { min-width: 9rem; }
+  }
+
+  /* Header block — the same fields in every view document, plus the one
+     field this chapter adds. */
+  .provenance {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: .15rem 1rem;
+    margin: 0;
+    font-size: .85rem;
+    color: #555;
+  }
+  .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
+  .provenance dd { margin: 0; }
+
+  figure { margin: 2.6rem 0; }
+  figure svg { display: block; width: 100%; height: auto; }
+  figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
+</style>
+</head>
+<body>
+<article>
+
+  <header>
+    <h1><!-- What was measured, on what, and the headline number --></h1>
+    <dl class="provenance">
+      <dt>Category</dt> <dd>benchmark</dd>
+      <dt>Source</dt>   <dd>docs/&lt;file&gt;.md; code: &lt;script or module&gt;</dd>
+      <dt>Updated</dt>  <dd>YYYY-MM-DD</dd><!-- last render date -->
+      <dt>Commit</dt>   <dd>&lt;short-sha&gt;</dd><!-- what pins the measured tree -->
+      <!-- Optional, when the run measures a build:
+      <dt>App version</dt> <dd>vX.Y.Z</dd> -->
+    </dl>
+  </header>
+
+  <section>
+    <h2>Scope</h2>
+    <p><!-- What is measured, and what is deliberately outside. --></p>
+
+    <h2>Protocol</h2>
+    <p>
+      <!-- The steps another reader repeats to get these numbers: device or
+           emulator, build type, warm-up, repetition count, and what counts as a
+           real difference. Name the script that runs it rather than restating
+           what the script does. -->
+    </p>
+
+    <h2>Results</h2>
+    <p>
+      <!-- The measurement, with its spread — a median with a min–max range, not
+           a single number. Say which sources were dirty at render time. A table
+           of runs belongs here; a figure only where the shape of the numbers is
+           the finding. -->
+    </p>
+
+    <!--
+      Diagram conventions:
+        - viewBox only; no width/height (the CSS scales it).
+        - currentColor for strokes/text, so ink follows the body colour.
+        - <title> for screen readers; role="img" on the <svg>.
+        - Reach for SVG only where the relationship is genuinely 2D — a graph
+          with cross-edges, a fan-in. A list drawn as boxes is worse than a list.
+        - Suffix every id (arrow-<diagram>, not arrow). Inline SVG shares one
+          id namespace with the whole page, so a second diagram reusing "arrow"
+          silently points at the first diagram's marker.
+    -->
+
+    <h2>What the numbers point at</h2>
+    <p>
+      <!-- Optional. The reading of the results. A decision that follows from
+           them is recorded in a .md, not here. -->
+    </p>
+  </section>
+
+</article>
+</body>
+</html>
