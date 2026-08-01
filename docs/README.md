@@ -46,8 +46,19 @@ doctype, inline styles, header, outline — and documents duplicate that
 skeleton rather than sharing one, because an author copies a template exactly
 once and then owns the result: a shared skeleton is an indirection paid on
 every read to save a duplication nobody maintains. Convention carried over
-from `camera/docs` (2026-08-01); these two chapters are the whole set here —
-no other templates are required.
+from `camera/docs` (2026-08-01).
+
+## Consolidation (2026-08-02)
+
+This directory is now the one home of the docs convention; the per-repository
+systems in `camera/docs` and `claude-memory-viewer/docs` are its ancestors,
+not its peers. `explanation.html`, `benchmark.html`, and `mockup.html` are
+imported verbatim from `camera/docs/templates` as raw material — their
+header comments still say "camera" — and the whole template set is being
+reshaped by the innovation pass (see the workspace backlog): view (`.html`)
+documents only, no specification (`.md`) layer, templates self-contained and
+example-included. Until that pass lands, the two chapters above remain the
+only ones a new document may join.
 
 A template carries a contract: `required-fields` are the header fields a
 document must have, `required-sections` the structure it should have. No hook
