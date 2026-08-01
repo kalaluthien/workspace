@@ -1,0 +1,160 @@
+#!/usr/bin/env python3
+"""Deterministic half of the STE compliance rubric.
+
+Implements the script-decided checks from
+notes/wiki/prose-style-compliance-scoring.md:
+  check2  sentence length: 20 words imperative / 25 otherwise (Rules 5.1/6.3,
+          counted per Rules 8.4-8.7)
+  check6  no perfect or progressive verb forms (Rules 3.2/3.4)
+  check7  no modal verbs may/might/should/would/shall (dictionary)
+  check10 six sentences maximum per paragraph (Rule 6.6)
+and shortlists candidates for the judge-adjudicated checks:
+  flag3   imperative sentence with a trailing condition clause (Rule 5.4)
+  flag8   be + past participle, possible passive (Rule 3.6)
+  flag13  contractions, exact (Rule 4.2)
+
+Usage: python3 ste_score.py <answer.md>   -> JSON on stdout
+"""
+import json
+import re
+import sys
+
+ABBREV = r"\b(?:e\.g|i\.e|etc|vs|cf|approx|no|fig|dr|mr|ms|st)\."
+IMPERATIVE_VERBS = {
+    "add", "apply", "avoid", "check", "choose", "click", "close", "commit",
+    "copy", "create", "delete", "do", "edit", "enter", "ensure", "fetch",
+    "give", "go", "install", "keep", "let", "make", "merge", "move", "name",
+    "note", "open", "pass", "paste", "pick", "pull", "push", "put", "read",
+    "rebase", "remove", "rename", "replace", "report", "reset", "restore",
+    "run", "save", "select", "send", "set", "start", "state", "stash", "stop",
+    "switch", "test", "type", "update", "use", "verify", "wait", "write",
+}
+IRREGULAR_PARTICIPLES = (
+    "been|begun|become|brought|built|caught|chosen|come|done|driven|eaten|"
+    "fallen|felt|found|given|gone|gotten|got|grown|heard|held|hidden|kept|"
+    "known|led|left|lost|made|meant|paid|put|read|risen|run|said|seen|sent|"
+    "set|shown|sold|spent|spoken|stood|taken|thought|told|understood|won|"
+    "worn|written"
+)
+CONTRACTIONS = re.compile(
+    r"\b(?:[a-z]+n't|it's|that's|there's|here's|what's|let's|"
+    r"(?:you|we|they)'re|i'm|(?:i|you|we|they)'ve|"
+    r"(?:i|you|he|she|it|we|they)'ll|(?:i|you|he|she|we|they)'d)\b",
+    re.IGNORECASE,
+)
+MODALS = re.compile(r"\b(may|might|should|would|shall)\b", re.IGNORECASE)
+PERFECT = re.compile(
+    r"\b(?:has|have|had)\s+(?:not\s+|already\s+|just\s+)?"
+    r"(?:\w+ed|" + IRREGULAR_PARTICIPLES + r")\b", re.IGNORECASE)
+PROGRESSIVE = re.compile(
+    r"\b(?:is|are|was|were|am|be|been|being)\s+(?:not\s+|still\s+)?\w+ing\b",
+    re.IGNORECASE)
+PASSIVE = re.compile(
+    r"\b(?:is|are|was|were|be|been|being|get|gets|got)\s+"
+    r"(?:not\s+|already\s+|then\s+)?(?:\w+ed|" + IRREGULAR_PARTICIPLES + r")\b",
+    re.IGNORECASE)
+TRAILING_COND = re.compile(r",\s*(?:if|when|unless|before|after)\b", re.IGNORECASE)
+
+
+def strip_markdown(text):
+    """Paragraph list of prose, code removed per the mdast reference designs."""
+    text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)  # fenced blocks out
+    text = re.sub(r"`[^`\n]+`", "CODESPAN", text)           # inline code = 1 word
+    text = re.sub(r"^#{1,6}\s.*$", "", text, flags=re.MULTILINE)  # headings out
+    text = re.sub(r"\*\*|\*|__|_(?=\w)|(?<=\w)_", "", text)  # emphasis markers
+    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)     # links -> label
+    paragraphs = []
+    for block in re.split(r"\n\s*\n", text):
+        lines = [ln.strip() for ln in block.splitlines() if ln.strip()]
+        if not lines:
+            continue
+        items, prose = [], []
+        for ln in lines:
+            m = re.match(r"^(?:[-*+]|\d+[.)])\s+(.*)$", ln)
+            if m:
+                items.append(m.group(1))  # Rule 8.6: the marker is not counted
+            else:
+                prose.append(ln)
+        if prose:
+            paragraphs.append({"kind": "prose", "text": " ".join(prose)})
+        for it in items:
+            paragraphs.append({"kind": "item", "text": it})
+    return paragraphs
+
+
+def split_sentences(text):
+    guarded = re.sub(ABBREV, lambda m: m.group(0).replace(".", "․"),
+                     text, flags=re.IGNORECASE)
+    guarded = re.sub(r"(\d)\.(\d)", r"\1․\2", guarded)  # decimals, versions
+    # Rule 8.4: a colon ends a sentence for counting purposes.
+    parts = re.split(r"(?<=[.!?:])\s+", guarded)
+    return [p.replace("․", ".").strip() for p in parts if p.strip()]
+
+
+def word_count(sentence):
+    s = re.sub(r"\([^)]*\)", " UNIT ", sentence)            # 8.5: parens = 1
+    s = re.sub(r"\"[^\"]+\"|“[^”]+”", " UNIT ", s)  # quoted = 1
+    words = 0
+    for tok in s.split():
+        tok = tok.strip(".,;:!?()[]")
+        if not tok:
+            continue
+        words += 1  # 8.6/8.7: numbers, identifiers, hyphenated all = 1
+    return words
+
+
+def is_imperative(sentence):
+    s = re.sub(r"^(?:UNIT|CODESPAN)\s+", "", sentence)
+    m = re.match(r"^(?:do not\s+|never\s+|always\s+)?([a-z]+)\b", s,
+                 re.IGNORECASE)
+    return bool(m) and m.group(1).lower() in IMPERATIVE_VERBS
+
+
+def main(path):
+    raw = open(path, encoding="utf-8").read()
+    paragraphs = strip_markdown(raw)
+    over, verbforms, modals, longpara = [], [], [], []
+    flags3, flags8, flags13 = [], [], []
+    lengths = []
+    for para in paragraphs:
+        sentences = split_sentences(para["text"])
+        if para["kind"] == "prose" and len(sentences) > 6:
+            longpara.append({"sentences": len(sentences),
+                             "start": sentences[0][:60]})
+        for s in sentences:
+            n = word_count(s)
+            imp = is_imperative(s)
+            lengths.append(n)
+            limit = 20 if imp else 25
+            if n > limit:
+                over.append({"sentence": s, "words": n, "limit": limit})
+            if PERFECT.search(s) or PROGRESSIVE.search(s):
+                verbforms.append(s)
+            for m in MODALS.finditer(s):
+                modals.append({"sentence": s, "word": m.group(0)})
+            if imp and TRAILING_COND.search(s):
+                flags3.append(s)
+            if PASSIVE.search(s):
+                flags8.append(s)
+            if CONTRACTIONS.search(s):
+                flags13.append(s)
+    total = len(lengths)
+    result = {
+        "components": {
+            "sentences": total,
+            "mean_words": round(sum(lengths) / total, 1) if total else 0,
+            "max_words": max(lengths) if total else 0,
+        },
+        "check2": {"pass": not over, "violations": over},
+        "check6": {"pass": not verbforms, "violations": verbforms},
+        "check7": {"pass": not modals, "violations": modals},
+        "check10": {"pass": not longpara, "violations": longpara},
+        "flags": {"check3_trailing_condition": flags3,
+                  "check8_passive_candidates": flags8,
+                  "check13_contractions": flags13},
+    }
+    json.dump(result, sys.stdout, indent=1)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1])
