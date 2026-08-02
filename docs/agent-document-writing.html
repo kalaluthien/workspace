@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Make the writer agent's definition the one place the document system's rules live — workspace</title>
+<title>Writer constitution — workspace</title>
 <style>
   html { font-size: 16px; }
   body {
@@ -12,14 +12,14 @@
     padding: 4rem 1.5rem 8rem;
     background: #ffffff;
     color: #111;
-    font-family: Charter, "Bitstream Charter", Georgia, serif;
-    line-height: 1.62;
+    font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.55;
     overflow-wrap: break-word;
   }
-  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
-  h2 { font-size: 1.3rem; margin: 3rem 0 .5rem; font-weight: 600; }
-  h3 { font-size: 1.02rem; margin: 2rem 0 .3rem; font-weight: 600; }
-  p, li { margin: .7rem 0; }
+  h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 .9rem; font-weight: 700; letter-spacing: -.01em; }
+  h2 { font-size: 1.25rem; margin: 3rem 0 .5rem; font-weight: 700; }
+  h3 { font-size: 1rem; margin: 2rem 0 .3rem; font-weight: 700; }
+  p, li { margin: .6rem 0; }
   ul, ol { padding-left: 1.2rem; }
   a { color: inherit; text-decoration-color: #aaa; }
   strong { font-weight: 600; }
@@ -30,7 +30,7 @@
   pre { overflow-x: auto; background: #f4f4f4; padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
   table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
   th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
-  th { font-weight: 600; }
+  th { font-weight: 700; }
   @media (max-width: 42rem) {
     table { display: block; overflow-x: auto; }
     th, td { min-width: 9rem; }
@@ -48,20 +48,25 @@
   details { border: 1px solid #e4e4e4; padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
   details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
   details[open] summary { margin-bottom: .5rem; }
-  figure { margin: 2.6rem 0; }
+  figure { margin: 2.2rem 0; }
   figure svg { display: block; width: 100%; height: auto; }
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
+  .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
+  .figure-row figure { margin: 0; }
+  footer.sources { margin-top: 4rem; border-top: 1px solid #e4e4e4; padding-top: 1rem; font-size: .85rem; color: #555; }
+  footer.sources h2 { font-size: .8rem; margin: 0 0 .3rem; font-variant: small-caps; letter-spacing: .06em; font-weight: 600; }
+  footer.sources ul { margin: 0; padding-left: 1.1rem; }
+  footer.sources li { margin: .2rem 0; }
 </style>
 </head>
 <body>
 <article>
 
   <header>
-    <h1>Make the writer agent&rsquo;s definition the one place the document system&rsquo;s rules live</h1>
+    <h1>Writer constitution</h1>
     <dl class="provenance">
       <dt>Doctype</dt> <dd>proposal</dd>
       <dt>Status</dt>  <dd>Open</dd>
-      <dt>Source</dt>  <dd>docs/README.md; docs/templates/; docs/components/; .claude/CLAUDE.md; .claude/agents/document-writer.md; camera/docs/README.md; camera/docs/templates/; camera/script/check-docs.py; camera/script/docs_chapters.py; board/docs/INDEX.md</dd>
       <dt>Updated</dt> <dd>2026-08-02</dd>
       <dt>Commit</dt>  <dd>a4d8e2b</dd>
     </dl>
@@ -72,8 +77,7 @@
     already diverged, so the writer agent&rsquo;s definition should hold the one
     normative description and every other mention should become a pointer.</p>
 
-    <h2 id="problem">One rule set is written out in six files, and two of the
-    copies are already wrong</h2>
+    <h2 id="problem">Problem</h2>
 
     <p>Every site below carries normative text about how documents are written
     &mdash; not a pointer to it, the rule itself. Changing one rule is therefore
@@ -130,8 +134,7 @@
     while the workspace&rsquo;s only hook is the three-line no-main-commits
     guard, so nothing machine-checks <code>workspace/docs</code> at all.</p>
 
-    <h2 id="options">The choice is which file holds the rules, and it turns on
-    who reads them and what makes a violation fail</h2>
+    <h2 id="options">Options</h2>
 
     <p>Two axes, named before any option is judged. <strong>Locality</strong>:
     is the file that holds a rule loaded by the actor that must obey it, at the
@@ -173,8 +176,7 @@
     locality outright and is still the weakest option, because it buys locality
     by moving the author, which is the one thing the pipeline decision fixed.</p>
 
-    <h2 id="recommendation">The writer&rsquo;s definition is the only file
-    loaded at the moment the rules bind, so the rules belong in it</h2>
+    <h2 id="recommendation">Recommendation</h2>
 
     <p><em>Writer as constitution</em> wins on locality and ties on enforcement.
     The governing principle is one sentence: <strong>a rule lives in the single
@@ -382,8 +384,7 @@
       responsible for flipping it.
     </div>
 
-    <h2 id="migration">Forty-five documents move in four phases, each exiting on
-    a machine check rather than on review</h2>
+    <h2 id="migration">Migration</h2>
 
     <p>Backward compatibility is not owed &mdash; the owner deferred it with the
     migration itself (2026-08-02, owner decision, <code>docs/README.md</code>)
@@ -429,6 +430,17 @@
     plan&rsquo;s own check: a phase that finishes without accounting for its
     share has left documents on the old contract.</p>
   </section>
+
+  <footer class="sources">
+    <h2 id="sources">Sources</h2>
+    <ul>
+      <li><code>docs/README.md</code>; <code>docs/templates/</code>; <code>docs/components/</code></li>
+      <li><code>.claude/CLAUDE.md</code>; <code>.claude/agents/document-writer.md</code></li>
+      <li><code>camera/docs/README.md</code>; <code>camera/docs/templates/</code></li>
+      <li><code>camera/script/check-docs.py</code>; <code>camera/script/docs_chapters.py</code></li>
+      <li><code>board/docs/INDEX.md</code></li>
+    </ul>
+  </footer>
 
 </article>
 </body>

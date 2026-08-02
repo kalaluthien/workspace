@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Claude configuration scopes — workspace</title>
+<title>Configuration scopes — workspace</title>
 <style>
   html { font-size: 16px; }
   body {
@@ -12,14 +12,14 @@
     padding: 4rem 1.5rem 8rem;
     background: #ffffff;
     color: #111;
-    font-family: Charter, "Bitstream Charter", Georgia, serif;
-    line-height: 1.62;
+    font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.55;
     overflow-wrap: break-word;
   }
-  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
-  h2 { font-size: 1.3rem; margin: 3rem 0 .5rem; font-weight: 600; }
-  h3 { font-size: 1.02rem; margin: 2rem 0 .3rem; font-weight: 600; }
-  p, li { margin: .7rem 0; }
+  h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 .9rem; font-weight: 700; letter-spacing: -.01em; }
+  h2 { font-size: 1.25rem; margin: 3rem 0 .5rem; font-weight: 700; }
+  h3 { font-size: 1rem; margin: 2rem 0 .3rem; font-weight: 700; }
+  p, li { margin: .6rem 0; }
   ul, ol { padding-left: 1.2rem; }
   a { color: inherit; text-decoration-color: #aaa; }
   strong { font-weight: 600; }
@@ -30,7 +30,7 @@
   pre { overflow-x: auto; background: #f4f4f4; padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
   table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
   th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
-  th { font-weight: 600; }
+  th { font-weight: 700; }
   @media (max-width: 42rem) {
     table { display: block; overflow-x: auto; }
     th, td { min-width: 9rem; }
@@ -48,22 +48,25 @@
   details { border: 1px solid #e4e4e4; padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
   details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
   details[open] summary { margin-bottom: .5rem; }
-  figure { margin: 2.6rem 0; }
+  figure { margin: 2.2rem 0; }
   figure svg { display: block; width: 100%; height: auto; }
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
+  .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
+  .figure-row figure { margin: 0; }
+  footer.sources { margin-top: 4rem; border-top: 1px solid #e4e4e4; padding-top: 1rem; font-size: .85rem; color: #555; }
+  footer.sources h2 { font-size: .8rem; margin: 0 0 .3rem; font-variant: small-caps; letter-spacing: .06em; font-weight: 600; }
+  footer.sources ul { margin: 0; padding-left: 1.1rem; }
+  footer.sources li { margin: .2rem 0; }
 </style>
 </head>
 <body>
 <article>
 
   <header>
-    <h1>Each configuration kind files to the scope that matches how far its
-      claim holds, and every router sits one scope above the destinations it
-      chooses between</h1>
+    <h1>Configuration scopes</h1>
     <dl class="provenance">
       <dt>Doctype</dt>  <dd>explanation</dd>
       <dt>Question</dt> <dd>where does each kind of Claude configuration — instruction, rule, skill, agent, memory — live, and what routes it there? (concept view)</dd>
-      <dt>Source</dt>   <dd>~/.claude/CLAUDE.md &sect;Filing, &sect;Claude Code; ~/workspace/.claude/CLAUDE.md &sect;Workspace layout; the live tree under ~/.claude/ and ~/workspace/, walked in the four listings below</dd>
       <dt>Updated</dt>  <dd>2026-08-02</dd>
       <dt>Commit</dt>   <dd>3e3d22f</dd>
     </dl>
@@ -71,8 +74,12 @@
 
   <section>
 
+    <p>Each configuration kind files to the scope that matches how far its
+    claim holds, and every router sits one scope above the destinations it
+    chooses between.</p>
+
     <figure>
-      <svg viewBox="0 0 660 400" role="img">
+      <svg viewBox="0 0 760 400" role="img">
         <title>The three configuration scopes, the memory pool each files into, and the one filing edge the Filing routes forbid</title>
         <defs>
           <marker id="arrow-scopes" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
@@ -80,49 +87,53 @@
           </marker>
         </defs>
 
-        <rect x="12" y="14" width="316" height="84" fill="none" stroke="currentColor"/>
+        <rect x="12" y="14" width="280" height="84" fill="none" stroke="currentColor"/>
         <text x="26" y="36" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Global — ~/.claude/</text>
         <text x="26" y="58" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">CLAUDE.md &#183; rules</text>
         <text x="26" y="78" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">no skills, agents, output-styles</text>
 
-        <rect x="12" y="154" width="316" height="84" fill="none" stroke="currentColor"/>
+        <rect x="12" y="154" width="280" height="84" fill="none" stroke="currentColor"/>
         <text x="26" y="176" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Workspace — ~/workspace/.claude/</text>
         <text x="26" y="198" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">CLAUDE.md &#183; rules &#183; skills</text>
         <text x="26" y="218" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">agents &#183; output-styles — all five</text>
 
-        <rect x="12" y="294" width="316" height="84" fill="none" stroke="currentColor"/>
+        <rect x="12" y="294" width="280" height="84" fill="none" stroke="currentColor"/>
         <text x="26" y="316" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Project — &lt;entry&gt;/.claude/ &#215;5</text>
         <text x="26" y="338" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">CLAUDE.md in 4 of the 5</text>
         <text x="26" y="358" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">notes only: skills, agents</text>
 
-        <line x1="170" y1="98" x2="170" y2="152" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
-        <text x="182" y="130" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">binds: principles, Filing routes</text>
-        <line x1="170" y1="238" x2="170" y2="292" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
-        <text x="182" y="270" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">assigns: the entry table</text>
+        <line x1="150" y1="98" x2="150" y2="152" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <text x="162" y="130" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">binds: principles, Filing routes</text>
+        <line x1="150" y1="238" x2="150" y2="292" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <text x="162" y="270" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">assigns: the entry table</text>
 
-        <rect x="392" y="28" width="256" height="56" fill="none" stroke="currentColor"/>
-        <text x="404" y="50" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">global pool</text>
-        <text x="404" y="70" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&#8230;--claude/memory</text>
+        <rect x="470" y="28" width="278" height="56" fill="none" stroke="currentColor"/>
+        <text x="482" y="50" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">global pool</text>
+        <text x="482" y="70" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&#8230;--claude/memory</text>
 
-        <rect x="392" y="168" width="256" height="56" fill="none" stroke="currentColor"/>
-        <text x="404" y="190" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">workspace pool</text>
-        <text x="404" y="210" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&#8230;-workspace/memory</text>
+        <rect x="470" y="168" width="278" height="56" fill="none" stroke="currentColor"/>
+        <text x="482" y="190" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">workspace pool</text>
+        <text x="482" y="210" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&#8230;-workspace/memory</text>
 
-        <rect x="392" y="308" width="256" height="56" fill="none" stroke="currentColor"/>
-        <text x="404" y="330" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">project pools &#215;5</text>
-        <text x="404" y="350" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&#8230;-workspace-&lt;entry&gt;/memory</text>
+        <rect x="470" y="308" width="278" height="56" fill="none" stroke="currentColor"/>
+        <text x="482" y="330" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">project pools &#215;5</text>
+        <text x="482" y="350" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&#8230;-workspace-&lt;entry&gt;/memory</text>
 
-        <line x1="328" y1="56" x2="390" y2="56" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
-        <text x="332" y="48" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">files: a tool's own fact</text>
-        <line x1="328" y1="196" x2="390" y2="196" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
-        <text x="332" y="188" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">files: a cross-project procedure</text>
-        <line x1="328" y1="336" x2="390" y2="336" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
-        <text x="332" y="328" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">files: the entry's own takeaway</text>
+        <line x1="292" y1="56" x2="468" y2="56" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <text x="380" y="36" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">files:</text>
+        <text x="380" y="50" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a tool's own fact</text>
+        <line x1="292" y1="196" x2="468" y2="196" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <text x="380" y="176" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">files:</text>
+        <text x="380" y="190" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a cross-project procedure</text>
+        <line x1="292" y1="336" x2="468" y2="336" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <text x="380" y="316" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">files:</text>
+        <text x="380" y="330" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">the entry's own takeaway</text>
 
-        <line x1="520" y1="166" x2="520" y2="88" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
-        <line x1="512" y1="119" x2="528" y2="135" stroke="currentColor"/>
-        <line x1="528" y1="119" x2="512" y2="135" stroke="currentColor"/>
-        <text x="502" y="131" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">forbidden: coordination never files here</text>
+        <line x1="520" y1="166" x2="520" y2="86" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <line x1="512" y1="118" x2="528" y2="134" stroke="currentColor"/>
+        <line x1="528" y1="118" x2="512" y2="134" stroke="currentColor"/>
+        <text x="538" y="120" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">forbidden:</text>
+        <text x="538" y="134" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">coordination never files here</text>
       </svg>
       <figcaption>
         Static structure, all three configuration scopes and their memory
@@ -240,7 +251,7 @@ mabinogi-mobile-automation/.claude/ CLAUDE.md
 board/.claude/                      CLAUDE.md
 kalaluthien.github.io/.claude/      (no such directory)</pre>
       <p>Settings files are filtered out of this listing; see
-        <a href="#not-shown">What is not shown</a>.</p>
+        <a href="#omissions">Omissions</a>.</p>
     </details>
 
     <details>
@@ -261,7 +272,7 @@ kalaluthien.github.io/.claude/      (no such directory)</pre>
         by hand.</p>
     </details>
 
-    <h2 id="session">What one session loads</h2>
+    <h2 id="session">Session composition</h2>
     <p>The scopes are not alternatives — a session composes them. It loads the
     global instruction file, every ancestor CLAUDE.md down to its working
     directory, and the memory index of exactly one pool, the one encoding that
@@ -297,20 +308,20 @@ kalaluthien.github.io/.claude/      (no such directory)</pre>
         <text x="24" y="230" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&#8230;-workspace-notes/memory</text>
         <text x="24" y="244" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">the cwd pool, MEMORY.md index</text>
 
-        <rect x="428" y="100" width="220" height="92" fill="none" stroke="currentColor"/>
-        <text x="440" y="126" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">one claude session</text>
-        <text x="440" y="146" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">cwd = ~/workspace/notes</text>
-        <text x="440" y="164" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">subagents inherit this</text>
-        <text x="440" y="180" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">snapshot unchanged</text>
+        <rect x="428" y="10" width="220" height="242" fill="none" stroke="currentColor"/>
+        <text x="440" y="110" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">one claude session</text>
+        <text x="440" y="130" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">cwd = ~/workspace/notes</text>
+        <text x="440" y="148" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">subagents inherit this</text>
+        <text x="440" y="166" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">snapshot unchanged</text>
 
-        <line x1="262" y1="32" x2="426" y2="118" stroke="currentColor" marker-end="url(#arrow-session)"/>
-        <text x="345" y="70" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">loads: always</text>
-        <line x1="262" y1="98" x2="426" y2="136" stroke="currentColor" marker-end="url(#arrow-session)"/>
-        <text x="345" y="112" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">loads: ancestor of cwd</text>
-        <line x1="262" y1="164" x2="426" y2="154" stroke="currentColor" marker-end="url(#arrow-session)"/>
-        <text x="345" y="154" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">loads: the cwd entry</text>
-        <line x1="262" y1="230" x2="426" y2="172" stroke="currentColor" marker-end="url(#arrow-session)"/>
-        <text x="345" y="196" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">loads: index of the cwd pool</text>
+        <line x1="262" y1="32" x2="426" y2="32" stroke="currentColor" marker-end="url(#arrow-session)"/>
+        <text x="344" y="26" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">loads: always</text>
+        <line x1="262" y1="98" x2="426" y2="98" stroke="currentColor" marker-end="url(#arrow-session)"/>
+        <text x="344" y="92" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">loads: ancestor of cwd</text>
+        <line x1="262" y1="164" x2="426" y2="164" stroke="currentColor" marker-end="url(#arrow-session)"/>
+        <text x="344" y="158" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">loads: the cwd entry</text>
+        <line x1="262" y1="230" x2="426" y2="230" stroke="currentColor" marker-end="url(#arrow-session)"/>
+        <text x="344" y="224" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">loads: index of the cwd pool</text>
       </svg>
       <figcaption>
         Static composition, one session whose working directory is
@@ -337,7 +348,7 @@ kalaluthien.github.io/.claude/      (no such directory)</pre>
       </tbody>
     </table>
 
-    <h2 id="routing">Where the routers sit</h2>
+    <h2 id="routing">Router placement</h2>
     <p>Every scope declares its own predicate in the opening lines of its
     CLAUDE.md, and the scope above assigns it — the two governing edges in the
     first figure. The consequence is that no file decides its own home: the
@@ -346,7 +357,7 @@ kalaluthien.github.io/.claude/      (no such directory)</pre>
     where it goes without opening any of the candidates.</p>
 
     <figure>
-      <svg viewBox="0 0 660 360" role="img">
+      <svg viewBox="0 0 760 360" role="img">
         <title>The six routes the Filing section of the global instruction file chooses between</title>
         <defs>
           <marker id="arrow-routes" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
@@ -357,39 +368,43 @@ kalaluthien.github.io/.claude/      (no such directory)</pre>
         <text x="24" y="174" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">~/.claude/CLAUDE.md</text>
         <text x="24" y="194" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">&#167;Filing — the router</text>
 
-        <rect x="400" y="10" width="248" height="40" fill="none" stroke="currentColor"/>
-        <text x="410" y="34" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a section of the same CLAUDE.md</text>
-        <rect x="400" y="68" width="248" height="40" fill="none" stroke="currentColor"/>
-        <text x="410" y="92" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">simplified-technical output style</text>
-        <rect x="400" y="126" width="248" height="40" fill="none" stroke="currentColor"/>
-        <text x="410" y="150" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">setup-* memory, global pool</text>
-        <rect x="400" y="184" width="248" height="40" fill="none" stroke="currentColor"/>
-        <text x="410" y="208" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">workspace pool memory</text>
-        <rect x="400" y="242" width="248" height="40" fill="none" stroke="currentColor"/>
-        <text x="410" y="266" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&lt;entry&gt;/.claude/CLAUDE.md</text>
-        <rect x="400" y="300" width="248" height="40" fill="none" stroke="currentColor"/>
-        <text x="410" y="324" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&lt;entry&gt;/docs/ or its spec</text>
+        <line x1="222" y1="180" x2="310" y2="180" stroke="currentColor"/>
+        <line x1="310" y1="30" x2="310" y2="320" stroke="currentColor"/>
 
-        <line x1="222" y1="164" x2="398" y2="30"  stroke="currentColor" marker-end="url(#arrow-routes)"/>
-        <text x="396" y="22"  text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a rule true anywhere</text>
-        <line x1="222" y1="172" x2="398" y2="88"  stroke="currentColor" marker-end="url(#arrow-routes)"/>
-        <text x="396" y="80"  text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a writing or language rule</text>
-        <line x1="222" y1="180" x2="398" y2="146" stroke="currentColor" marker-end="url(#arrow-routes)"/>
-        <text x="396" y="138" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">one tool's own fact</text>
-        <line x1="222" y1="188" x2="398" y2="204" stroke="currentColor" marker-end="url(#arrow-routes)"/>
-        <text x="396" y="196" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">coordinates several projects</text>
-        <line x1="222" y1="196" x2="398" y2="262" stroke="currentColor" marker-end="url(#arrow-routes)"/>
-        <text x="396" y="254" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a repository working gotcha</text>
-        <line x1="222" y1="204" x2="398" y2="320" stroke="currentColor" marker-end="url(#arrow-routes)"/>
-        <text x="396" y="312" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a repository product truth</text>
+        <rect x="500" y="10" width="248" height="40" fill="none" stroke="currentColor"/>
+        <text x="510" y="34" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a section of the same CLAUDE.md</text>
+        <rect x="500" y="68" width="248" height="40" fill="none" stroke="currentColor"/>
+        <text x="510" y="92" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">simplified-technical output style</text>
+        <rect x="500" y="126" width="248" height="40" fill="none" stroke="currentColor"/>
+        <text x="510" y="150" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">setup-* memory, global pool</text>
+        <rect x="500" y="184" width="248" height="40" fill="none" stroke="currentColor"/>
+        <text x="510" y="208" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">workspace pool memory</text>
+        <rect x="500" y="242" width="248" height="40" fill="none" stroke="currentColor"/>
+        <text x="510" y="266" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&lt;entry&gt;/.claude/CLAUDE.md</text>
+        <rect x="500" y="300" width="248" height="40" fill="none" stroke="currentColor"/>
+        <text x="510" y="324" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&lt;entry&gt;/docs/ or its spec</text>
+
+        <line x1="310" y1="30" x2="498" y2="30" stroke="currentColor" marker-end="url(#arrow-routes)"/>
+        <text x="316" y="22" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a rule true anywhere</text>
+        <line x1="310" y1="88" x2="498" y2="88" stroke="currentColor" marker-end="url(#arrow-routes)"/>
+        <text x="316" y="80" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a writing or language rule</text>
+        <line x1="310" y1="146" x2="498" y2="146" stroke="currentColor" marker-end="url(#arrow-routes)"/>
+        <text x="316" y="138" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">one tool's own fact</text>
+        <line x1="310" y1="204" x2="498" y2="204" stroke="currentColor" marker-end="url(#arrow-routes)"/>
+        <text x="316" y="196" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">coordinates several projects</text>
+        <line x1="310" y1="262" x2="498" y2="262" stroke="currentColor" marker-end="url(#arrow-routes)"/>
+        <text x="316" y="254" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a repository working gotcha</text>
+        <line x1="310" y1="320" x2="498" y2="320" stroke="currentColor" marker-end="url(#arrow-routes)"/>
+        <text x="316" y="312" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a repository product truth</text>
       </svg>
       <figcaption>
         Routing structure, the "Filing" section of
         <code>~/.claude/CLAUDE.md</code> only. Key: solid box — the router
         (left) or one destination (right); arrow — one route, labelled with
-        the predicate that selects it. Two destinations sit outside the global
-        scope that holds the router, which is the shape the opening rule
-        describes.
+        the predicate that selects it; the unmarked spine is the shared stem
+        every route leaves the router through. Two destinations sit outside
+        the global scope that holds the router, which is the shape the
+        opening rule describes.
       </figcaption>
     </figure>
 
@@ -397,6 +412,7 @@ kalaluthien.github.io/.claude/      (no such directory)</pre>
       <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
       <tbody>
         <tr><td>&sect;Filing — the router</td><td>instruction section</td><td>the six-way choice a durable takeaway passes through before it is written anywhere</td></tr>
+        <tr><td>spine</td><td>shared stem</td><td>the one unmarked channel every route leaves the router through before it branches</td></tr>
         <tr><td>a section of the same CLAUDE.md</td><td>destination, global scope</td><td>a rule that holds on any repository, machine, or tool, filed under the work it applies to</td></tr>
         <tr><td>simplified-technical output style</td><td>destination, workspace scope</td><td>the writing and language rules, addressed by path from the global file</td></tr>
         <tr><td>setup-* memory, global pool</td><td>destination, global pool</td><td>one tool's or environment's own fact, so every project finds it in one place</td></tr>
@@ -427,7 +443,7 @@ kalaluthien.github.io/.claude/      (no such directory)</pre>
     <code>MEMORY.md</code> header, so a reader already inside a pool never has
     to climb back to the router to check whether a file belongs there.</p>
 
-    <h2 id="formats">Where each file format is defined</h2>
+    <h2 id="formats">Format definitions</h2>
     <table>
       <tr><th>item</th><th>format defined in</th><th>defines</th></tr>
       <tr><td>CLAUDE.md placement</td>
@@ -467,7 +483,7 @@ kalaluthien.github.io/.claude/      (no such directory)</pre>
       not less.
     </div>
 
-    <h2 id="not-shown">What is not shown</h2>
+    <h2 id="omissions">Omissions</h2>
     <p>The figures and tables claim placement and routing, and nothing else.
     Not shown, deliberately:</p>
     <ul>
@@ -499,6 +515,15 @@ kalaluthien.github.io/.claude/      (no such directory)</pre>
     update the matrix and figures in place and re-pin the Commit field.</p>
 
   </section>
+
+  <footer class="sources">
+    <h2 id="sources">Sources</h2>
+    <ul>
+      <li><code>~/.claude/CLAUDE.md</code> &sect;Filing, &sect;Claude Code</li>
+      <li><code>~/workspace/.claude/CLAUDE.md</code> &sect;Workspace layout</li>
+      <li>the live tree under <code>~/.claude/</code> and <code>~/workspace/</code>, walked in the four listings above</li>
+    </ul>
+  </footer>
 
 </article>
 </body>

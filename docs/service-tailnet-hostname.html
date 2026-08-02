@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Giving a service its own tailnet hostname — workspace</title>
+<title>Tailnet hostname — workspace</title>
 <style>
   html { font-size: 16px; }
   body {
@@ -12,14 +12,14 @@
     padding: 4rem 1.5rem 8rem;
     background: #ffffff;
     color: #111;
-    font-family: Charter, "Bitstream Charter", Georgia, serif;
-    line-height: 1.62;
+    font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.55;
     overflow-wrap: break-word;
   }
-  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
-  h2 { font-size: 1.3rem; margin: 3rem 0 .5rem; font-weight: 600; }
-  h3 { font-size: 1.02rem; margin: 2rem 0 .3rem; font-weight: 600; }
-  p, li { margin: .7rem 0; }
+  h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 .9rem; font-weight: 700; letter-spacing: -.01em; }
+  h2 { font-size: 1.25rem; margin: 3rem 0 .5rem; font-weight: 700; }
+  h3 { font-size: 1rem; margin: 2rem 0 .3rem; font-weight: 700; }
+  p, li { margin: .6rem 0; }
   ul, ol { padding-left: 1.2rem; }
   a { color: inherit; text-decoration-color: #aaa; }
   strong { font-weight: 600; }
@@ -30,7 +30,7 @@
   pre { overflow-x: auto; background: #f4f4f4; padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
   table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
   th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
-  th { font-weight: 600; }
+  th { font-weight: 700; }
   @media (max-width: 42rem) {
     table { display: block; overflow-x: auto; }
     th, td { min-width: 9rem; }
@@ -48,20 +48,28 @@
   details { border: 1px solid #e4e4e4; padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
   details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
   details[open] summary { margin-bottom: .5rem; }
-  figure { margin: 2.6rem 0; }
+  figure { margin: 2.2rem 0; }
   figure svg { display: block; width: 100%; height: auto; }
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
+  .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
+  .figure-row figure { margin: 0; }
+  ol.steps { padding-left: 1.6rem; }
+  ol.steps > li { margin: 1.3rem 0; }
+  ol.steps > li::marker { font-weight: 700; }
+  footer.sources { margin-top: 4rem; border-top: 1px solid #e4e4e4; padding-top: 1rem; font-size: .85rem; color: #555; }
+  footer.sources h2 { font-size: .8rem; margin: 0 0 .3rem; font-variant: small-caps; letter-spacing: .06em; font-weight: 600; }
+  footer.sources ul { margin: 0; padding-left: 1.1rem; }
+  footer.sources li { margin: .2rem 0; }
 </style>
 </head>
 <body>
 <article>
 
   <header>
-    <h1>Giving a service its own tailnet hostname</h1>
+    <h1>Tailnet hostname</h1>
     <dl class="provenance">
       <dt>Doctype</dt> <dd>guide</dd>
       <dt>Goal</dt>    <dd>A service reachable at <code>https://&lt;name&gt;.&lt;tailnet&gt;.ts.net</code> on its own tailnet node, installable on a phone beside every other service, with no handler left on the machine node.</dd>
-      <dt>Source</dt>  <dd>.claude/rules/services.md; memory <code>setup-tailnet-services</code>; knowledge: <code>notes/wiki/tailscale-in-containers.md</code></dd>
       <dt>Updated</dt> <dd>2026-08-02</dd>
       <dt>Commit</dt>  <dd>3e3d22f</dd>
     </dl>
@@ -92,7 +100,7 @@
     </ul>
 
     <h2 id="steps">Steps</h2>
-    <ol>
+    <ol class="steps">
       <li>
         <p>Name the node after the service and write its serve configuration.
         The name becomes the hostname, so it takes the service's name, not the
@@ -265,6 +273,15 @@ tailscale status | grep "$app"</pre>
       </li>
     </ul>
   </section>
+
+  <footer class="sources">
+    <h2 id="sources">Sources</h2>
+    <ul>
+      <li><code>.claude/rules/services.md</code></li>
+      <li>memory <code>setup-tailnet-services</code></li>
+      <li>knowledge: <code>notes/wiki/tailscale-in-containers.md</code></li>
+    </ul>
+  </footer>
 
 </article>
 </body>
