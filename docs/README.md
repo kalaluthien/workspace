@@ -107,3 +107,62 @@ Workspace files carry a plane prefix, `agent-` or `service-`; an entry's
 files follow the entry's own naming. `INDEX.md` is the catalogue — every
 document, its chapter, one line of scope — and changes in the same commit
 as the document.
+
+## The docs contract
+
+The block below is this system's machine copy: where a `docs/` directory
+keeps its views, how `INDEX.md` spells a chapter and a member link, which
+`<dt>` terms carry which provenance role, and which chapter a doctype
+belongs to. A program that reads any entry's `docs/` parses it instead of
+carrying its own copy — the board service's docs surface and the
+`scripts/check-docs` checker both do — so a change to the system's machine
+shape is made here, in the same commit as the prose it follows. A rule
+encoded twice is a rule that drifts.
+
+Each role lists its accepted `<dt>` terms, primary first. That is what lets
+`Doctype` become the term today while the entries' documents on the retired
+`Category` vocabulary finish migrating: both terms are read, and neither
+side needs a change when a document moves between them.
+
+```json contract=docs
+{
+  "contract": "docs",
+  "version": 1,
+  "updated": "2026-08-02",
+
+  "view": { "dir": "docs", "extension": ".html", "depth": 1 },
+
+  "index": {
+    "file": "INDEX.md",
+    "chapter_prefix": "## ",
+    "link": "markdown-link-to-sibling-view",
+    "ignore_lines": ["Template:"]
+  },
+
+  "provenance": {
+    "selector": "dl.provenance",
+    "roles": {
+      "doctype": ["Doctype", "Category"],
+      "question": ["Question", "Goal"],
+      "updated": ["Updated"]
+    }
+  },
+
+  "doctypes": [
+    { "name": "spec", "chapter": "Specifications" },
+    { "name": "explanation", "chapter": "Explanations" },
+    { "name": "guide", "chapter": "Guides" },
+    { "name": "proposal", "chapter": "Proposals" }
+  ],
+
+  "unlisted_chapter": "Unlisted",
+  "title": "head-only"
+}
+```
+
+`spec` is the `.md` kind: it holds a chapter in every `INDEX.md` and is
+never a view, so a reader that lists views only catalogues the chapter and
+serves nothing under it. `unlisted_chapter` names where a reader files a
+document its `INDEX.md` does not list; it is declared so every reader
+agrees on the word, and each reader owns whether it degrades that way at
+all.

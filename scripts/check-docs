@@ -1,0 +1,267 @@
+#!/usr/bin/env python3
+"""Check a `docs/` directory against the docs system's own contract.
+
+The shape being checked is not this script's. It is declared once, in
+`~/workspace/docs/README.md`, as the fenced `json contract=docs` block: where
+views live, how `INDEX.md` spells a chapter and a member link, which `<dt>`
+terms carry which provenance role, and which chapter each doctype belongs to.
+This script parses that block and checks against what it says. The board
+service compiles the same declaration to build its Docs surface, which is
+what makes the block a contract rather than a description — a document that
+passes here is one the surface can list.
+
+    scripts/check-docs [DIR ...]     # default: the workspace root
+
+Each DIR is a repository root holding a `docs/`. What is checked:
+
+  1. every view in `docs/` is listed by a chapter of `docs/INDEX.md`
+  2. every view a chapter lists exists on disk
+  3. every view carries the provenance block the selector names
+  4. its doctype is one the contract declares, under an accepted term
+  5. the chapter it is filed under is the one its doctype belongs to
+  6. its `Updated` value is a date
+
+What is not checked: everything the templates own — required sections,
+figures, rubric items. A template's contract is checked where the template is
+filled (an entry's own `pre-commit`), and restating it here would be a second
+copy of a rule this script does not own.
+
+Stdlib only, and no dependency on any entry's toolchain: a checker a
+`pre-commit` cannot run is a checker nobody runs. Exit 1 on any problem, 2
+when the contract itself cannot be read — a shape this script could not read
+is never a pass.
+"""
+
+import json
+import os
+import re
+import sys
+
+WORKSPACE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONTRACT_DOCUMENT = os.path.join(WORKSPACE, "docs", "README.md")
+SUPPORTED_MAJOR = 1
+
+BLOCK = re.compile(
+    r"^```json[ \t]+contract=docs[ \t]*\n(.*?)\n```[ \t]*$",
+    re.MULTILINE | re.DOTALL,
+)
+TERM = re.compile(r"<dt>(.*?)</dt>\s*<dd>(.*?)</dd>", re.DOTALL)
+TAGS = re.compile(r"<[^>]+>")
+DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+class ContractError(Exception):
+    """The declaration could not be read, with the reason a reader can act on."""
+
+
+def contract(path=CONTRACT_DOCUMENT):
+    """The docs contract, parsed out of the document that owns it."""
+    try:
+        with open(path, encoding="utf-8") as handle:
+            document = handle.read()
+    except OSError as exc:
+        raise ContractError("%s: cannot be read: %s" % (path, exc))
+    found = BLOCK.search(document)
+    if not found:
+        raise ContractError(
+            "%s: no ```json contract=docs block — the shape is declared there" % path
+        )
+    try:
+        data = json.loads(found.group(1))
+    except ValueError as exc:
+        raise ContractError("%s: the docs contract block is not JSON: %s" % (path, exc))
+    if data.get("version") != SUPPORTED_MAJOR:
+        raise ContractError(
+            "%s: docs contract version %r; this checker reads major %d"
+            % (path, data.get("version"), SUPPORTED_MAJOR)
+        )
+    for key in ("view", "index", "provenance", "doctypes"):
+        if key not in data:
+            raise ContractError("%s: the docs contract has no %s block" % (path, key))
+    return data
+
+
+def views(root, rule):
+    """Every view of one repository's docs directory, at the declared depth."""
+    directory = os.path.join(root, rule["view"]["dir"])
+    if not os.path.isdir(directory):
+        return []
+    extension = rule["view"]["extension"]
+    return sorted(
+        name
+        for name in os.listdir(directory)
+        if name.endswith(extension)
+        and os.path.isfile(os.path.join(directory, name))
+    )
+
+
+def chapters(root, rule):
+    """→ [(chapter title, [view filename, ...])], in the order INDEX.md reads."""
+    path = os.path.join(root, rule["view"]["dir"], rule["index"]["file"])
+    try:
+        with open(path, encoding="utf-8") as handle:
+            text = handle.read()
+    except OSError:
+        return None
+    prefix = rule["index"]["chapter_prefix"]
+    ignore = tuple(rule["index"].get("ignore_lines") or ())
+    link = re.compile(
+        r"\]\(\s*(?!\w+:)([^)/\s]+" + re.escape(rule["view"]["extension"]) + r")\s*\)"
+    )
+    heading = re.compile(r"^" + re.escape(prefix) + r"\s*(.+?)\s*$", re.MULTILINE)
+
+    found = []
+    marks = list(heading.finditer(text))
+    for position, match in enumerate(marks):
+        end = marks[position + 1].start() if position + 1 < len(marks) else len(text)
+        body = "\n".join(
+            line
+            for line in text[match.end():end].splitlines()
+            if not line.lstrip().startswith(ignore)
+        )
+        names = []
+        for hit in link.finditer(body):
+            if hit.group(1) not in names:
+                names.append(hit.group(1))
+        found.append((match.group(1), names))
+    return found
+
+
+def plain(markup):
+    return re.sub(r"\s+", " ", TAGS.sub("", markup)).strip()
+
+
+def provenance(text, rule):
+    """The provenance block's terms, casefolded, or None when there is none."""
+    tag, _, klass = rule["provenance"]["selector"].partition(".")
+    opening = re.compile(
+        r"<%s\b[^>]*class=[\"'][^\"']*\b%s\b[^\"']*[\"'][^>]*>(.*?)</%s>"
+        % (re.escape(tag), re.escape(klass), re.escape(tag)),
+        re.DOTALL,
+    )
+    block = opening.search(text)
+    if not block:
+        return None
+    return {
+        plain(term).rstrip(":").casefold(): plain(value)
+        for term, value in TERM.findall(block.group(1))
+    }
+
+
+def role_of(fields, rule, role):
+    """The first accepted term the document actually carries, for one role."""
+    for term in rule["provenance"]["roles"].get(role, []):
+        value = fields.get(term.casefold())
+        if value:
+            return value
+    return None
+
+
+def check(root, rule):
+    """Problems with one repository's docs directory, as a list of sentences."""
+    problems = []
+    label = os.path.relpath(root, os.path.dirname(WORKSPACE))
+    present = views(root, rule)
+    if not present:
+        return problems
+
+    book = chapters(root, rule)
+    chapter_of = {}
+    if book is None:
+        problems.append(
+            "%s/%s: no %s — every view needs a chapter"
+            % (label, rule["view"]["dir"], rule["index"]["file"])
+        )
+        book = []
+    for title, names in book:
+        for name in names:
+            chapter_of[name] = title
+            if name not in present:
+                problems.append(
+                    "%s: chapter '%s' lists %s, which is not in %s/"
+                    % (label, title, name, rule["view"]["dir"])
+                )
+    for name in present:
+        if name not in chapter_of and book:
+            problems.append(
+                "%s: %s is in %s/ but no chapter of %s lists it"
+                % (label, name, rule["view"]["dir"], rule["index"]["file"])
+            )
+
+    chapter_by_doctype = {
+        row["name"].casefold(): row["chapter"] for row in rule["doctypes"]
+    }
+    for name in present:
+        path = os.path.join(root, rule["view"]["dir"], name)
+        with open(path, encoding="utf-8") as handle:
+            text = handle.read()
+        fields = provenance(text, rule)
+        if fields is None:
+            problems.append(
+                "%s: %s carries no %s block"
+                % (label, name, rule["provenance"]["selector"])
+            )
+            continue
+        doctype = role_of(fields, rule, "doctype")
+        if not doctype:
+            problems.append(
+                "%s: %s declares no doctype — one of %s carries it"
+                % (label, name, ", ".join(rule["provenance"]["roles"]["doctype"]))
+            )
+        elif doctype.casefold() not in chapter_by_doctype:
+            problems.append(
+                "%s: %s declares doctype '%s', which the system does not have "
+                "(%s)" % (label, name, doctype, ", ".join(sorted(chapter_by_doctype)))
+            )
+        elif name in chapter_of:
+            wanted = chapter_by_doctype[doctype.casefold()]
+            if chapter_of[name] != wanted:
+                problems.append(
+                    "%s: %s is a %s, which belongs to chapter '%s', but %s files "
+                    "it under '%s'"
+                    % (
+                        label,
+                        name,
+                        doctype,
+                        wanted,
+                        rule["index"]["file"],
+                        chapter_of[name],
+                    )
+                )
+        updated = role_of(fields, rule, "updated")
+        if not updated:
+            problems.append("%s: %s declares no Updated date" % (label, name))
+        elif not DATE.match(updated):
+            problems.append(
+                "%s: %s has Updated '%s', which is not YYYY-MM-DD"
+                % (label, name, updated)
+            )
+    return problems
+
+
+def main():
+    try:
+        rule = contract()
+    except ContractError as exc:
+        print("check-docs: %s" % exc, file=sys.stderr)
+        return 2
+
+    roots = sys.argv[1:] or [WORKSPACE]
+    problems = []
+    for root in roots:
+        problems += check(os.path.abspath(root), rule)
+    if problems:
+        print("check-docs: the docs contract is not satisfied —", file=sys.stderr)
+        for problem in problems:
+            print("  %s" % problem, file=sys.stderr)
+        print(
+            "\n  (the shape is declared in %s)" % CONTRACT_DOCUMENT, file=sys.stderr
+        )
+        return 1
+    for root in roots:
+        print("%s: ok" % os.path.abspath(root))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
