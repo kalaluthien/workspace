@@ -1,31 +1,39 @@
 # Index
 
-Every document in `docs/`, as the chapter list. A chapter is a `##` heading,
-a `Template:` line, and the documents that belong to it in reading order.
-Update in the same commit that adds, renames, or retires a document.
-Catalogue of the system: `README.md`.
+Every document in `docs/`, as the chapter list. A chapter is a `##`
+heading, a `Template:` line, and the documents that belong to it in
+reading order. Update in the same commit that adds, renames, or retires a
+document. Catalogue of the system: `README.md`.
 
-## Principles
+## Specifications
 
-Template: `templates/principle.html`
+Template: `templates/spec.md`
 
-(none yet — the template's own example records the views-only decision)
+(none yet — the agent orchestration and service coordination layers are
+still documented in `.claude/` files)
 
-## Patterns
+## Explanations
 
-Template: `templates/pattern.html`
+Template: `templates/explanation.html`
 
-- [`agent-config-scopes.html`](agent-config-scopes.html) — the shape of the
-  three Claude configuration scopes (global, workspace, project entry): one
-  matrix over CLAUDE.md, rules, skills, agents, and memory pools, with the
-  location of every routing rule, responsibility declaration, and file-format
-  definition; appendixes hold the survey evidence, the migration record, and
-  a connectivity check over the document templates.
+- [`agent-config-scopes.html`](agent-config-scopes.html) — where each kind
+  of Claude configuration (instruction, rule, skill, agent, memory) lives
+  across the global, workspace, and project scopes, and what routes it
+  there.
 
-## Practices
+## Guides
 
-Template: `templates/practice.html`
-- [`service-tailnet-hostname.html`](service-tailnet-hostname.html) — giving a
-  service its own tailnet node and hostname with a `tailscale/tailscale`
-  sidecar, so several services stay installable as phone apps at once; the
-  state-directory trap, the host-allowlist move, and retiring the old mount.
+Template: `templates/guide.html`
+
+- [`service-tailnet-hostname.html`](service-tailnet-hostname.html) —
+  giving a service its own tailnet node and hostname with a
+  `tailscale/tailscale` sidecar: the walked steps, the state-directory
+  trap, and the recovery paths.
+
+## Proposals
+
+Template: `templates/proposal.html`
+
+- [`agent-document-writing.html`](agent-document-writing.html) — adopt one
+  parent document system (this directory's templates, components, and
+  writer agent) for every docs/ directory; Open.

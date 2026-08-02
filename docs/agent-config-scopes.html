@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Claude configuration scopes — workspace</title>
 <style>
-  /* Charter ships with macOS, Georgia everywhere else, so the page needs no
-     font download. White background by owner preference (2026-08-02). */
   html { font-size: 16px; }
   body {
     max-width: 42rem;
@@ -18,7 +16,6 @@
     line-height: 1.62;
     overflow-wrap: break-word;
   }
-
   h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
   h2 { font-size: 1.3rem; margin: 3rem 0 .5rem; font-weight: 600; }
   h3 { font-size: 1.02rem; margin: 2rem 0 .3rem; font-weight: 600; }
@@ -26,72 +23,31 @@
   ul, ol { padding-left: 1.2rem; }
   a { color: inherit; text-decoration-color: #aaa; }
   strong { font-weight: 600; }
-
   code, pre, .provenance dd {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: .85em;
   }
-  /* Wide content scrolls inside itself; the page never scrolls sideways. */
-  pre {
-    overflow-x: auto;
-    background: #f4f4f4;
-    padding: 1rem;
-    line-height: 1.45;
-    margin: 1.4rem 0;
-  }
-
+  pre { overflow-x: auto; background: #f4f4f4; padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
   table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
   th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
   th { font-weight: 600; }
-  /* phone-width table scroll: below the body's own max-width a multi-column
-     table would crush to one word per line (width:100% leaves nothing to
-     overflow, so nothing scrolls). The cell minimum keeps columns readable
-     and pushes the table wide; display:block lets it pan inside its own box. */
   @media (max-width: 42rem) {
     table { display: block; overflow-x: auto; }
     th, td { min-width: 9rem; }
   }
-
-  .provenance {
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    gap: .15rem 1rem;
-    margin: 0;
-    font-size: .85rem;
-    color: #555;
-  }
+  .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
   .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
   .provenance dd { margin: 0; }
-
-  .warning {
-    border-left: 3px solid #8a5a00;
-    padding: .1rem 0 .1rem .9rem;
-    margin: .9rem 0;
-  }
-  .warning ul { margin: .3rem 0; }
-
-  /* Labeled review blocks in the Information Mapping style: one observation
-     per box, tagged by kind. NOTICE — read it, then continue. GAP — a defect
-     in this document or in the tree it surveys; it names the fix or the
-     owner. Added 2026-08-02 as annotations; the surveyed prose above and
-     below each box is unchanged. */
-  .callout {
-    border: 1px solid #ccc;
-    border-left-width: 4px;
-    padding: .55rem .9rem;
-    margin: 1.2rem 0;
-    font-size: .88rem;
-    line-height: 1.55;
-  }
-  .callout .tag {
-    font-variant: small-caps;
-    letter-spacing: .06em;
-    font-weight: 600;
-    margin-right: .45rem;
-  }
-  .callout.notice { border-left-color: #556; }
-  .callout.gap { border-left-color: #8a5a00; }
-
+  .callout { border: 1px solid #ccc; border-left-width: 4px; padding: .55rem .9rem; margin: 1.2rem 0; font-size: .88rem; line-height: 1.55; }
+  .callout .tag { font-variant: small-caps; letter-spacing: .06em; font-weight: 600; margin-right: .45rem; }
+  .callout.notice   { border-left-color: #556; }
+  .callout.gap      { border-left-color: #8a5a00; }
+  .callout.warning  { border-left-color: #a33; }
+  .callout.recovery { border-left-color: #2a6; }
+  .callout ul { margin: .3rem 0; }
+  details { border: 1px solid #e4e4e4; padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
+  details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
+  details[open] summary { margin-bottom: .5rem; }
   figure { margin: 2.6rem 0; }
   figure svg { display: block; width: 100%; height: auto; }
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
@@ -101,215 +57,307 @@
 <article>
 
   <header>
-    <h1>The Claude configuration scopes</h1>
+    <h1>Each configuration kind files to the scope that matches how far its
+      claim holds, and every router sits one scope above the destinations it
+      chooses between</h1>
     <dl class="provenance">
-      <dt>Category</dt> <dd>pattern</dd>
-      <dt>Question</dt> <dd>where does each kind of Claude configuration — instruction, rule, skill, agent, memory — live, and what routes it there?</dd>
-      <dt>Source</dt>   <dd>~/.claude/CLAUDE.md &sect;Filing, &sect;Claude Code; ~/workspace/.claude/CLAUDE.md &sect;Workspace layout</dd>
+      <dt>Doctype</dt>  <dd>explanation</dd>
+      <dt>Question</dt> <dd>where does each kind of Claude configuration — instruction, rule, skill, agent, memory — live, and what routes it there? (concept view)</dd>
+      <dt>Source</dt>   <dd>~/.claude/CLAUDE.md &sect;Filing, &sect;Claude Code; ~/workspace/.claude/CLAUDE.md &sect;Workspace layout; the live tree under ~/.claude/ and ~/workspace/, walked in the four listings below</dd>
       <dt>Updated</dt>  <dd>2026-08-02</dd>
-      <dt>Commit</dt>   <dd>3789e39</dd>
+      <dt>Commit</dt>   <dd>3e3d22f</dd>
     </dl>
   </header>
 
   <section>
-    <div class="callout gap">
-      <span class="tag">gap</span>
-      This document carries two commit pins. The header pins
-      <code>3789e39</code>; the connectivity appendix walks the tree at
-      <code>05f4c0d</code>. The staleness rule in the survey evidence
-      appendix says: re-pin the Commit field to the tree of the newest
-      re-walk. Apply that rule at the next update.
-    </div>
 
     <figure>
-      <svg viewBox="0 0 660 380" role="img">
-        <title>The three configuration scopes and the memory pool each one files into</title>
+      <svg viewBox="0 0 660 400" role="img">
+        <title>The three configuration scopes, the memory pool each files into, and the one filing edge the Filing routes forbid</title>
         <defs>
           <marker id="arrow-scopes" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
             <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
           </marker>
         </defs>
-        <rect x="12" y="16" width="310" height="84" fill="none" stroke="currentColor"/>
-        <text x="24" y="38" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Global — ~/.claude/</text>
-        <text x="24" y="58" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">CLAUDE.md: principles, craft, Filing</text>
-        <text x="24" y="76" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">rules/: skill-authoring</text>
 
-        <rect x="12" y="148" width="310" height="84" fill="none" stroke="currentColor"/>
-        <text x="24" y="170" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Workspace — ~/workspace/.claude/</text>
-        <text x="24" y="190" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">CLAUDE.md: layout, entry table</text>
-        <text x="24" y="208" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">rules/: services · skills/: delegating</text>
+        <rect x="12" y="14" width="316" height="84" fill="none" stroke="currentColor"/>
+        <text x="26" y="36" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Global — ~/.claude/</text>
+        <text x="26" y="58" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">CLAUDE.md &#183; rules</text>
+        <text x="26" y="78" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">no skills, agents, output-styles</text>
 
-        <rect x="12" y="280" width="310" height="84" fill="none" stroke="currentColor"/>
-        <text x="24" y="302" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Project — &lt;entry&gt;/.claude/ (&#215;6)</text>
-        <text x="24" y="322" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">CLAUDE.md each</text>
-        <text x="24" y="340" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">notes only: 6 skills, 3 agents</text>
+        <rect x="12" y="154" width="316" height="84" fill="none" stroke="currentColor"/>
+        <text x="26" y="176" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Workspace — ~/workspace/.claude/</text>
+        <text x="26" y="198" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">CLAUDE.md &#183; rules &#183; skills</text>
+        <text x="26" y="218" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">agents &#183; output-styles — all five</text>
 
-        <line x1="167" y1="100" x2="167" y2="146" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
-        <text x="178" y="128" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">binds: principles, signals</text>
-        <line x1="167" y1="232" x2="167" y2="278" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
-        <text x="178" y="260" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">assigns: entry table</text>
+        <rect x="12" y="294" width="316" height="84" fill="none" stroke="currentColor"/>
+        <text x="26" y="316" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Project — &lt;entry&gt;/.claude/ &#215;5</text>
+        <text x="26" y="338" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">CLAUDE.md in 4 of the 5</text>
+        <text x="26" y="358" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">notes only: skills, agents</text>
 
-        <rect x="392" y="30" width="256" height="56" fill="none" stroke="currentColor"/>
+        <line x1="170" y1="98" x2="170" y2="152" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <text x="182" y="130" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">binds: principles, Filing routes</text>
+        <line x1="170" y1="238" x2="170" y2="292" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <text x="182" y="270" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">assigns: the entry table</text>
+
+        <rect x="392" y="28" width="256" height="56" fill="none" stroke="currentColor"/>
         <text x="404" y="50" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">global pool</text>
-        <text x="404" y="68" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">…--claude/memory — 10 setup-*</text>
+        <text x="404" y="70" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&#8230;--claude/memory</text>
 
-        <rect x="392" y="162" width="256" height="56" fill="none" stroke="currentColor"/>
-        <text x="404" y="182" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">workspace pool</text>
-        <text x="404" y="200" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">…-workspace/memory — 5 files</text>
+        <rect x="392" y="168" width="256" height="56" fill="none" stroke="currentColor"/>
+        <text x="404" y="190" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">workspace pool</text>
+        <text x="404" y="210" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&#8230;-workspace/memory</text>
 
-        <rect x="392" y="294" width="256" height="56" fill="none" stroke="currentColor"/>
-        <text x="404" y="314" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">project pools (&#215;6)</text>
-        <text x="404" y="332" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">…-workspace-&lt;entry&gt;/memory</text>
+        <rect x="392" y="308" width="256" height="56" fill="none" stroke="currentColor"/>
+        <text x="404" y="330" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">project pools &#215;5</text>
+        <text x="404" y="350" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&#8230;-workspace-&lt;entry&gt;/memory</text>
 
-        <line x1="322" y1="58" x2="390" y2="58" stroke="currentColor" stroke-dasharray="4 3" marker-end="url(#arrow-scopes)"/>
-        <text x="330" y="50" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">files to</text>
-        <line x1="322" y1="190" x2="390" y2="190" stroke="currentColor" stroke-dasharray="4 3" marker-end="url(#arrow-scopes)"/>
-        <text x="330" y="182" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">files to</text>
-        <line x1="322" y1="322" x2="390" y2="322" stroke="currentColor" stroke-dasharray="4 3" marker-end="url(#arrow-scopes)"/>
-        <text x="330" y="314" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">files to</text>
+        <line x1="328" y1="56" x2="390" y2="56" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <text x="332" y="48" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">files: a tool's own fact</text>
+        <line x1="328" y1="196" x2="390" y2="196" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <text x="332" y="188" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">files: a cross-project procedure</text>
+        <line x1="328" y1="336" x2="390" y2="336" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <text x="332" y="328" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">files: the entry's own takeaway</text>
+
+        <line x1="520" y1="166" x2="520" y2="88" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <line x1="512" y1="119" x2="528" y2="135" stroke="currentColor"/>
+        <line x1="528" y1="119" x2="512" y2="135" stroke="currentColor"/>
+        <text x="502" y="131" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">forbidden: coordination never files here</text>
       </svg>
       <figcaption>
-        Container diagram, all three configuration scopes at commit 3789e39.
-        Key: solid box — a scope's <code>.claude/</code> directory (left) or
-        its memory pool under <code>~/.claude/projects/</code> (right); solid
-        arrow — a governing channel, labelled with its mechanism, pointing
-        from the governing scope to the governed; dashed arrow — where a
-        scope's durable takeaways are filed. Every empty cell in the matrix
-        below is deliberate, not missing.
+        Static structure, all three configuration scopes and their memory
+        pools at commit <code>3e3d22f</code>. Key: solid box — a scope's
+        <code>.claude/</code> directory (left) or the memory pool a session at
+        that scope indexes (right); arrow — one channel, labelled with its
+        intent, pointing from source to consumer; arrow struck through — a
+        filing edge the "Filing" routes forbid. No element is dashed: every
+        part drawn here exists at the pinned commit.
       </figcaption>
     </figure>
-
-    <p>
-      Claude configuration lives in three scopes, and each file kind has one
-      correct home. This pattern draws the shape — the scope matrix, the
-      session composition, and the routing — so a reader can name the
-      destination of any new instruction, rule, skill, agent, or memory
-      without re-deriving the layout. The listings that filled the matrix
-      are in the survey evidence appendix.
-    </p>
 
     <h2 id="elements">Elements</h2>
     <table>
       <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>global scope</td><td>configuration directory</td><td><code>~/.claude/</code> — the instruction file and conditional rules that bind any repository</td></tr>
-        <tr><td>workspace scope</td><td>configuration directory</td><td><code>~/workspace/.claude/</code> — layout, the entry routing table, the one cross-entry skill</td></tr>
-        <tr><td>project scope</td><td>configuration directory</td><td><code>&lt;entry&gt;/.claude/</code> &#215;6 — one CLAUDE.md each; notes adds skills and agents</td></tr>
-        <tr><td>global pool</td><td>memory pool</td><td><code>…--claude/memory</code> — single-tool <code>setup-*</code> facts, visible from every project</td></tr>
-        <tr><td>workspace pool</td><td>memory pool</td><td><code>…-workspace/memory</code> — what coordinates more than one project or service</td></tr>
-        <tr><td>project pools</td><td>memory pool</td><td><code>…-workspace-&lt;entry&gt;/memory</code> — one entry's own durable takeaways</td></tr>
+        <tr><td>Global — ~/.claude/</td><td>configuration directory</td><td>the instruction file and the conditional rules that bind work in any repository on the machine</td></tr>
+        <tr><td>Workspace — ~/workspace/.claude/</td><td>configuration directory</td><td>the layout, the entry routing table, and the cross-entry skill, agent, and output style</td></tr>
+        <tr><td>Project — &lt;entry&gt;/.claude/ &#215;5</td><td>configuration directory</td><td>one per project entry: how to work inside that entry, and the instances only it uses</td></tr>
+        <tr><td>global pool</td><td>memory pool</td><td>a single tool's or environment's own <code>setup-*</code> facts, visible from every project</td></tr>
+        <tr><td>workspace pool</td><td>memory pool</td><td>what coordinates more than one project or service and has no home in a repository</td></tr>
+        <tr><td>project pools &#215;5</td><td>memory pool</td><td>one entry's own durable takeaways, indexed by a session whose cwd is that entry</td></tr>
+        <tr><td>binds: principles, Filing routes</td><td>governing edge</td><td>the global instruction file's principles and routes hold inside the workspace scope unchanged</td></tr>
+        <tr><td>assigns: the entry table</td><td>governing edge</td><td>the workspace CLAUDE.md names each project entry and when a request routes to it</td></tr>
+        <tr><td>files: a tool's own fact</td><td>filing edge</td><td>"Filing" route 3 — one tool's or environment's fact goes to the global pool</td></tr>
+        <tr><td>files: a cross-project procedure</td><td>filing edge</td><td>"Filing" route 4 — a procedure whose subject is the combination goes to the workspace pool</td></tr>
+        <tr><td>files: the entry's own takeaway</td><td>filing edge</td><td>a memory lives in the pool of the project it serves</td></tr>
+        <tr><td>forbidden: coordination never files here</td><td>forbidden edge</td><td>"Filing" route 4 bars the global pool for a coordination procedure — it would hide behind a tool name that names only one of its parts</td></tr>
       </tbody>
     </table>
 
     <h2 id="matrix">Scope matrix</h2>
-    <p>The three scopes divide cleanly: the global scope holds rules true
-    anywhere, the workspace scope holds coordination across project entries,
-    and each project entry holds only its own working knowledge.</p>
+    <p>The scopes divide by how far a claim holds: the global scope carries
+    what is true on any machine and in any repository, the workspace scope
+    carries what coordinates the entries, and a project entry carries only its
+    own working knowledge. The cells below are what that division has actually
+    produced.</p>
     <table>
       <tr><th></th><th>Global (~/.claude/)</th><th>Workspace (~/workspace/.claude/)</th><th>Project (&lt;entry&gt;/.claude/)</th></tr>
       <tr><th>CLAUDE.md</th>
-        <td>1 file: preferences, request signals, golden principles, craft, "Filing" routes</td>
+        <td>1 file: preferences, request signals, golden principles, craft, the "Filing" routes</td>
         <td>1 file: layout and entry routing table, technical-knowledge flow, herdr sessions, concurrent agents, git identity</td>
-        <td>5 files: notes (vault conventions), camera (Android app), mabinogi-mobile-automation (game window), board (board web app), claude-memory-viewer (retiring reference)</td></tr>
+        <td>4 files: notes (vault conventions), camera (Android app), mabinogi-mobile-automation (game window), board (board web app)</td></tr>
       <tr><th>rules/</th>
-        <td><code>skill-authoring.md</code> — fires on <code>**/skills/*/SKILL.md</code></td>
+        <td><code>skill-authoring.md</code> — fires on <code>**/skills/*/SKILL.md</code> and <code>**/skills/*/references/*.md</code></td>
         <td><code>services.md</code> — fires on <code>docs/service-*.html</code></td>
         <td>none</td></tr>
       <tr><th>skills/</th>
-        <td>none</td>
-        <td><code>delegating/</code> — herdr session lifecycle</td>
+        <td>directory absent</td>
+        <td><code>delegating/</code> — herdr session lifecycle, with its scripts</td>
         <td>notes only: committing-operations, filling-front-matter, ingesting-material, publishing-to-github-pages, updating-wiki-index, updating-wiki-pages</td></tr>
       <tr><th>agents/</th>
-        <td>none</td>
-        <td>none</td>
-        <td>notes only: researcher, blog-publisher, wiki-curator — all <code>model: sonnet</code></td></tr>
+        <td>directory absent</td>
+        <td><code>document-writer.md</code> — <code>model: opus</code></td>
+        <td>notes only: blog-publisher, researcher, wiki-curator — all <code>model: sonnet</code></td></tr>
+      <tr><th>output-styles/</th>
+        <td>directory absent — the global CLAUDE.md addresses the workspace copy by path</td>
+        <td><code>simplified-technical.md</code> — the writing and language rules</td>
+        <td>none</td></tr>
       <tr><th>memory pool</th>
         <td>10 <code>setup-*</code> topics: android-toolchain, claude-rules, colima, git, herdr, python-uv, remote-access, rtk, ruby, shell-macos</td>
-        <td>backlog-claude-setup, handoff-docs-board-2026-08-02, handoff-memory-viewer-checks-2026-07-29, history-workspace-refactor, setup-tailnet-services</td>
-        <td>camera: backlog, history-automation-design, setup-android-emulator · notes: 2 feedback, 2 reference, 1 profile · mabinogi: backlog · claude-memory-viewer: backlog · board: (empty)</td></tr>
+        <td>4 files: backlog-claude-setup, handoff-board-checks-2026-08-02, history-workspace-refactor, setup-tailnet-services</td>
+        <td>notes 5 (2 feedback, 2 reference, 1 profile) &#183; camera 3 &#183; mabinogi 1 &#183; board 0, no index yet &#183; claude-memory-viewer 1, entry deleted</td></tr>
     </table>
 
     <div class="callout notice">
       <span class="tag">notice</span>
-      The project column counts 5 CLAUDE.md files for 6 entries. This is
-      not an error: <code>kalaluthien.github.io/</code> has no
-      <code>.claude/</code> by design. The survey evidence appendix records
-      this trap, but a reader meets the matrix first — hence this pointer.
+      The project column counts 4 CLAUDE.md files against 5 entries. This is
+      not an omission: <code>kalaluthien.github.io/</code> has no
+      <code>.claude/</code> directory by design, and the workspace entry table
+      routes a reader there to <code>_config.yml</code> instead. Check that
+      table before reading a missing <code>.claude/</code> as a defect.
     </div>
-
-    <h2 id="session">Session composition</h2>
-    <p>The scopes are not alternatives — a session composes them. A session
-    in a project entry loads the global instruction file, every ancestor
-    CLAUDE.md down to its working directory, and the memory index of exactly
-    one pool; rules from any scope fire later, when a matching file is read.
-    Subagents inherit the same composition, snapshotted at session start
-    (per the notes-pool memory <code>reference-subagent-inheritance</code>).</p>
 
     <div class="callout gap">
       <span class="tag">gap</span>
-      The cited memory is misfiled. The snapshot fact holds for every
-      session, but <code>reference-subagent-inheritance</code> lives in the
-      notes pool, so a session in any other entry cannot see it. Per the
-      "Filing" routes, a harness behavior fact belongs in a global
-      <code>setup-*</code> memory — the same route the rule format already
-      takes. Move the file; keep a <code>[[name]]</code> link in the notes
-      pool if needed.
+      One project pool has no project.
+      <code>&#8230;-workspace-claude-memory-viewer/memory/</code> still holds
+      <code>MEMORY.md</code> and <code>backlog-claude-memory-viewer</code>,
+      but the entry was deleted from the workspace on 2026-08-02 (recorded in
+      the workspace pool's <code>history-workspace-refactor</code>), so no
+      session can ever index that pool again. "Filing" states where a memory
+      is created and how it is pruned, but records no route for a pool whose
+      entry is gone. The owner decides: delete it, or fold the surviving
+      backlog into the workspace pool.
+    </div>
+
+    <details>
+      <summary>Global scope: only CLAUDE.md and rules/ exist — the other three directories are absent, not empty (evidence)</summary>
+<pre>$ ls ~/.claude/{CLAUDE.md,rules,skills,agents,output-styles}
+CLAUDE.md      (file)
+rules          skill-authoring.md
+skills         (no such directory)
+agents         (no such directory)
+output-styles  (no such directory)</pre>
+    </details>
+
+    <details>
+      <summary>Workspace scope: the one scope where all five kinds are present (evidence)</summary>
+<pre>$ ls ~/workspace/.claude/{CLAUDE.md,rules,skills,agents,output-styles}
+CLAUDE.md      (file)
+rules          services.md
+skills         delegating
+agents         document-writer.md
+output-styles  simplified-technical.md</pre>
+    </details>
+
+    <details>
+      <summary>Project scope: every entry but one carries a CLAUDE.md, only notes/ carries skills and agents, no entry carries rules (evidence)</summary>
+<pre>$ for e in notes camera mabinogi-mobile-automation board \
+           kalaluthien.github.io; do ls $e/.claude/; done
+notes/.claude/                      agents CLAUDE.md skills
+camera/.claude/                     CLAUDE.md
+mabinogi-mobile-automation/.claude/ CLAUDE.md
+board/.claude/                      CLAUDE.md
+kalaluthien.github.io/.claude/      (no such directory)</pre>
+      <p>Settings files are filtered out of this listing; see
+        <a href="#not-shown">What is not shown</a>.</p>
+    </details>
+
+    <details>
+      <summary>Memory pools: seven directories — the two upper scopes plus five project pools, one of them empty and one of them orphaned (evidence)</summary>
+<pre>$ ls -d ~/.claude/projects/*/memory | while read d; do
+    echo "$d: $(ls $d | wc -l) files"; done
+-Users-hyungmokim--claude                              11 files
+-Users-hyungmokim-workspace                             5 files
+-Users-hyungmokim-workspace-notes                       6 files
+-Users-hyungmokim-workspace-camera                      4 files
+-Users-hyungmokim-workspace-mabinogi-mobile-automation  2 files
+-Users-hyungmokim-workspace-claude-memory-viewer        2 files
+-Users-hyungmokim-workspace-board                       0 files</pre>
+      <p>Counts include each pool's <code>MEMORY.md</code>; the matrix counts
+        exclude it. A pool path under <code>~/.claude/projects/</code> encodes
+        the working directory with <code>/</code> replaced by <code>-</code>,
+        so list the parent and match by suffix rather than typing the encoding
+        by hand.</p>
+    </details>
+
+    <h2 id="session">What one session loads</h2>
+    <p>The scopes are not alternatives — a session composes them. It loads the
+    global instruction file, every ancestor CLAUDE.md down to its working
+    directory, and the memory index of exactly one pool, the one encoding that
+    working directory. Rules from any scope stay dormant until the session
+    reads a file their <code>paths</code> key matches, so a rule is the only
+    configuration whose arrival depends on what the session opens. Subagents
+    inherit the same composition, snapshotted at session start (per the notes
+    pool's <code>reference-subagent-inheritance</code>, verified 2026-07-16).</p>
+
+    <div class="callout gap">
+      <span class="tag">gap</span>
+      The memory just cited is misfiled. The snapshot fact holds for every
+      session on this machine, but
+      <code>reference-subagent-inheritance</code> lives in the notes pool, so
+      a session in any other entry cannot see it. Per "Filing" route 3, a
+      harness behavior fact belongs in a global <code>setup-*</code> memory —
+      the same route the rule format already takes. Move the file, and leave a
+      <code>[[name]]</code> link in the notes pool if that pool still needs it.
     </div>
 
     <figure>
-      <svg viewBox="0 0 660 300" role="img">
-        <title>The configuration one session loads, shown for a session in the notes entry</title>
+      <svg viewBox="0 0 660 270" role="img">
+        <title>The four configuration sources one session loads, shown for a session whose working directory is the notes entry</title>
         <defs>
           <marker id="arrow-session" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
             <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
           </marker>
         </defs>
-        <rect x="12" y="10" width="300" height="44" fill="none" stroke="currentColor"/>
-        <text x="24" y="30" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">~/.claude/ CLAUDE.md + rules/</text>
-        <text x="24" y="46" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">global scope</text>
 
-        <rect x="12" y="76" width="300" height="44" fill="none" stroke="currentColor"/>
-        <text x="24" y="96" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">~/workspace/.claude/ CLAUDE.md + skills</text>
-        <text x="24" y="112" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">workspace scope, ancestor of cwd</text>
+        <rect x="12" y="10" width="250" height="44" fill="none" stroke="currentColor"/>
+        <text x="24" y="32" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">~/.claude/ CLAUDE.md + rules</text>
+        <text x="24" y="46" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">global scope</text>
 
-        <rect x="12" y="142" width="300" height="44" fill="none" stroke="currentColor"/>
-        <text x="24" y="162" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">notes/.claude/ CLAUDE.md, skills, agents</text>
-        <text x="24" y="178" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">project scope, the cwd entry</text>
+        <rect x="12" y="76" width="250" height="44" fill="none" stroke="currentColor"/>
+        <text x="24" y="98" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">~/workspace/.claude/ + all five</text>
+        <text x="24" y="112" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">workspace scope, ancestor of cwd</text>
 
-        <rect x="12" y="208" width="300" height="44" fill="none" stroke="currentColor"/>
-        <text x="24" y="228" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">pool …-workspace-notes/memory</text>
-        <text x="24" y="244" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">MEMORY.md, the cwd pool index</text>
+        <rect x="12" y="142" width="250" height="44" fill="none" stroke="currentColor"/>
+        <text x="24" y="164" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">notes/.claude/ + skills, agents</text>
+        <text x="24" y="178" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">project scope, the cwd entry</text>
 
-        <rect x="420" y="106" width="228" height="80" fill="none" stroke="currentColor"/>
-        <text x="432" y="132" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">one claude session</text>
-        <text x="432" y="152" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">cwd = ~/workspace/notes</text>
-        <text x="432" y="170" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">subagents inherit the same</text>
+        <rect x="12" y="208" width="250" height="44" fill="none" stroke="currentColor"/>
+        <text x="24" y="230" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&#8230;-workspace-notes/memory</text>
+        <text x="24" y="244" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">the cwd pool, MEMORY.md index</text>
 
-        <line x1="312" y1="32" x2="418" y2="118" stroke="currentColor" marker-end="url(#arrow-session)"/>
-        <text x="322" y="28" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">loads: always; rules fire on read</text>
-        <line x1="312" y1="98" x2="418" y2="134" stroke="currentColor" marker-end="url(#arrow-session)"/>
-        <text x="322" y="94" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">loads: ancestor chain of cwd</text>
-        <line x1="312" y1="164" x2="418" y2="156" stroke="currentColor" marker-end="url(#arrow-session)"/>
-        <text x="322" y="160" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">loads: the cwd entry</text>
-        <line x1="312" y1="230" x2="418" y2="176" stroke="currentColor" marker-end="url(#arrow-session)"/>
-        <text x="322" y="238" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">loads: index of the cwd pool</text>
+        <rect x="428" y="100" width="220" height="92" fill="none" stroke="currentColor"/>
+        <text x="440" y="126" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">one claude session</text>
+        <text x="440" y="146" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">cwd = ~/workspace/notes</text>
+        <text x="440" y="164" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">subagents inherit this</text>
+        <text x="440" y="180" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">snapshot unchanged</text>
+
+        <line x1="262" y1="32" x2="426" y2="118" stroke="currentColor" marker-end="url(#arrow-session)"/>
+        <text x="345" y="70" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">loads: always</text>
+        <line x1="262" y1="98" x2="426" y2="136" stroke="currentColor" marker-end="url(#arrow-session)"/>
+        <text x="345" y="112" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">loads: ancestor of cwd</text>
+        <line x1="262" y1="164" x2="426" y2="154" stroke="currentColor" marker-end="url(#arrow-session)"/>
+        <text x="345" y="154" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">loads: the cwd entry</text>
+        <line x1="262" y1="230" x2="426" y2="172" stroke="currentColor" marker-end="url(#arrow-session)"/>
+        <text x="345" y="196" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">loads: index of the cwd pool</text>
       </svg>
       <figcaption>
-        Runtime diagram, one session in <code>notes/</code>. Key: solid box —
-        a configuration source (left) or the running session (right); arrow —
-        one loading channel into the session's context, labelled with the
-        condition that selects it. A session in a different entry swaps only
-        the two cwd-bound boxes; the upper two never change.
+        Static composition, one session whose working directory is
+        <code>notes/</code>. Key: solid box — a configuration source (left) or
+        the running session (right); arrow — one loading channel into the
+        session's context, labelled with the condition that selects it. A
+        session in another entry swaps only the two cwd-bound boxes; the upper
+        two never change.
       </figcaption>
     </figure>
 
-    <h2 id="routing">Routing logic locations</h2>
-    <p>One rule holds throughout: the router for a thing lives one scope
-    <strong>above</strong> the destinations it chooses between.</p>
+    <table>
+      <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>~/.claude/ CLAUDE.md + rules</td><td>configuration source</td><td>reaches every session on the machine regardless of working directory</td></tr>
+        <tr><td>~/workspace/.claude/ + all five</td><td>configuration source</td><td>reaches a session because the workspace is an ancestor of its working directory</td></tr>
+        <tr><td>notes/.claude/ + skills, agents</td><td>configuration source</td><td>reaches a session because the entry is its working directory</td></tr>
+        <tr><td>&#8230;-workspace-notes/memory</td><td>memory pool</td><td>the one pool whose encoded name matches the working directory; its index loads, its files on demand</td></tr>
+        <tr><td>one claude session</td><td>running process</td><td>the consumer that composes all four, and the snapshot its subagents inherit</td></tr>
+        <tr><td>loads: always</td><td>loading edge</td><td>unconditional at session start</td></tr>
+        <tr><td>loads: ancestor of cwd</td><td>loading edge</td><td>selected by the working directory sitting under the workspace root</td></tr>
+        <tr><td>loads: the cwd entry</td><td>loading edge</td><td>selected by the working directory being that entry</td></tr>
+        <tr><td>loads: index of the cwd pool</td><td>loading edge</td><td>selected by the pool name encoding the working directory</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="routing">Where the routers sit</h2>
+    <p>Every scope declares its own predicate in the opening lines of its
+    CLAUDE.md, and the scope above assigns it — the two governing edges in the
+    first figure. The consequence is that no file decides its own home: the
+    router for a thing always lives one scope above the destinations it
+    chooses between, so a reader who knows what a thing <em>is</em> can find
+    where it goes without opening any of the candidates.</p>
 
     <figure>
       <svg viewBox="0 0 660 360" role="img">
-        <title>The six Filing routes from the global CLAUDE.md to their destinations</title>
+        <title>The six routes the Filing section of the global instruction file chooses between</title>
         <defs>
           <marker id="arrow-routes" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
             <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
@@ -317,12 +365,12 @@
         </defs>
         <rect x="12" y="150" width="210" height="60" fill="none" stroke="currentColor"/>
         <text x="24" y="174" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">~/.claude/CLAUDE.md</text>
-        <text x="24" y="194" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">&#167;Filing — six routes</text>
+        <text x="24" y="194" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="currentColor">&#167;Filing — the router</text>
 
         <rect x="400" y="10" width="248" height="40" fill="none" stroke="currentColor"/>
-        <text x="410" y="34" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">section of the global CLAUDE.md</text>
+        <text x="410" y="34" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a section of the same CLAUDE.md</text>
         <rect x="400" y="68" width="248" height="40" fill="none" stroke="currentColor"/>
-        <text x="410" y="92" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">output style simplified-technical</text>
+        <text x="410" y="92" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">simplified-technical output style</text>
         <rect x="400" y="126" width="248" height="40" fill="none" stroke="currentColor"/>
         <text x="410" y="150" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">setup-* memory, global pool</text>
         <rect x="400" y="184" width="248" height="40" fill="none" stroke="currentColor"/>
@@ -330,73 +378,66 @@
         <rect x="400" y="242" width="248" height="40" fill="none" stroke="currentColor"/>
         <text x="410" y="266" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&lt;entry&gt;/.claude/CLAUDE.md</text>
         <rect x="400" y="300" width="248" height="40" fill="none" stroke="currentColor"/>
-        <text x="410" y="324" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&lt;entry&gt;/docs/ or spec</text>
+        <text x="410" y="324" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">&lt;entry&gt;/docs/ or its spec</text>
 
         <line x1="222" y1="164" x2="398" y2="30"  stroke="currentColor" marker-end="url(#arrow-routes)"/>
         <text x="396" y="22"  text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a rule true anywhere</text>
         <line x1="222" y1="172" x2="398" y2="88"  stroke="currentColor" marker-end="url(#arrow-routes)"/>
-        <text x="396" y="80"  text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a writing rule</text>
+        <text x="396" y="80"  text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a writing or language rule</text>
         <line x1="222" y1="180" x2="398" y2="146" stroke="currentColor" marker-end="url(#arrow-routes)"/>
         <text x="396" y="138" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">one tool's own fact</text>
         <line x1="222" y1="188" x2="398" y2="204" stroke="currentColor" marker-end="url(#arrow-routes)"/>
-        <text x="396" y="196" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">coordinates projects</text>
+        <text x="396" y="196" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">coordinates several projects</text>
         <line x1="222" y1="196" x2="398" y2="262" stroke="currentColor" marker-end="url(#arrow-routes)"/>
-        <text x="396" y="254" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a repo working gotcha</text>
+        <text x="396" y="254" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a repository working gotcha</text>
         <line x1="222" y1="204" x2="398" y2="320" stroke="currentColor" marker-end="url(#arrow-routes)"/>
-        <text x="396" y="312" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a repo product truth</text>
+        <text x="396" y="312" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">a repository product truth</text>
       </svg>
       <figcaption>
-        Routing diagram, the "Filing" section only. Key: solid box — the
-        router (left) or a destination (right); arrow — one route, labelled
-        with the predicate that selects it. The entry table in the workspace
-        CLAUDE.md repeats this exact shape one scope down, routing requests
-        to project entries — the router always sits one scope above its
-        destinations.
+        Routing structure, the "Filing" section of
+        <code>~/.claude/CLAUDE.md</code> only. Key: solid box — the router
+        (left) or one destination (right); arrow — one route, labelled with
+        the predicate that selects it. Two destinations sit outside the global
+        scope that holds the router, which is the shape the opening rule
+        describes.
       </figcaption>
     </figure>
 
+    <table>
+      <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>&sect;Filing — the router</td><td>instruction section</td><td>the six-way choice a durable takeaway passes through before it is written anywhere</td></tr>
+        <tr><td>a section of the same CLAUDE.md</td><td>destination, global scope</td><td>a rule that holds on any repository, machine, or tool, filed under the work it applies to</td></tr>
+        <tr><td>simplified-technical output style</td><td>destination, workspace scope</td><td>the writing and language rules, addressed by path from the global file</td></tr>
+        <tr><td>setup-* memory, global pool</td><td>destination, global pool</td><td>one tool's or environment's own fact, so every project finds it in one place</td></tr>
+        <tr><td>workspace pool memory</td><td>destination, workspace pool</td><td>a procedure whose subject is the combination of projects or services</td></tr>
+        <tr><td>&lt;entry&gt;/.claude/CLAUDE.md</td><td>destination, project scope</td><td>a working gotcha specific to that repository: how to build, test, or debug it</td></tr>
+        <tr><td>&lt;entry&gt;/docs/ or its spec</td><td>destination, project repository</td><td>a product, architecture, or verification truth, which never goes to a CLAUDE.md</td></tr>
+      </tbody>
+    </table>
+
+    <p>The "Filing" section is the router for memories only. Four more routers
+    exist, each one scope above what it chooses between:</p>
     <ol>
-      <li>Memory routing — <code>~/.claude/CLAUDE.md</code> "Filing": the six
-        routes in the figure above.</li>
-      <li>Request routing — <code>~/workspace/.claude/CLAUDE.md</code>, the
-        project-entry table: route by intent, then read that entry's own
-        documents first.</li>
-      <li>Document routing — the same file, "Workspace layout": a document
-        lands in <code>docs/</code> with an <code>agent-</code> or
-        <code>service-</code> plane prefix only when no project entry owns
-        the topic.</li>
-      <li>Survey routing — the same file, "Technical knowledge": read the
-        wiki first; delegate any web survey to <code>notes/</code> so the
-        answer lands in the vault.</li>
-      <li>Session routing — the workspace <code>delegating</code> skill:
-        which herdr pane and repository a delegated session runs in.</li>
-      <li>Pool self-description — each pool's <code>MEMORY.md</code> header
-        restates its own boundary, so a reader inside the pool never needs
-        the router.</li>
+      <li><strong>Request routing</strong> — the project-entry table in
+        <code>~/workspace/.claude/CLAUDE.md</code>: route by intent, then read
+        that entry's own documents first.</li>
+      <li><strong>Document routing</strong> — the same file, "Workspace
+        layout": a document lands in <code>docs/</code> under an
+        <code>agent-</code> or <code>service-</code> plane prefix only when no
+        project entry owns the topic.</li>
+      <li><strong>Survey routing</strong> — the same file, "Technical
+        knowledge": read the wiki first, and delegate any web survey to
+        <code>notes/</code> so the answer lands in the vault.</li>
+      <li><strong>Session routing</strong> — the workspace
+        <code>delegating</code> skill: which herdr pane and repository a
+        delegated session runs in.</li>
     </ol>
+    <p>Each memory pool also restates its own boundary in its
+    <code>MEMORY.md</code> header, so a reader already inside a pool never has
+    to climb back to the router to check whether a file belongs there.</p>
 
-    <h2 id="responsibility">Responsibility declarations</h2>
-    <p>Each scope declares its own responsibility in the first lines of its
-    CLAUDE.md, and the scope above assigns it — the two solid arrows in the
-    first figure.</p>
-    <ul>
-      <li>Global: <code>~/.claude/CLAUDE.md</code> opens with "taste-level
-        preferences that hold on any machine, in any repository" — the scope
-        predicate itself.</li>
-      <li>Workspace: <code>~/workspace/.claude/CLAUDE.md</code> opens by
-        declaring the workspace a control plane over agents and services,
-        and splits directories into workspace-owned and project entries. Its
-        entry table assigns every project's responsibility from above.</li>
-      <li>Project: each entry's CLAUDE.md declares <em>how</em> to work
-        inside the entry; the workspace table declares <em>when</em> to
-        enter it. The two never repeat each other.</li>
-      <li>Memory pools: each <code>MEMORY.md</code> header carries the
-        pool's charter — for example the workspace pool: "what coordinates
-        more than one project or service and has no home in a
-        repository".</li>
-    </ul>
-
-    <h2 id="formats">File-format definitions</h2>
+    <h2 id="formats">Where each file format is defined</h2>
     <table>
       <tr><th>item</th><th>format defined in</th><th>defines</th></tr>
       <tr><td>CLAUDE.md placement</td>
@@ -407,216 +448,66 @@
         <td>frontmatter shape, <code>&lt;subcategory&gt;-&lt;topic&gt;</code> naming, episodic / semantic / procedural lifecycle</td></tr>
       <tr><td>skill</td>
         <td><code>~/.claude/rules/skill-authoring.md</code></td>
-        <td>SKILL.md structure; loads itself whenever a SKILL.md is read</td></tr>
+        <td>SKILL.md structure; loads itself whenever a SKILL.md or a skill reference is read</td></tr>
       <tr><td>skill naming</td>
         <td><code>~/.claude/CLAUDE.md</code> "Claude Code" item 2</td>
         <td>gerund form — verb-ing plus object</td></tr>
       <tr><td>rule</td>
         <td><code>setup-claude-rules</code> memory, global pool</td>
-        <td>the <code>paths</code> key, gitignore-style matching, fires on read but never on write</td></tr>
+        <td>the <code>paths</code> key, gitignore-style matching, firing on read but never on write</td></tr>
       <tr><td>agent</td>
-        <td>frontmatter convention in <code>notes/.claude/agents/*.md</code></td>
-        <td><code>name</code>, <code>description</code>, <code>model</code>; model choice per "Claude Code" item 3; inheritance facts in the notes-pool memory <code>reference-subagent-inheritance</code></td></tr>
+        <td>no written definition — by example only, in <code>~/workspace/.claude/agents/document-writer.md</code> and <code>notes/.claude/agents/*.md</code></td>
+        <td><code>name</code>, <code>description</code>, <code>model</code>; model choice per "Claude Code" item 3</td></tr>
     </table>
-    <p>The pattern across the whole survey: definitions and routers sit at
-    global scope, assignments at workspace scope, instances at project
-    scope. The one asymmetry worth knowing: the rule format is defined in a
-    verified <code>setup-*</code> memory rather than a CLAUDE.md, because it
-    is a harness behavior fact, not a preference.</p>
+    <p>Two rows break the pattern the rest of this document follows, where
+    definitions and routers sit at global scope and instances sit below. The
+    rule format is defined in a <code>setup-*</code> memory rather than in a
+    CLAUDE.md, because it is a verified harness behavior rather than a
+    preference. The agent format is defined nowhere — only demonstrated, and
+    demonstrated at the two scopes that hold instances.</p>
 
     <div class="callout gap">
       <span class="tag">gap</span>
-      The pattern has a second asymmetry this paragraph does not name: the
-      agent format is defined only by example, at project scope
-      (<code>notes/.claude/agents/*.md</code>), while the closing rule says
-      definitions sit at global scope. Either write the agent format down
-      at global scope, or name it here as the second exception beside the
-      rule format.
+      The agent row has no definition to cite, so an author writing a new
+      agent has to reverse-engineer the frontmatter from an existing file, and
+      nothing states which keys are required. Either write the agent format
+      down at global scope beside the skill rule, or record the decision that
+      it stays by example. The workspace scope acquiring its own agent
+      (<code>document-writer.md</code>) makes the second author more likely,
+      not less.
     </div>
 
     <h2 id="not-shown">What is not shown</h2>
-    <p>The figures and the matrix claim placement and routing only. Not
-    shown: the contents of any configuration file; the harness's load
-    mechanics beyond the conditions the session figure names;
-    <code>settings.json</code>, permissions, and hooks in every scope —
-    the survey covers the five matrix file kinds and no more; and the
-    history of retired scopes, which lives in the workspace pool's
-    <code>history-workspace-refactor</code> memory.</p>
-
-    <h2 id="evidence">Appendix: survey evidence</h2>
-    <p>The four listings that filled the matrix, taken against the tree at
-    the pinned commit. They assume the workspace checked out at
-    <code>~/workspace</code>, and they read the tree against the "Filing"
-    taxonomy in <code>~/.claude/CLAUDE.md</code>.</p>
-    <ol>
-      <li>
-        <p>List the global scope. Only <code>CLAUDE.md</code> and
-        <code>rules/</code> hold content; <code>skills/</code> and
-        <code>agents/</code> are empty by design, because machine-wide
-        behavior lives in the instruction file and the conditional rules.</p>
-<pre>$ ls ~/.claude/{CLAUDE.md,rules,skills,agents}
-CLAUDE.md
-rules/:  skill-authoring.md
-skills/: (empty)
-agents/: (empty)</pre>
-      </li>
-      <li>
-        <p>List the workspace scope. It adds the one cross-entry skill and the
-        services-plane rule; it defines no agents.</p>
-<pre>$ ls ~/workspace/.claude/{CLAUDE.md,rules,skills,output-styles}
-CLAUDE.md
-rules/:         services.md
-skills/:        delegating/
-output-styles/: simplified-technical.md</pre>
-        <div class="callout gap">
-          <span class="tag">gap</span>
-          This listing shows <code>output-styles/</code>, but the scope
-          matrix has no <code>output-styles</code> row. The file kind enters
-          the survey and then drops out of the summary. Add the row, or
-          state why the matrix omits it.
-        </div>
-      </li>
-      <li>
-        <p>List each project entry. Every entry carries its own
-        <code>CLAUDE.md</code>; only <code>notes/</code> defines skills and
-        agents; no entry defines rules.</p>
-<pre>$ for p in notes camera mabinogi-mobile-automation board \
-           claude-memory-viewer kalaluthien.github.io; do
-    ls ~/workspace/$p/.claude/; done
-notes/:      CLAUDE.md  skills/ (6)  agents/ (3)
-camera/:     CLAUDE.md
-mabinogi-mobile-automation/: CLAUDE.md
-board/:      CLAUDE.md
-claude-memory-viewer/:       CLAUDE.md   (retiring)
-kalaluthien.github.io/:      (no .claude — routed to _config.yml)</pre>
-      </li>
-      <li>
-        <p>List the memory pools. The global pool and the workspace pool map
-        to the two upper scopes; five project pools exist, and the newest —
-        <code>board</code> — is still empty.</p>
-<pre>$ ls ~/.claude/projects/*/memory/
--Users-hyungmokim--claude/:   MEMORY.md + 10 setup-* files
--Users-hyungmokim-workspace/: MEMORY.md + 5 files
-...-workspace-notes/:         MEMORY.md + 5 files
-...-workspace-camera/:        MEMORY.md + 3 files
-...-workspace-mabinogi-mobile-automation/: MEMORY.md + 1 file
-...-workspace-claude-memory-viewer/:       MEMORY.md + 1 file
-...-workspace-board/:                      (empty)</pre>
-        <div class="callout gap">
-          <span class="tag">gap</span>
-          The board pool does not reproduce. On 2026-08-02, the path
-          <code>…-workspace-board/memory/</code> does not exist — the
-          harness creates a pool only when a session first runs in the
-          entry. Four project pools exist, not five. Per the staleness rule
-          below, this is a staleness signal for this listing and the
-          matrix.
-        </div>
-      </li>
-    </ol>
-    <p><strong>Staleness rule.</strong> Re-run the four listings against
-    the current tree; they must reproduce the matrix exactly. A difference
-    means this document is stale, not the tree: update the matrix and the
-    figures in place, re-pin the Commit field to the tree the re-walk ran
-    on, and do not fork a dated copy. Two traps while re-walking:</p>
+    <p>The figures and tables claim placement and routing, and nothing else.
+    Not shown, deliberately:</p>
     <ul>
-      <li>A pool path under <code>~/.claude/projects/</code> does not
-        resolve: the encoded name mirrors the working directory
-        (<code>/</code> becomes <code>-</code>). List the parent directory
-        and match by suffix instead of typing the encoding by hand.</li>
-      <li>An entry has no <code>.claude/</code> directory: check the entry
-        table in the workspace CLAUDE.md before treating it as a gap —
-        <code>kalaluthien.github.io/</code> is routed to
-        <code>_config.yml</code> by design.</li>
+      <li><strong>The contents of any configuration file</strong> — the matrix
+        names files and the kinds they hold, never what they say. Read the
+        file.</li>
+      <li><strong>Settings, permissions, and hooks</strong> —
+        <code>settings.json</code> and <code>settings.local.json</code> exist
+        at every scope and inside entries, and are filtered out of the third
+        listing. They are configuration, but they are the harness's, not the
+        instruction system's, and no "Filing" route mentions them.</li>
+      <li><strong>The rest of <code>~/.claude/</code></strong> — the runtime
+        directories beside the instruction files (sessions, plugins, caches,
+        history) hold no authored configuration.</li>
+      <li><strong>Worktrees</strong> — <code>~/workspace/</code> also holds
+        <code>board-wt-trimsurfaces/</code>, a git worktree of
+        <code>board/</code>. It carries a <code>.claude/CLAUDE.md</code>
+        because it is a checkout of the same repository, not because it is a
+        sixth entry, and it is excluded from every count here.</li>
+      <li><strong>Load mechanics</strong> — the second figure names the
+        condition that selects each source, not the order, the token budget,
+        or what happens when two scopes disagree.</li>
+      <li><strong>History</strong> — which scopes and entries existed before
+        today. That log is the workspace pool's
+        <code>history-workspace-refactor</code>.</li>
     </ul>
+    <p>The four listings reproduce the matrix at commit <code>3e3d22f</code>.
+    A later re-walk that disagrees means this document is stale, not the tree:
+    update the matrix and figures in place and re-pin the Commit field.</p>
 
-    <h2 id="appendix">Appendix: migration record (2026-08-02)</h2>
-    <p>This document began on the retired how-to-guide skeleton and moved to
-    the practice template in the same change that added the figures. The
-    comparison that scoped the job, kept as the record of what changed:</p>
-    <table>
-      <tr><th>aspect</th><th>as-is (before)</th><th>to-be (this revision)</th></tr>
-      <tr><td>Chapter / Category</td>
-        <td>listed under Practices, header said <code>how-to-guide</code></td>
-        <td>header says <code>practice</code></td></tr>
-      <tr><td>Skeleton</td>
-        <td>copied from retired <code>how-to-guide.html</code></td>
-        <td>copied fresh from <code>practice.html</code>, figure CSS from <code>pattern.html</code></td></tr>
-      <tr><td>Required sections</td>
-        <td>Prerequisites, Steps, Acceptance</td>
-        <td>plus Recovery</td></tr>
-      <tr><td>Figures</td>
-        <td>none — prose and tables only</td>
-        <td>three, per the pattern template's C4 checklist: scope containers, session composition, Filing routes</td></tr>
-      <tr><td>Commit pin</td>
-        <td><code>71f9375</code></td>
-        <td><code>3789e39</code>, after a re-walk</td></tr>
-      <tr><td>Survey content</td>
-        <td>5 project entries; no <code>board</code>; claude-memory-viewer active</td>
-        <td>6 entries; <code>board</code> added with its empty pool; claude-memory-viewer marked retiring</td></tr>
-    </table>
-    <p>Re-categorized from practice to pattern later the same day
-    (2026-08-02): the reader's question this document answers is "what
-    shape does the configuration have?", not "how do I do it?" — the four
-    listings are evidence behind the figures, not a procedure walked to a
-    goal. The change moved the listings to the survey evidence appendix,
-    folded Acceptance and Recovery into its staleness rule, and added the
-    Elements table and the "What is not shown" section per the pattern
-    contract.</p>
-
-    <h2 id="connectivity">Appendix: template connectivity check (2026-08-02)</h2>
-    <p>The document templates are self-contained by decision, so their
-    instructions connect only through explicit references. This check walks
-    five author scenarios through the references that exist at commit
-    05f4c0d and records where a walk dead-ends. Each scenario starts where a
-    real author starts — <code>docs/README.md</code> or a copied template —
-    and follows only what the files themselves say.</p>
-    <table>
-      <tr><th>scenario</th><th>path walked</th><th>verdict</th></tr>
-      <tr><td>Route a new document to its template</td>
-        <td>README's chapter table carries a reader's-question column
-          (why / what shape / how); the practice template's own example
-          restates the same chooser in its first step — two independent
-          paths</td>
-        <td>connected</td></tr>
-      <tr><td>Add a document end to end</td>
-        <td>README: "to add a document, follow the practice template's own
-          example" — the example walks copy, fill, catalogue row, one
-          commit</td>
-        <td>connected</td></tr>
-      <tr><td>Resolve the cited research</td>
-        <td>the templates and README cite seven <code>notes/wiki/*.md</code>
-          pages by path; all seven exist in the notes vault</td>
-        <td>connected</td></tr>
-      <tr><td>Add a figure to a practice or principle</td>
-        <td>the figure discipline — C4 checklist, SVG conventions, figure
-          CSS — lives only in <code>pattern.html</code>;
-          <code>practice.html</code> says "a practice owes no figure" with
-          no pointer, <code>principle.html</code> says nothing</td>
-        <td>dead end</td></tr>
-      <tr><td>Warn in a pattern or principle</td>
-        <td>the warning form — hazard, consequence, avoidance, placed at
-          the step it names — and the <code>.warning</code> CSS live only
-          in <code>practice.html</code>; the other two carry neither the
-          rule nor a pointer</td>
-        <td>dead end</td></tr>
-    </table>
-    <p>Reading of the two dead ends: within its own genre every template is
-    complete, but the shared component disciplines sit in exactly one
-    sibling, and nothing routes an author there. This document is the
-    evidence — its figures required opening <code>pattern.html</code> by
-    hand and importing the figure CSS, a step no instruction named. The
-    consistent fix is one pointer line in each template's header comment
-    ("for a figure, follow pattern.html's checklist and copy its figure
-    CSS; for a warning, practice.html's outline form"), keeping each rule
-    written once while making every path to it explicit. The fix belongs to
-    the template owners; this appendix only records the check.</p>
-
-    <div class="callout notice">
-      <span class="tag">notice</span>
-      The recorded fix is still open. On 2026-08-02, no template header
-      carries the pointer lines; the two dead ends stand. Track the item
-      until the template owners land it, then update the verdict column.
-    </div>
   </section>
 
 </article>
