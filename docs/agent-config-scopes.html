@@ -6,14 +6,13 @@
 <title>Survey the Claude configuration scopes — workspace</title>
 <style>
   /* Charter ships with macOS, Georgia everywhere else, so the page needs no
-     font download. Tufte's #fffff8 / #111 instead of pure black-on-white:
-     nearly indistinguishable, without the harsh contrast. */
+     font download. White background by owner preference (2026-08-02). */
   html { font-size: 16px; }
   body {
     max-width: 42rem;
     margin: 0 auto;
     padding: 4rem 1.5rem 8rem;
-    background: #fffff8;
+    background: #ffffff;
     color: #111;
     font-family: Charter, "Bitstream Charter", Georgia, serif;
     line-height: 1.62;
@@ -35,14 +34,14 @@
   /* Wide content scrolls inside itself; the page never scrolls sideways. */
   pre {
     overflow-x: auto;
-    background: #f2f2ea;
+    background: #f4f4f4;
     padding: 1rem;
     line-height: 1.45;
     margin: 1.4rem 0;
   }
 
   table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
-  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e2e2d8; }
+  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
   th { font-weight: 600; }
   /* phone-width table scroll: below the body's own max-width a multi-column
      table would crush to one word per line (width:100% leaves nothing to
@@ -71,6 +70,28 @@
   }
   .warning ul { margin: .3rem 0; }
 
+  /* Labeled review blocks in the Information Mapping style: one observation
+     per box, tagged by kind. NOTICE — read it, then continue. GAP — a defect
+     in this document or in the tree it surveys; it names the fix or the
+     owner. Added 2026-08-02 as annotations; the surveyed prose above and
+     below each box is unchanged. */
+  .callout {
+    border: 1px solid #ccc;
+    border-left-width: 4px;
+    padding: .55rem .9rem;
+    margin: 1.2rem 0;
+    font-size: .88rem;
+    line-height: 1.55;
+  }
+  .callout .tag {
+    font-variant: small-caps;
+    letter-spacing: .06em;
+    font-weight: 600;
+    margin-right: .45rem;
+  }
+  .callout.notice { border-left-color: #556; }
+  .callout.gap { border-left-color: #8a5a00; }
+
   figure { margin: 2.6rem 0; }
   figure svg { display: block; width: 100%; height: auto; }
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
@@ -97,6 +118,15 @@
       a reader can name the destination of any new instruction, rule, skill,
       agent, or memory without re-deriving the layout.
     </p>
+
+    <div class="callout gap">
+      <span class="tag">gap</span>
+      This document carries two commit pins. The header pins
+      <code>3789e39</code>; the connectivity appendix walks the tree at
+      <code>05f4c0d</code>. The Recovery section says: re-pin the Commit
+      field to the tree of the newest re-walk. Apply that rule at the next
+      update.
+    </div>
 
     <figure>
       <svg viewBox="0 0 660 380" role="img">
@@ -187,6 +217,13 @@ CLAUDE.md
 rules/:         services.md
 skills/:        delegating/
 output-styles/: simplified-technical.md</pre>
+        <div class="callout gap">
+          <span class="tag">gap</span>
+          This step lists <code>output-styles/</code>, but the scope matrix
+          below has no <code>output-styles</code> row. The file kind enters
+          the survey and then drops out of the summary. Add the row, or
+          state why the matrix omits it.
+        </div>
       </li>
       <li>
         <p>List each project entry. Every entry carries its own
@@ -214,6 +251,14 @@ kalaluthien.github.io/:      (no .claude — routed to _config.yml)</pre>
 ...-workspace-mabinogi-mobile-automation/: MEMORY.md + 1 file
 ...-workspace-claude-memory-viewer/:       MEMORY.md + 1 file
 ...-workspace-board/:                      (empty)</pre>
+        <div class="callout gap">
+          <span class="tag">gap</span>
+          The board pool does not reproduce. On 2026-08-02, the path
+          <code>…-workspace-board/memory/</code> does not exist — the
+          harness creates a pool only when a session first runs in the
+          entry. Four project pools exist, not five. Per the Acceptance
+          section, this is a staleness signal for this step and the matrix.
+        </div>
       </li>
     </ol>
 
@@ -245,6 +290,14 @@ kalaluthien.github.io/:      (no .claude — routed to _config.yml)</pre>
         <td>camera: backlog, history-automation-design, setup-android-emulator · notes: 2 feedback, 2 reference, 1 profile · mabinogi: backlog · claude-memory-viewer: backlog · board: (empty)</td></tr>
     </table>
 
+    <div class="callout notice">
+      <span class="tag">notice</span>
+      The project column counts 5 CLAUDE.md files for 6 entries. This is
+      not an error: <code>kalaluthien.github.io/</code> has no
+      <code>.claude/</code> by design. The Recovery section records this,
+      but a reader meets the matrix first — hence this pointer.
+    </div>
+
     <h2 id="session">Session composition</h2>
     <p>The scopes are not alternatives — a session composes them. A session
     in a project entry loads the global instruction file, every ancestor
@@ -252,6 +305,17 @@ kalaluthien.github.io/:      (no .claude — routed to _config.yml)</pre>
     one pool; rules from any scope fire later, when a matching file is read.
     Subagents inherit the same composition, snapshotted at session start
     (per the notes-pool memory <code>reference-subagent-inheritance</code>).</p>
+
+    <div class="callout gap">
+      <span class="tag">gap</span>
+      The cited memory is misfiled. The snapshot fact holds for every
+      session, but <code>reference-subagent-inheritance</code> lives in the
+      notes pool, so a session in any other entry cannot see it. Per the
+      "Filing" routes, a harness behavior fact belongs in a global
+      <code>setup-*</code> memory — the same route the rule format already
+      takes. Move the file; keep a <code>[[name]]</code> link in the notes
+      pool if needed.
+    </div>
 
     <figure>
       <svg viewBox="0 0 660 300" role="img">
@@ -421,6 +485,16 @@ kalaluthien.github.io/:      (no .claude — routed to _config.yml)</pre>
     verified <code>setup-*</code> memory rather than a CLAUDE.md, because it
     is a harness behavior fact, not a preference.</p>
 
+    <div class="callout gap">
+      <span class="tag">gap</span>
+      The pattern has a second asymmetry this paragraph does not name: the
+      agent format is defined only by example, at project scope
+      (<code>notes/.claude/agents/*.md</code>), while the closing rule says
+      definitions sit at global scope. Either write the agent format down
+      at global scope, or name it here as the second exception beside the
+      rule format.
+    </div>
+
     <h2 id="acceptance">Acceptance</h2>
     <p>Given any new configuration file — an instruction, a rule, a skill,
     an agent, a memory — the reader names its destination scope from the
@@ -517,6 +591,13 @@ kalaluthien.github.io/:      (no .claude — routed to _config.yml)</pre>
     CSS; for a warning, practice.html's outline form"), keeping each rule
     written once while making every path to it explicit. The fix belongs to
     the template owners; this appendix only records the check.</p>
+
+    <div class="callout notice">
+      <span class="tag">notice</span>
+      The recorded fix is still open. On 2026-08-02, no template header
+      carries the pointer lines; the two dead ends stand. Track the item
+      until the template owners land it, then update the verdict column.
+    </div>
   </section>
 
 </article>
