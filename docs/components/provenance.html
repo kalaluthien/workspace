@@ -1,0 +1,70 @@
+<!doctype html>
+<!--
+  Component: provenance — the header block that opens every view document.
+  This file demonstrates itself: the <header> below is the component and the
+  CSS between the component markers is its style.
+
+  Rules:
+  - The h1 carries the document's conclusion, phrased by doctype: an
+    explanation states the answer as a sentence; a guide states the task as
+    the reader would ask for it; a proposal states the change as what it
+    would make true; a report states what was measured and the headline
+    finding; a mockup states which surface, in which proposed state.
+  - The fields carry the derivation. A paragraph restating that the document
+    is derived is meta-description — the fields already say it.
+  - Every view carries Doctype, Source, Updated, Commit, plus the one field
+    its doctype adds (Question, Goal, or Status). Commit pins the tree the
+    document was rendered against; there is exactly one Commit value — a
+    section that re-walked at a newer tree re-pins the whole document.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>provenance — docs components</title>
+<style>
+  html { font-size: 16px; }
+  body { max-width: 42rem; margin: 0 auto; padding: 4rem 1.5rem 8rem;
+         background: #ffffff; color: #111;
+         font-family: Charter, "Bitstream Charter", Georgia, serif;
+         line-height: 1.62; overflow-wrap: break-word; }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
+  p { margin: .7rem 0; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
+
+  /* component: provenance */
+  .provenance {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: .15rem 1rem;
+    margin: 0;
+    font-size: .85rem;
+    color: #555;
+  }
+  .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
+  .provenance dd { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
+  /* end component: provenance */
+</style>
+</head>
+<body>
+<article>
+  <header>
+    <h1>The header block carries the derivation</h1>
+    <dl class="provenance">
+      <dt>Doctype</dt> <dd>explanation</dd>
+      <dt>Question</dt> <dd>what does a view header carry, and why these fields?</dd>
+      <dt>Source</dt>   <dd>docs/README.md; docs/templates/</dd>
+      <dt>Updated</dt>  <dd>2026-08-02</dd>
+      <dt>Commit</dt>   <dd>0f2c3c8</dd>
+    </dl>
+  </header>
+  <p>
+    The header above is the component, filled as its own example. The h1
+    states the document's conclusion; the four shared fields plus the
+    doctype's own field carry everything a reader needs to trust or distrust
+    the page — what kind it is, what it stands on, when it was rendered, and
+    against which tree.
+  </p>
+</article>
+</body>
+</html>

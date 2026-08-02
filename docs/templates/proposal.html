@@ -1,0 +1,153 @@
+<!doctype html>
+<!--
+  Doctype: proposal — a change argued but not decided. Copy to
+  docs/<name>.html (workspace: plane prefix agent- or service-) and fill in;
+  update the same file in place. Delete every comment, including this one.
+
+  A proposal is the one prose view allowed to describe what does not exist.
+  What it says about today is grounded and cited; what it says about
+  tomorrow is an option, and is written as one. Nothing is decided here:
+  acceptance is recorded in a spec, and the Status field then points at
+  that document. Status is one of: Open; Accepted YYYY-MM-DD -> <spec
+  file>; Rejected YYYY-MM-DD, <reason>.
+
+  The skeleton follows the measured argument structure
+  (research: notes/wiki/document-argument-structures.md):
+  - The h1 states the change as what it would make true ("Adopt X for Y"),
+    never the topic ("On X").
+  - The document opens with one and-but-therefore sentence: the situation,
+    the complication, and the recommendation in about thirty words. A
+    reader who stops there has already reached the answer. No Situation or
+    Question section exists — that sentence carries both.
+  - Problem shows today's cost rather than asserting it: the observation,
+    the file or measurement it came from, and who it costs. A problem no
+    reader can check is a preference.
+  - Options: the axes are named before any option is judged; two options
+    minimum, each with a name (never a letter), its cost, and what it
+    gives up. The options that lost stay in the document forever — the
+    reason one lost is the only thing standing between it and being
+    re-proposed. Check the list for what is missing and what is counted
+    twice; a deliberate overlap is allowed when named.
+  - Recommendation: one option, why it wins on the stated axes, what would
+    have to be true for the recommendation to flip, and the smallest first
+    step — accepting should cost one commit, not a project.
+  - Section headings are claims, not topics; each supports the
+    recommendation independently, so one refuted section leaves the rest
+    standing. Three to five top-level sections, three heading levels
+    maximum; a fourth level is an appendix.
+
+  required-fields: Doctype, Status, Source, Updated, Commit
+  required-sections: Problem, Options, Recommendation
+
+  rubric — the writer checks every item before delivering and reports the
+  result; the reviewer scores against the same list. Binary, no partial
+  credit:
+  - [ ] The h1 states the change as what it would make true, not the topic.
+  - [ ] The document opens with one and-but-therefore sentence that reaches
+        the recommendation.
+  - [ ] Every claim about today cites an observation a reader can check at
+        the pinned commit.
+  - [ ] The axes are named before any option is judged.
+  - [ ] At least two named options, each with cost and what it gives up.
+  - [ ] The recommendation names the flip condition and the smallest first
+        step.
+  - [ ] Section headings are claims; each supports the recommendation
+        independently.
+  - [ ] Three to five top-level sections, three heading levels maximum.
+  - [ ] Nothing is decided in the document; Status carries the state.
+  - [ ] Wide content scrolls inside its own container at phone width.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><!-- Title --> — <!-- repo --></title>
+<style>
+  /* Base, provenance, callout, figure, disclosure styles — copied from
+     docs/components/ (self-contained by rule; copied, never linked). */
+  html { font-size: 16px; }
+  body {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 8rem;
+    background: #ffffff;
+    color: #111;
+    font-family: Charter, "Bitstream Charter", Georgia, serif;
+    line-height: 1.62;
+    overflow-wrap: break-word;
+  }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
+  h2 { font-size: 1.3rem; margin: 3rem 0 .5rem; font-weight: 600; }
+  h3 { font-size: 1.02rem; margin: 2rem 0 .3rem; font-weight: 600; }
+  p, li { margin: .7rem 0; }
+  ul, ol { padding-left: 1.2rem; }
+  a { color: inherit; text-decoration-color: #aaa; }
+  strong { font-weight: 600; }
+  code, pre, .provenance dd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85em;
+  }
+  pre { overflow-x: auto; background: #f4f4f4; padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
+  th { font-weight: 600; }
+  @media (max-width: 42rem) {
+    table { display: block; overflow-x: auto; }
+    th, td { min-width: 9rem; }
+  }
+  .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
+  .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
+  .provenance dd { margin: 0; }
+  .callout { border: 1px solid #ccc; border-left-width: 4px; padding: .55rem .9rem; margin: 1.2rem 0; font-size: .88rem; line-height: 1.55; }
+  .callout .tag { font-variant: small-caps; letter-spacing: .06em; font-weight: 600; margin-right: .45rem; }
+  .callout.notice   { border-left-color: #556; }
+  .callout.gap      { border-left-color: #8a5a00; }
+  .callout.warning  { border-left-color: #a33; }
+  .callout.recovery { border-left-color: #2a6; }
+  .callout ul { margin: .3rem 0; }
+  details { border: 1px solid #e4e4e4; padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
+  details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
+  details[open] summary { margin-bottom: .5rem; }
+  figure { margin: 2.6rem 0; }
+  figure svg { display: block; width: 100%; height: auto; }
+  figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
+</style>
+</head>
+<body>
+<article>
+
+  <header>
+    <h1><!-- The change, stated as what it would make true --></h1>
+    <dl class="provenance">
+      <dt>Doctype</dt> <dd>proposal</dd>
+      <dt>Status</dt>  <dd>Open</dd>
+      <dt>Source</dt>  <dd><!-- specs; code; research it stands on --></dd>
+      <dt>Updated</dt> <dd><!-- YYYY-MM-DD, last render date --></dd>
+      <dt>Commit</dt>  <dd><!-- short sha of the tree the problem was read on --></dd>
+    </dl>
+  </header>
+
+  <section>
+    <p><!-- The one and-but-therefore sentence. --></p>
+
+    <h2 id="problem"><!-- The problem, as a claim --></h2>
+    <p><!-- The observation, its source, who it costs. --></p>
+
+    <h2 id="options"><!-- The options, as a claim about the choice --></h2>
+    <p><!-- The axes, named before any option is judged. --></p>
+    <table>
+      <thead><tr><th>Option</th><th>What it does</th><th>Cost</th><th>What it gives up</th></tr></thead>
+      <tbody>
+        <tr><td><!-- a name, not a letter --></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="recommendation"><!-- The recommendation, as a claim --></h2>
+    <p><!-- The winner on the axes, the flip condition, the smallest first
+            step. --></p>
+  </section>
+
+</article>
+</body>
+</html>

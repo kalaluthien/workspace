@@ -1,0 +1,143 @@
+<!doctype html>
+<!--
+  Doctype: report — what an investigation found, pinned to its commit: a
+  measurement, a check, or a survey of a tree. Copy to docs/<name>.html
+  (workspace: plane prefix agent- or service-) and fill in; update the same
+  file in place on re-run. Delete every comment, including this one.
+
+  A report is a claim someone else must be able to re-run. Protocol and
+  Findings are required for exactly that reason: without the protocol the
+  findings cannot be reproduced, and without the findings the protocol was
+  never run. A report is dated by nature — it says what was found when we
+  looked, where an explanation says what is true. When a re-run would give a
+  different answer, that is the report aging normally, not a defect.
+
+  Numeric findings report a median with its min–max range, never a single
+  number, and say what counts as a real difference before showing one.
+  Check and survey findings report a verdict per item with the evidence
+  walked — the path taken, the thing observed. Raw output goes in a
+  disclosure block whose summary states the finding
+  (docs/components/disclosure.html).
+
+  A decision that follows from the findings is recorded in a spec, not
+  here. Add an "App version" field when the run measures a build rather
+  than the source tree.
+
+  required-fields: Doctype, Source, Updated, Commit
+  required-sections: Scope, Protocol, Findings
+
+  rubric — the writer checks every item before delivering and reports the
+  result; the reviewer scores against the same list. Binary, no partial
+  credit:
+  - [ ] The h1 states what was examined and the headline finding.
+  - [ ] Scope says what is measured or checked, and what is deliberately
+        outside.
+  - [ ] The protocol is sufficient for a reader with the repository to
+        re-run to the same findings without asking the author; it names the
+        script where one exists rather than restating it.
+  - [ ] What counts as a real difference (or a pass) is stated before any
+        finding is shown.
+  - [ ] Numeric findings carry spread (median with min–max); check findings
+        carry a per-item verdict with the evidence walked.
+  - [ ] Sources dirty at run time are named.
+  - [ ] A figure appears only where the shape of the findings is itself the
+        finding; otherwise the table stands.
+  - [ ] No decision is made in the document.
+  - [ ] No fact stated twice across prose, table, and figure.
+  - [ ] Wide content scrolls inside its own container at phone width.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><!-- Title --> — <!-- repo --></title>
+<style>
+  /* Base, provenance, callout, figure, disclosure styles — copied from
+     docs/components/ (self-contained by rule; copied, never linked). */
+  html { font-size: 16px; }
+  body {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 8rem;
+    background: #ffffff;
+    color: #111;
+    font-family: Charter, "Bitstream Charter", Georgia, serif;
+    line-height: 1.62;
+    overflow-wrap: break-word;
+  }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
+  h2 { font-size: 1.3rem; margin: 3rem 0 .5rem; font-weight: 600; }
+  h3 { font-size: 1.02rem; margin: 2rem 0 .3rem; font-weight: 600; }
+  p, li { margin: .7rem 0; }
+  ul, ol { padding-left: 1.2rem; }
+  a { color: inherit; text-decoration-color: #aaa; }
+  strong { font-weight: 600; }
+  code, pre, .provenance dd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85em;
+  }
+  pre { overflow-x: auto; background: #f4f4f4; padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
+  th { font-weight: 600; }
+  @media (max-width: 42rem) {
+    table { display: block; overflow-x: auto; }
+    th, td { min-width: 9rem; }
+  }
+  .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
+  .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
+  .provenance dd { margin: 0; }
+  .callout { border: 1px solid #ccc; border-left-width: 4px; padding: .55rem .9rem; margin: 1.2rem 0; font-size: .88rem; line-height: 1.55; }
+  .callout .tag { font-variant: small-caps; letter-spacing: .06em; font-weight: 600; margin-right: .45rem; }
+  .callout.notice   { border-left-color: #556; }
+  .callout.gap      { border-left-color: #8a5a00; }
+  .callout.warning  { border-left-color: #a33; }
+  .callout.recovery { border-left-color: #2a6; }
+  .callout ul { margin: .3rem 0; }
+  details { border: 1px solid #e4e4e4; padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
+  details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
+  details[open] summary { margin-bottom: .5rem; }
+  figure { margin: 2.6rem 0; }
+  figure svg { display: block; width: 100%; height: auto; }
+  figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
+</style>
+</head>
+<body>
+<article>
+
+  <header>
+    <h1><!-- What was examined, on what, and the headline finding --></h1>
+    <dl class="provenance">
+      <dt>Doctype</dt> <dd>report</dd>
+      <dt>Source</dt>  <dd><!-- the specs and scripts it stands on --></dd>
+      <dt>Updated</dt> <dd><!-- YYYY-MM-DD, last run date --></dd>
+      <dt>Commit</dt>  <dd><!-- short sha of the tree the run examined --></dd>
+      <!-- Optional, when the run measures a build:
+      <dt>App version</dt> <dd>vX.Y.Z</dd> -->
+    </dl>
+  </header>
+
+  <section>
+    <h2 id="scope">Scope</h2>
+    <p><!-- What is measured or checked, and what is deliberately outside. --></p>
+
+    <h2 id="protocol">Protocol</h2>
+    <p><!-- The steps another reader repeats to the same findings: setup,
+            repetition count, and what counts as a real difference or a
+            pass. Name the script that runs a step rather than restating
+            it. --></p>
+
+    <h2 id="findings">Findings</h2>
+    <table>
+      <!-- Numeric: item, median, min–max. Check or survey: item, path
+           walked, verdict. Raw output backs the table from a disclosure
+           block below it. -->
+    </table>
+
+    <h2><!-- Optional: what the findings point at --></h2>
+    <p><!-- The reading, without the decision — that goes in a spec. --></p>
+  </section>
+
+</article>
+</body>
+</html>

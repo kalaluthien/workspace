@@ -1,0 +1,108 @@
+<!doctype html>
+<!--
+  Component: figure — the diagram kit for view documents.
+  This file demonstrates itself: the figure below follows every rule it
+  states, and the CSS between the component markers is its style.
+
+  Choose the form before drawing anything. The form follows the data and the
+  reader's task, never the domain noun; position beats length beats area
+  beats colour; below a few hundred items a labelled table beats every
+  space-filling form; a list drawn as boxes is worse than a list
+  (research: notes/wiki/information-visualization-principles.md). State the
+  item count and the task first — if the relation is not genuinely 2D, the
+  right figure is a table or a list, and the document owes no SVG.
+
+  Notation checklist — every diagram obeys all of it (the C4 checklist,
+  research: notes/wiki/software-architecture-view-models.md):
+  - The caption states the diagram's type and scope, and carries the key.
+  - Every element carries a type and a short description; the elements
+    table under the figure is that contract.
+  - Every line is unidirectional and labelled with its intent — never a
+    bare "uses"; a line between deployable things names the protocol.
+  - Words sit on the part they describe: label elements inside the drawing;
+    identity, value, and condition stay in words adjacent to the mark
+    (spatial contiguity, the largest measured effect in the family —
+    research: notes/wiki/procedural-instruction-design.md).
+  - A speculative element is drawn dashed, so the split between what ships
+    and what is proposed reads before any table does.
+
+  SVG conventions:
+  - viewBox only, no width/height — the CSS scales it.
+  - currentColor for strokes and text, so ink follows the body colour.
+  - <title> plus role="img" for screen readers.
+  - Suffix every id (arrow-<diagram>, not arrow) — inline SVG shares one id
+    namespace with the whole page, so a second diagram reusing "arrow"
+    silently points at the first diagram's marker.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>figure — docs components</title>
+<style>
+  html { font-size: 16px; }
+  body { max-width: 42rem; margin: 0 auto; padding: 4rem 1.5rem 8rem;
+         background: #ffffff; color: #111;
+         font-family: Charter, "Bitstream Charter", Georgia, serif;
+         line-height: 1.62; overflow-wrap: break-word; }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
+  p { margin: .7rem 0; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
+  table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
+  th { font-weight: 600; }
+  @media (max-width: 42rem) {
+    table { display: block; overflow-x: auto; }
+    th, td { min-width: 9rem; }
+  }
+
+  /* component: figure */
+  figure { margin: 2.6rem 0; }
+  figure svg { display: block; width: 100%; height: auto; }
+  figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
+  /* end component: figure */
+</style>
+</head>
+<body>
+<article>
+  <h1>figure</h1>
+  <p>
+    The figure below demonstrates the kit: solid box, dashed speculative
+    box, one labelled unidirectional line, a suffixed marker id, labels on
+    the parts, key in the caption, elements contract underneath.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 660 150" role="img">
+      <title>A shipped element feeding a proposed element, as the notation example</title>
+      <defs>
+        <marker id="arrow-kit" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <rect x="20" y="45" width="220" height="60" fill="none" stroke="currentColor"/>
+      <text x="34" y="70" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">shipped element</text>
+      <text x="34" y="90" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".65">exists at the pinned commit</text>
+      <rect x="420" y="45" width="220" height="60" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+      <text x="434" y="70" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">proposed element</text>
+      <text x="434" y="90" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".65">dashed: does not ship yet</text>
+      <line x1="240" y1="75" x2="418" y2="75" stroke="currentColor" marker-end="url(#arrow-kit)"/>
+      <text x="330" y="66" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">feeds: rendered pages</text>
+    </svg>
+    <figcaption>
+      Notation example, this component only. Key: solid box — an element that
+      exists; dashed box — a proposed element; arrow — one channel, labelled
+      with its intent, pointing from source to consumer.
+    </figcaption>
+  </figure>
+
+  <table>
+    <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>shipped element</td><td>example box</td><td>stands for anything observable at the pinned commit</td></tr>
+      <tr><td>proposed element</td><td>example box, speculative</td><td>stands for anything a proposal or mockup introduces</td></tr>
+    </tbody>
+  </table>
+</article>
+</body>
+</html>

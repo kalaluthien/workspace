@@ -1,0 +1,93 @@
+<!doctype html>
+<!--
+  Component: base — the page skeleton every view document starts from.
+  This file demonstrates itself: its own <style> block is the component.
+  A template already carries a copy; an author touching the CSS edits the
+  template's copy and, when the change is general, this file in the same
+  commit.
+
+  Rules the skeleton enforces:
+  - Self-contained: inline <style>, no JavaScript, no webfonts, no CDN.
+    The document must open from file:// with no network, forever.
+  - White background (owner preference, 2026-08-02); Charter/Georgia so the
+    page needs no font download; 42rem measure keeps lines near 65
+    characters.
+  - Wide content (tables, pre, figures) scrolls inside its own container;
+    the page never scrolls sideways, at any width.
+  - Restraint over polish: no gradients, shadows, emoji, icon fonts, or
+    hover-dependent behavior.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>base — docs components</title>
+<style>
+  /* component: base */
+  html { font-size: 16px; }
+  body {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 8rem;
+    background: #ffffff;
+    color: #111;
+    font-family: Charter, "Bitstream Charter", Georgia, serif;
+    line-height: 1.62;
+    overflow-wrap: break-word;
+  }
+
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
+  h2 { font-size: 1.3rem; margin: 3rem 0 .5rem; font-weight: 600; }
+  h3 { font-size: 1.02rem; margin: 2rem 0 .3rem; font-weight: 600; }
+  p, li { margin: .7rem 0; }
+  ul, ol { padding-left: 1.2rem; }
+  a { color: inherit; text-decoration-color: #aaa; }
+  strong { font-weight: 600; }
+
+  code, pre {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85em;
+  }
+  /* Wide content scrolls inside itself; the page never scrolls sideways. */
+  pre {
+    overflow-x: auto;
+    background: #f4f4f4;
+    padding: 1rem;
+    line-height: 1.45;
+    margin: 1.4rem 0;
+  }
+
+  table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
+  th { font-weight: 600; }
+  /* Phone-width table scroll: below the body's own max-width a multi-column
+     table would crush to one word per line (width:100% leaves nothing to
+     overflow, so nothing scrolls). The cell minimum keeps columns readable
+     and pushes the table wide; display:block lets it pan inside its own box. */
+  @media (max-width: 42rem) {
+    table { display: block; overflow-x: auto; }
+    th, td { min-width: 9rem; }
+  }
+  /* end component: base */
+</style>
+</head>
+<body>
+<article>
+  <h1>base</h1>
+  <p>
+    The page skeleton every view document starts from. The <code>&lt;style&gt;</code>
+    block of this very file is the component; the rules it enforces are in
+    the header comment. This paragraph, the table below, and the code block
+    demonstrate the three content shapes the skeleton styles.
+  </p>
+  <table>
+    <tr><th>element</th><th>treatment</th></tr>
+    <tr><td>body text</td><td>42rem measure, serif, white ground</td></tr>
+    <tr><td>wide content</td><td>scrolls inside its own container</td></tr>
+    <tr><td>phone width</td><td>tables pan; the page never scrolls sideways</td></tr>
+  </table>
+<pre>$ echo "a command and its output render like this"
+a command and its output render like this</pre>
+</article>
+</body>
+</html>

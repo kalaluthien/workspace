@@ -1,0 +1,134 @@
+<!doctype html>
+<!--
+  Doctype: mockup — a surface drawn before it exists: design exploration.
+  Copy to docs/<name>.html (workspace: plane prefix agent- or service-) and
+  fill in; update the same file in place. Delete every comment, including
+  this one.
+
+  A mockup is a question, not a claim. It draws a surface that does not
+  ship yet, or a variant of one that does, and it may be reproduced from
+  the repository, drawn from scratch, or taken from a survey of other
+  systems — the Source field says which. A drawing whose elements all ship
+  is an explanation in the wrong doctype, because the shipped surface is
+  grounded fact.
+
+  Every element that does not ship today is drawn dashed and named in the
+  table with where it comes from, so a reader can never mistake the drawing
+  for the repository (docs/components/figure.html owns the notation).
+  Number each element in the drawing and name it in the table, so the
+  caption never describes a position in prose. A mockup decides nothing:
+  when a drawing is accepted, the decision is recorded in a spec and the
+  caption points at it.
+
+  required-fields: Doctype, Source, Updated, Commit
+  required-elements: figure, figcaption
+
+  rubric — the writer checks every item before delivering and reports the
+  result; the reviewer scores against the same list. Binary, no partial
+  credit:
+  - [ ] The h1 names which surface, in which proposed state.
+  - [ ] Every speculative element is dashed in the drawing and has a table
+        row saying it does not ship and where it comes from.
+  - [ ] The caption states which parts are proposed and what the drawing
+        leaves out.
+  - [ ] Elements are numbered in the drawing and named in the table; no
+        position is described in prose.
+  - [ ] At least one element is speculative — otherwise this is an
+        explanation.
+  - [ ] Nothing is decided in the document.
+  - [ ] Wide content scrolls inside its own container at phone width.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><!-- Title --> — <!-- repo --></title>
+<style>
+  /* Base, provenance, callout, figure, disclosure styles — copied from
+     docs/components/ (self-contained by rule; copied, never linked). */
+  html { font-size: 16px; }
+  body {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 8rem;
+    background: #ffffff;
+    color: #111;
+    font-family: Charter, "Bitstream Charter", Georgia, serif;
+    line-height: 1.62;
+    overflow-wrap: break-word;
+  }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
+  h2 { font-size: 1.3rem; margin: 3rem 0 .5rem; font-weight: 600; }
+  h3 { font-size: 1.02rem; margin: 2rem 0 .3rem; font-weight: 600; }
+  p, li { margin: .7rem 0; }
+  ul, ol { padding-left: 1.2rem; }
+  a { color: inherit; text-decoration-color: #aaa; }
+  strong { font-weight: 600; }
+  code, pre, .provenance dd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85em;
+  }
+  pre { overflow-x: auto; background: #f4f4f4; padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
+  th { font-weight: 600; }
+  @media (max-width: 42rem) {
+    table { display: block; overflow-x: auto; }
+    th, td { min-width: 9rem; }
+  }
+  .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
+  .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
+  .provenance dd { margin: 0; }
+  .callout { border: 1px solid #ccc; border-left-width: 4px; padding: .55rem .9rem; margin: 1.2rem 0; font-size: .88rem; line-height: 1.55; }
+  .callout .tag { font-variant: small-caps; letter-spacing: .06em; font-weight: 600; margin-right: .45rem; }
+  .callout.notice   { border-left-color: #556; }
+  .callout.gap      { border-left-color: #8a5a00; }
+  .callout.warning  { border-left-color: #a33; }
+  .callout.recovery { border-left-color: #2a6; }
+  .callout ul { margin: .3rem 0; }
+  details { border: 1px solid #e4e4e4; padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
+  details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
+  details[open] summary { margin-bottom: .5rem; }
+  figure { margin: 2.6rem 0; }
+  figure svg { display: block; width: 100%; height: auto; }
+  figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
+</style>
+</head>
+<body>
+<article>
+
+  <header>
+    <h1><!-- Which surface, in which proposed state --></h1>
+    <dl class="provenance">
+      <dt>Doctype</dt> <dd>mockup</dd>
+      <dt>Source</dt>  <dd><!-- a proposal; a survey; a spec; or "drawn from scratch" --></dd>
+      <dt>Updated</dt> <dd><!-- YYYY-MM-DD, last render date --></dd>
+      <dt>Commit</dt>  <dd><!-- short sha of the tree the shipped parts were read on --></dd>
+    </dl>
+  </header>
+
+  <section>
+    <h2><!-- The screen, or one region of it --></h2>
+
+    <figure>
+      <svg viewBox="0 0 360 720" role="img">
+        <title><!-- One sentence: which screen, in which state --></title>
+        <!-- Solid stroke: ships today. Dashed stroke: speculative.
+             Number each element; the table below names them. -->
+      </svg>
+      <figcaption>
+        <!-- Which elements are speculative, and what the drawing leaves
+             out. "Every element speculative" is a valid caption; so is
+             "the chrome is as shipped, the panel is proposed". -->
+      </figcaption>
+    </figure>
+
+    <table>
+      <thead><tr><th>#</th><th>What the owner would see</th><th>Ships today</th><th>Comes from</th></tr></thead>
+      <tbody><tr><td>1</td><td></td><td><!-- yes | no --></td><td><!-- a proposal, a survey, or the spec it already has --></td></tr></tbody>
+    </table>
+  </section>
+
+</article>
+</body>
+</html>
