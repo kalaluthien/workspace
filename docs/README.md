@@ -20,12 +20,3 @@ what exists and where.
   file, `<plane>-<kebab-slice>.html` with plane prefix `agent-` or
   `service-`, updated in place; the workspace's normative rules stay in
   `.claude/CLAUDE.md`.
-
-Ancestry: consolidated 2026-08-02 from the `camera/docs` and
-`claude-memory-viewer/docs` conventions; the decision to hold views only is
-recorded in the principle template's own example. Style research behind the
-templates: `notes/wiki/document-argument-structures.md`,
-`notes/wiki/procedural-instruction-design.md`,
-`notes/wiki/structured-writing.md`,
-`notes/wiki/software-architecture-view-models.md`,
-`notes/wiki/information-visualization-principles.md`.

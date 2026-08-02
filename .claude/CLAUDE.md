@@ -34,8 +34,7 @@ to work in an entry lives in the entry:
 | `notes/` | research, surveys, study notes, wiki curation, blog writing or publishing, Obsidian | `.claude/CLAUDE.md` |
 | `camera/` | the Android camera app: features, bugs, specs, releases, APK install, emulator tests | `.claude/CLAUDE.md`, then `docs/README.md` |
 | `mabinogi-mobile-automation/` | the 마비노기 모바일 game window: park, show, screenshot, start, quit | `.claude/CLAUDE.md` |
-| `board/` | the board web app replacing claude-memory-viewer: task board, docs rendering, search, its server, container, tailscale exposure | `.claude/CLAUDE.md`, then `docs/INDEX.md` |
-| `claude-memory-viewer/` | the retiring memory-observer app — reference implementation for `board/`; no new features land here | `.claude/CLAUDE.md`, then `docs/INDEX.md` |
+| `board/` | the board web app: task board, docs rendering, search, its server, container, tailscale exposure | `.claude/CLAUDE.md`, then `docs/INDEX.md` |
 | `kalaluthien.github.io/` | site theme, Jekyll config, deployment — content itself is synced from `notes/`, edit it there | `_config.yml` |
 
 A request that spans entries (research + implementation, multi-repo work) is an
