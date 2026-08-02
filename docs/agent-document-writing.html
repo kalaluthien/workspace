@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Adopt one parent document system for every docs/ directory — workspace</title>
+<title>Make the writer agent's definition the one place the document system's rules live — workspace</title>
 <style>
   html { font-size: 16px; }
   body {
@@ -57,232 +57,377 @@
 <article>
 
   <header>
-    <h1>Adopt one parent document system for every docs/ directory</h1>
+    <h1>Make the writer agent&rsquo;s definition the one place the document system&rsquo;s rules live</h1>
     <dl class="provenance">
       <dt>Doctype</dt> <dd>proposal</dd>
       <dt>Status</dt>  <dd>Open</dd>
-      <dt>Source</dt>  <dd>docs/README.md; docs/templates/; docs/components/; .claude/agents/document-writer.md; camera/docs/README.md; board/docs/INDEX.md; <code>git log &mdash;&nbsp;docs/</code></dd>
+      <dt>Source</dt>  <dd>docs/README.md; docs/templates/; docs/components/; .claude/CLAUDE.md; .claude/agents/document-writer.md; camera/docs/README.md; camera/docs/templates/; camera/script/check-docs.py; camera/script/docs_chapters.py; board/docs/INDEX.md</dd>
       <dt>Updated</dt> <dd>2026-08-02</dd>
-      <dt>Commit</dt>  <dd>3e3d22f</dd>
+      <dt>Commit</dt>  <dd>a4d8e2b</dd>
     </dl>
   </header>
 
   <section>
-    <p>Three repositories write <code>docs/</code> views, each from a template
-    set descended from a different ancestor, but the branch at
-    <code>3e3d22f</code> has already deleted the workspace&rsquo;s three
-    templates and left <code>board</code>&rsquo;s catalogue pointing at files
-    that are gone &mdash; so the recommendation is to adopt the minimized
-    parent system, three view doctypes and one spec template, for
-    <code>workspace/docs</code> and one camera test document first.</p>
+    <p>Six files state the document system&rsquo;s rules, but the copies have
+    already diverged, so the writer agent&rsquo;s definition should hold the one
+    normative description and every other mention should become a pointer.</p>
 
-    <div class="callout notice">
-      <span class="tag">Not shown</span> The pinned commit is
-      <code>3e3d22f</code>, but the branch carries uncommitted work on top of
-      it, and the system is described as the working tree now states it. Every
-      claim about the <em>problem</em> is checkable at the pin. Every claim
-      about the <em>proposed system</em> &mdash; four templates, three view
-      doctypes, the minimality decision &mdash; reads uncommitted files:
-      <code>docs/README.md</code>, <code>docs/templates/</code>,
-      <code>docs/INDEX.md</code>, and the two migrated workspace views.
-    </div>
+    <h2 id="problem">One rule set is written out in six files, and two of the
+    copies are already wrong</h2>
 
-    <h2 id="problem">Two template ancestries diverged, and the drafted change
-    already removed one of them</h2>
-
-    <p><code>camera/docs/templates/</code> holds nine files: five view
-    templates (<code>explanation</code>, <code>benchmark</code>,
-    <code>how-to-guide</code>, <code>mockup</code>, <code>proposal</code>) and
-    four spec templates. <code>camera/docs/README.md</code> is 13&nbsp;KB of
-    rules that directory owns alone &mdash; its chapter table, its
-    <code>Category</code> field, its <code>script/check-docs.py</code> commit
-    hook. <code>workspace/docs/templates/</code> carried three view templates
-    on a separate line of descent: <code>principle</code>,
-    <code>pattern</code>, <code>practice</code>, added at <code>aac9e27</code>
-    and deleted at <code>3e3d22f</code>. <code>board/docs/</code> has no
-    <code>templates/</code> directory at all; <code>board/docs/INDEX.md</code>
-    and <code>board/.claude/CLAUDE.md</code> both send an author to those same
-    three workspace paths, which the pinned commit removed. Board therefore
-    writes today against a template set that no longer exists.</p>
-
-    <p>The two ancestries gave the same reader question different names, and
-    each spent more names than the question needed:</p>
+    <p>Every site below carries normative text about how documents are written
+    &mdash; not a pointer to it, the rule itself. Changing one rule is therefore
+    a six-file change, and two sites have already drifted far enough to send an
+    author somewhere that does not exist. The owner pays for it twice: as the
+    only reviewer, and as the reader of a catalogue that now misdescribes its
+    own system.</p>
 
     <table>
-      <thead><tr><th>The reader&rsquo;s question</th><th>camera/docs</th><th>workspace/docs and board/docs</th><th>current system</th></tr></thead>
+      <thead><tr><th>Site</th><th>Normative text it holds</th><th>Observable at <code>a4d8e2b</code></th></tr></thead>
       <tbody>
-        <tr><td>how does it work, why is it this way, what did we find</td><td>explanation, benchmark</td><td>principle, pattern</td><td>explanation</td></tr>
-        <tr><td>how do I do it</td><td>how-to-guide</td><td>practice</td><td>guide</td></tr>
-        <tr><td>what should change, what could it look like</td><td>proposal, mockup</td><td>&mdash;</td><td>proposal</td></tr>
+        <tr>
+          <td><code>docs/README.md</code></td>
+          <td>The whole rule set: two kinds, three view doctypes, naming, catalogue, pipeline.</td>
+          <td>84 lines, all of them rules; the declared constitution.</td>
+        </tr>
+        <tr>
+          <td><code>.claude/CLAUDE.md</code></td>
+          <td>The plane-prefix naming rule, restated near-verbatim.</td>
+          <td>Line&nbsp;24 &ldquo;a <code>docs/</code> filename carries its plane as a prefix, <code>agent-&lt;slice&gt;</code> or <code>service-&lt;slice&gt;</code>&rdquo; against <code>README.md</code> line&nbsp;81 &ldquo;workspace files carry a plane prefix, <code>agent-</code> or <code>service-</code>&rdquo;.</td>
+        </tr>
+        <tr>
+          <td><code>.claude/agents/document-writer.md</code></td>
+          <td>The pipeline, the read order, and the rubric rule.</td>
+          <td>44 lines; &sect;Procedure repeats <code>README.md</code> &sect;Writing pipeline step&nbsp;2 and the rubric definition in &sect;Templates and components.</td>
+        </tr>
+        <tr>
+          <td>Template header comments</td>
+          <td>Writing rules that go well past the machine contract each template owes.</td>
+          <td>250 comment lines across four templates &mdash; 70 of 175 in <code>explanation.html</code>, 63 of 164 in <code>guide.html</code>, 66 of 160 in <code>proposal.html</code>, 51 of 61 in <code>spec.md</code>. All three view templates state the plane-prefix rule a fourth, fifth and sixth time.</td>
+        </tr>
+        <tr>
+          <td>Component rule comments</td>
+          <td>Self-containment, restraint, phone width, block choice &mdash; and a doctype list.</td>
+          <td>129 comment lines across five files. <code>provenance.html</code> lines&nbsp;8&ndash;12 phrase the h1 for five doctypes including <strong>report</strong> and <strong>mockup</strong>; <code>docs/templates/</code> defines neither.</td>
+        </tr>
+        <tr>
+          <td><code>board/docs/INDEX.md</code></td>
+          <td>Where an author of that entry is sent to find the rules.</td>
+          <td>Lines&nbsp;7&ndash;9: &ldquo;the system&rsquo;s rules live inside the three templates&rdquo;. Four templates exist, and none of the three names it inherited (<code>principle</code>, <code>pattern</code>, <code>practice</code>) is among them.</td>
+        </tr>
       </tbody>
     </table>
 
-    <p>Twelve of the fifteen views already written across the three
-    repositories still carry the retired <code>Category</code> field, and spend
-    six distinct genre names between them &mdash; <code>principle</code>&nbsp;4,
-    <code>explanation</code>&nbsp;3, <code>pattern</code>&nbsp;2,
-    <code>practice</code>&nbsp;1, <code>benchmark</code>&nbsp;1,
-    <code>proposal</code>&nbsp;1. A reader cannot tell from the genre alone
-    what kind of claim a document makes until they know which repository it
-    came from. The drift is still growing: <code>board/docs/</code> has gained
-    a seventh view, <code>service-surfaces.html</code>, written as a
-    <code>principle</code> &mdash; a genre whose template the parent deleted at
-    the pinned commit.</p>
+    <p>Two further defects follow from the same shape. The parent relation is
+    asserted only by the parent: <code>docs/README.md</code> line&nbsp;4 claims
+    to be &ldquo;the parent of every <code>docs/</code> directory&rdquo;, while
+    a search of <code>camera/docs/</code> for <code>workspace/docs</code>,
+    <code>~/workspace</code> or &ldquo;parent document&rdquo; returns nothing
+    &mdash; that entry&rsquo;s 218-line README still describes a nine-template
+    system of its own. And enforcement is split by entry rather than shared:
+    <code>camera/hooks/pre-commit</code> runs a 224-line
+    <code>script/check-docs.py</code> over staged documents at commit time,
+    while the workspace&rsquo;s only hook is the three-line no-main-commits
+    guard, so nothing machine-checks <code>workspace/docs</code> at all.</p>
 
-    <p>No template on either ancestry carried a rubric. Every one of
-    camera&rsquo;s nine and all three deleted workspace templates contain the
-    word zero times; each of the four current templates carries one rubric
-    block. What existed instead was <code>required-sections</code> and
-    <code>required-elements</code>, and <code>camera/docs/README.md</code>
-    &sect;Enforcement states outright that both are &ldquo;not checked
-    anywhere&rdquo;. Review quality was therefore whatever the reviewer
-    remembered on the day &mdash; a cost paid by the owner, who is the
-    reviewer, on every delivered document.</p>
+    <h2 id="options">The choice is which file holds the rules, and it turns on
+    who reads them and what makes a violation fail</h2>
 
-    <details>
-      <summary>The checks behind the counts, re-runnable on the branch</summary>
-      <pre>ls camera/docs/templates/                  # 9 files
-ls docs/templates/                         # 4: spec.md + 3 view templates
-git show 959af7e:docs/templates/practice.html | grep -c rubric   # 0
-grep -c rubric camera/docs/templates/*     # 0 in all nine
-grep -c rubric docs/templates/*            # 1 in all four
-git log --oneline -- docs/templates/       # 5 commits, 9b9428a the style one
-git show --stat 9b9428a                    # 5 files for one background change
-grep -o '&lt;dt&gt;\(Category\|Doctype\)&lt;/dt&gt;.*&lt;dd&gt;[a-z-]*' \
-  docs/*.html camera/docs/*.html board/docs/*.html   # 15 views, 12 Category
-grep -l 'max-width: 42rem' docs/templates/*.html docs/components/*.html
-                                           # 8 &mdash; spec.md carries no style block</pre>
-    </details>
-
-    <h2 id="options">The choice is how many doctypes the parent defines, and
-    where the shared skeleton lives</h2>
-
-    <p>Six axes, named before any option is judged. <strong>Consistency</strong>:
-    does one reader&rsquo;s question get one name in every repository.
-    <strong>Cost per new document</strong>: what an author pays to start one,
-    including choosing the doctype. <strong>Cost per rule change</strong>: how
-    many files one change to a shared rule touches.
-    <strong>Reviewability</strong>: can a reviewer score a document without
-    prior knowledge of the system. <strong>Self-containment</strong>: does the
-    delivered file open from <code>file://</code> with no build step and no
-    external reference. <strong>Migration cost</strong>: what the twelve views
-    still on the old field and the two remaining catalogues owe.</p>
+    <p>Two axes, named before any option is judged. <strong>Locality</strong>:
+    is the file that holds a rule loaded by the actor that must obey it, at the
+    moment the rule binds &mdash; or does obeying it require a second read the
+    actor may skip. <strong>Enforcement</strong>: what makes a violation fail,
+    rather than merely be discouraged.</p>
 
     <table>
       <thead><tr><th>Option</th><th>What it does</th><th>Cost</th><th>What it gives up</th></tr></thead>
       <tbody>
         <tr>
-          <td><strong>Separate ancestries</strong></td>
-          <td>Restores the three deleted workspace templates and leaves camera&rsquo;s nine and board&rsquo;s borrowing as they were.</td>
-          <td>A revert. Nothing else, ever.</td>
-          <td>Consistency and reviewability, permanently. Board keeps depending on another repository&rsquo;s files with nothing enforcing they stay.</td>
+          <td><strong>README as master</strong></td>
+          <td>Keeps <code>docs/README.md</code> as the constitution and demotes every other site to a pointer at it.</td>
+          <td>Five files trimmed; the README grows to absorb what they held.</td>
+          <td>Locality. A prose file enforces nothing, and the writer still needs the rules inside its own definition to act on them &mdash; so the README&ndash;agent duplication survives as structure, not accident. The reader of the rules and the home of the rules stay two files.</td>
         </tr>
         <tr>
-          <td><strong>Rubrics only</strong></td>
-          <td>Keeps every repository&rsquo;s template set and its genre names; adds a rubric block to each of the twelve pre-existing templates.</td>
-          <td>Twelve edits, no migration, no catalogue change. A rubric must be written twice wherever two names cover one question.</td>
-          <td>Consistency. A document still means different things in different directories, and a rule change is still paid once per ancestry.</td>
+          <td><strong>Writer as constitution</strong></td>
+          <td>Makes <code>.claude/agents/document-writer.md</code> the one normative description of the whole system, spec rules included, with every other site a pointer.</td>
+          <td>One file serves two audiences &mdash; the writer&rsquo;s own system prompt and reference for the doing agents that write specs &mdash; so spec-only prose rides in the writer&rsquo;s context on every invocation.</td>
+          <td>A clean single audience per file. The spec rules are read by an agent that is not the file&rsquo;s owner, through a one-line pointer in the spec template header.</td>
         </tr>
         <tr>
-          <td><strong>Maximal split</strong></td>
-          <td>One doctype per genre, as drafted at <code>3e3d22f</code>: five view templates (adding <code>report</code> and <code>mockup</code>) and five spec templates.</td>
-          <td>Ten templates to keep consistent with each other; ten rubrics that drift apart; an author choosing between five view doctypes before writing a line.</td>
-          <td>Minimality. A shape that recurs once demands a new template rather than a section, and the choice cost lands on every document forever.</td>
-        </tr>
-        <tr>
-          <td><strong>Minimized parent system</strong></td>
-          <td>Three view doctypes (<code>explanation</code>, <code>guide</code>, <code>proposal</code>) and one <code>spec.md</code> whose section shapes cover decisions, rules, procedures, capabilities and ledgers; a rubric in each; <code>components/</code> as the doctype-independent layer; the <code>document-writer</code> agent as the writer.</td>
-          <td>Twelve views carry the retired <code>Category</code> field; camera&rsquo;s nine templates and its <code>check-docs.py</code> hook still assert the old vocabulary; board&rsquo;s catalogue needs re-pointing. A base-style change is edited in eight files.</td>
-          <td>Per-repository genre names that fit one repository only, and single-sourcing: every view template holds a full copy of the base style by rule.</td>
-        </tr>
-        <tr>
-          <td><strong>Generated skeletons</strong></td>
-          <td>Makes <code>components/</code> the only hand-edited source and generates each template from it with a build step; templates become derived artifacts.</td>
-          <td>A generator, a runner for it in each repository, and either generated files committed or a staleness check that fails when they drift.</td>
-          <td>&ldquo;An author copies a template once and then owns the result&rdquo; (2026-07-28, owner decision, <code>camera/docs/README.md</code>). The template stops being readable as the whole thing it produces.</td>
+          <td><strong>Writer as sole author</strong></td>
+          <td>Routes every document, spec and view alike, through the writer, so its definition is total by construction.</td>
+          <td>Every spec change becomes a delegation; all documentation serializes behind one agent.</td>
+          <td>&ldquo;A spec is written by the agent doing the work, in the same change as what it governs&rdquo; (<code>docs/README.md</code> &sect;Writing pipeline). The doing agent holds the context a spec needs, and a handoff through a second agent is lossy exactly where fidelity matters most.</td>
         </tr>
       </tbody>
     </table>
 
-    <p>Two overlaps are deliberate and worth naming. <em>Rubrics only</em> is a
-    proper subset of both parent-system options on the reviewability axis; it
-    is listed separately because it tests whether the rubric gap alone
-    justified the vocabulary change, or whether those are two wants that
-    arrived together. <em>Maximal split</em> and <em>Minimized parent
-    system</em> are the same system at two granularities and differ on one axis
-    only, doctype count &mdash; which is why the count, not the system, is what
-    was actually at stake. <em>Generated skeletons</em> is the only option that
-    attacks the cost-per-rule-change axis, which is why it stays in the
-    document despite contradicting a recorded decision: an option removed for
-    its conclusion cannot be re-proposed with its reason attached.</p>
+    <p>On <strong>locality</strong>, only the second option puts the rules in a
+    file the acting agent already loads: the writer&rsquo;s definition is read
+    on every act of view writing, whereas a README is read when someone
+    remembers to. On <strong>enforcement</strong>, none of the three enforces
+    anything by itself &mdash; enforcement is a machine check, and all three
+    options need the same one. That is why the recommendation carries a checker
+    alongside it rather than instead of it. <em>Writer as sole author</em> wins
+    locality outright and is still the weakest option, because it buys locality
+    by moving the author, which is the one thing the pipeline decision fixed.</p>
 
-    <h2 id="recommendation">Three doctypes and one spec template close naming
-    and review at the lowest standing cost</h2>
+    <h2 id="recommendation">The writer&rsquo;s definition is the only file
+    loaded at the moment the rules bind, so the rules belong in it</h2>
 
-    <p><em>Minimized parent system</em> wins because it is the only option
-    positive on consistency, reviewability and self-containment at once.
-    <em>Separate ancestries</em> and <em>Rubrics only</em> cannot reach
-    consistency by construction &mdash; they preserve the ancestries that
-    caused the drift. <em>Maximal split</em> reaches consistency but pays for
-    it on cost per new document and cost per rule change, and it loses on the
-    axis the owner named: the system is &ldquo;deliberately minimal
-    (2026-08-02, owner decision) &hellip; a shape that recurs becomes a section
-    pattern inside an existing template, never a new doctype&rdquo;
-    (<code>docs/README.md</code>). The folds that decision forced are
-    defensible on their own terms &mdash; a dated finding is an explanation
-    whose ground is a re-runnable protocol, and a mockup is a proposal whose
-    option is drawn &mdash; so the collapse costs no distinction a reader was
-    relying on.</p>
+    <p><em>Writer as constitution</em> wins on locality and ties on enforcement.
+    The governing principle is one sentence: <strong>a rule lives in the single
+    file its actor loads at the moment the rule binds; every other mention is a
+    pointer.</strong> The writer is the only actor that touches every view in
+    every entry, so its definition is where the source of truth and the point of
+    use become the same file.</p>
 
-    <p><em>Generated skeletons</em> still beats the recommendation on exactly
-    one axis, cost per rule change: one edit against eight. That axis is real
-    and should not be waved away &mdash; of the five commits that have ever
-    touched <code>docs/templates/</code>, one (<code>9b9428a</code>, a white
-    background) was a pure shared-style change, and it was paid as five edits
-    across three templates and both existing views. The same change now costs
-    eight edits, three view templates and five components, and still does not
-    reach a document already written, which owns its copy by rule. What
-    outweighs it is that the build step has to land in every repository and
-    argue against a self-containment rule the system states twice, while the
-    axes it loses on have no such workaround. Minimizing the doctype count
-    already bought back a fifth of that cost: the same change would have been
-    ten edits under <em>Maximal split</em>.</p>
+    <figure>
+      <svg viewBox="0 0 760 630" role="img" aria-labelledby="rules-title">
+        <title id="rules-title">Where the document system&rsquo;s rules are written today across six files, and where the proposal would write them: one file, with the other five holding pointers.</title>
+        <defs>
+          <marker id="arrow-rules" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+          </marker>
+        </defs>
 
-    <p>That makes the flip condition near rather than hypothetical: the next
-    shared-style change will cost eight edits against the five that
-    <code>9b9428a</code> cost, and if a third follows it,
-    <em>Generated skeletons</em> buys back more than its indirection costs and
-    the 2026-07-28 copy-once decision should be reopened rather than worked
-    around. It also flips if camera&rsquo;s <code>check-docs.py</code> hook
-    turns out to cost more to teach the <code>Doctype</code> field than the
-    whole migration saves &mdash; that is one read of one file and has not been
-    done.</p>
+        <text x="14" y="32" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">today, at a4d8e2b &mdash; six files hold rules</text>
+        <rect x="10" y="40" width="740" height="300" fill="none" stroke="currentColor" opacity=".45"/>
 
-    <p>The smallest first step is this branch, and no more than this branch:
-    adopt the system for <code>workspace/docs</code> alone, which its
-    uncommitted state already carries &mdash; four templates in place,
-    <code>docs/INDEX.md</code> re-chaptered as Specifications, Explanations,
-    Guides and Proposals, and the two existing views restated from
-    <code>Category</code> to <code>Doctype</code> as <code>explanation</code>
-    and <code>guide</code>. What remains before the step is complete is one
-    camera document written against the new templates as a live test of them.
-    The camera-wide migration &mdash; its nine templates, its catalogue and its
-    hook &mdash; is a separate change; the owner deferred backward
-    compatibility for it (2026-08-02, owner decision). One commit accepts this;
-    nothing in it obliges the second.</p>
+        <rect x="30" y="70" width="170" height="34" fill="none" stroke="currentColor"/>
+        <text x="38" y="86" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">docs/README.md</text>
+        <text x="38" y="99" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">the whole rule set</text>
 
-    <div class="callout gap">
-      <span class="tag">Undecided</span> Board is still accruing documents in
-      the retired vocabulary &mdash; seven views on <code>Category</code>, the
-      newest written as a <code>principle</code> after the parent deleted that
-      template. Whether board migrates its catalogue as part of this change or
-      keeps writing against the old three names until a later one is not
-      recorded anywhere. The mapping itself is settled: a principle whose
-      decision is open becomes a proposal, one whose decision is made becomes a
-      decision section in <code>spec.md</code> and leaves the view set
-      entirely &mdash; so board&rsquo;s count of views is not conserved by the
-      migration.
+        <rect x="295" y="70" width="170" height="34" fill="none" stroke="currentColor"/>
+        <text x="303" y="86" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">.claude/CLAUDE.md</text>
+        <text x="303" y="99" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">routing and naming</text>
+
+        <rect x="560" y="70" width="170" height="34" fill="none" stroke="currentColor"/>
+        <text x="568" y="86" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">document-writer.md</text>
+        <text x="568" y="99" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">the writer agent</text>
+
+        <rect x="30" y="230" width="170" height="34" fill="none" stroke="currentColor"/>
+        <text x="38" y="246" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">templates/ &times;4</text>
+        <text x="38" y="259" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">header comments</text>
+
+        <rect x="295" y="230" width="170" height="34" fill="none" stroke="currentColor"/>
+        <text x="303" y="246" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">components/ &times;5</text>
+        <text x="303" y="259" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">rule comments</text>
+
+        <rect x="560" y="230" width="170" height="34" fill="none" stroke="currentColor"/>
+        <text x="568" y="246" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">board INDEX.md</text>
+        <text x="568" y="259" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">sends authors here</text>
+
+        <polyline points="125,104 125,130 385,130 385,108" fill="none" stroke="currentColor" marker-end="url(#arrow-rules)"/>
+        <text x="255" y="124" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">repeats: naming</text>
+
+        <polyline points="95,104 95,160 645,160 645,108" fill="none" stroke="currentColor" marker-end="url(#arrow-rules)"/>
+        <text x="370" y="154" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">repeats: pipeline, rubric</text>
+
+        <polyline points="330,228 330,190 700,190 700,108" fill="none" stroke="currentColor" marker-end="url(#arrow-rules)"/>
+        <text x="515" y="184" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">repeats: self-containment</text>
+
+        <line x1="60" y1="104" x2="60" y2="226" stroke="currentColor" marker-end="url(#arrow-rules)"/>
+        <text x="68" y="176" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">repeats: the</text>
+        <text x="68" y="188" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">doctype rules</text>
+
+        <polyline points="330,264 330,290 170,290 170,268" fill="none" stroke="currentColor" marker-end="url(#arrow-rules)"/>
+        <text x="182" y="282" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">diverged: doctype list</text>
+
+        <polyline points="620,264 620,310 78,310 78,268" fill="none" stroke="currentColor" marker-end="url(#arrow-rules)"/>
+        <text x="360" y="304" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">diverged: template count</text>
+
+        <text x="14" y="372" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">proposed &mdash; one file holds rules, the rest point at it</text>
+        <rect x="10" y="380" width="740" height="230" fill="none" stroke="currentColor" stroke-dasharray="5 4" opacity=".45"/>
+
+        <rect x="30" y="410" width="700" height="72" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="38" y="404" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">pointer-only sites (1&ndash;5)</text>
+
+        <rect x="42" y="422" width="126" height="48" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="50" y="440" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="bold" fill="currentColor">1 docs/README.md</text>
+        <text x="50" y="453" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">two-kinds table</text>
+        <text x="50" y="464" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">+ one pointer</text>
+
+        <rect x="178" y="422" width="126" height="48" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="186" y="440" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="bold" fill="currentColor">2 CLAUDE.md</text>
+        <text x="186" y="453" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">one routing line</text>
+        <text x="186" y="464" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">to the writer</text>
+
+        <rect x="314" y="422" width="126" height="48" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="322" y="440" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="bold" fill="currentColor">3 templates/ &times;4</text>
+        <text x="322" y="453" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">skeleton and</text>
+        <text x="322" y="464" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">machine contract</text>
+
+        <rect x="450" y="422" width="126" height="48" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="458" y="440" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="bold" fill="currentColor">4 components/ &times;5</text>
+        <text x="458" y="453" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">self-demonstration</text>
+        <text x="458" y="464" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">only</text>
+
+        <rect x="586" y="422" width="126" height="48" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="594" y="440" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="bold" fill="currentColor">5 board INDEX.md</text>
+        <text x="594" y="453" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">catalogue only</text>
+
+        <line x1="380" y1="482" x2="380" y2="518" stroke="currentColor" stroke-dasharray="5 4" marker-end="url(#arrow-rules)"/>
+        <text x="392" y="504" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">7 defers to: every rule</text>
+
+        <rect x="250" y="522" width="260" height="72" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="262" y="540" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">6 document-writer.md</text>
+        <text x="262" y="556" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">the one normative description:</text>
+        <text x="262" y="568" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">system, doctypes, naming,</text>
+        <text x="262" y="580" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">pipeline, spec rules</text>
+      </svg>
+      <figcaption>
+        Structure diagram; scope is where the rules are <em>written</em>, not
+        what enforces them. Key: solid box &mdash; a file holding normative text
+        at <code>a4d8e2b</code>; solid arrow &mdash; text one file repeats from
+        another, labelled with what is repeated; dashed &mdash; proposed, which
+        is every element inside the frame labelled <em>proposed</em>; frame
+        &mdash; a set drawn as one, and its single edge stands for that edge
+        from every member.
+      </figcaption>
+    </figure>
+
+    <table>
+      <thead><tr><th>#</th><th>Element</th><th>Type</th><th>Comes from</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><code>docs/README.md</code></td><td>pointer-only site</td><td>change&nbsp;2 below</td></tr>
+        <tr><td>2</td><td><code>.claude/CLAUDE.md</code></td><td>pointer-only site</td><td>change&nbsp;3 below</td></tr>
+        <tr><td>3</td><td><code>docs/templates/</code></td><td>pointer-only site</td><td>change&nbsp;4 below</td></tr>
+        <tr><td>4</td><td><code>docs/components/</code></td><td>pointer-only site</td><td>change&nbsp;5 below</td></tr>
+        <tr><td>5</td><td><code>board/docs/INDEX.md</code></td><td>pointer-only site</td><td>change&nbsp;8 below, phase&nbsp;3</td></tr>
+        <tr><td>6</td><td><code>document-writer.md</code></td><td>the constitution</td><td>change&nbsp;1 below</td></tr>
+        <tr><td>7</td><td>defers to</td><td>edge, frame to constitution</td><td>the governing principle above</td></tr>
+      </tbody>
+    </table>
+
+    <p>Eight concrete changes carry it:</p>
+
+    <ol>
+      <li><code>document-writer.md</code> absorbs the normative content of
+      <code>README.md</code>: the two-kinds split, the three view doctypes,
+      naming and catalogue rules, the pipeline, and a new spec-rules section
+      covering the five section shapes (decision, rule, procedure, capability,
+      ledger).</li>
+      <li><code>docs/README.md</code> shrinks to the two-kinds table plus one
+      pointer at the agent definition; <code>INDEX.md</code> stays the
+      catalogue.</li>
+      <li><code>.claude/CLAUDE.md</code> keeps one routing line &mdash; docs
+      work delegates to <code>document-writer</code> &mdash; and drops the
+      naming restatement.</li>
+      <li>Templates demote to skeleton plus machine contract. The contract gains
+      per-shape <code>required-sections</code>, so the capability shape
+      re-imposes Behavior, Configuration and Acceptance &mdash; the part of
+      camera&rsquo;s <code>feature.md</code> that the merge into
+      <code>spec.md</code> silently dropped.</li>
+      <li>Components demote to pure self-demonstration; their rule prose moves
+      into the agent definition, and the stale
+      <strong>report</strong>/<strong>mockup</strong> doctype list in
+      <code>provenance.html</code> goes with it.</li>
+      <li><code>figure.html</code> gains the two pieces of camera&rsquo;s
+      <code>mockup.html</code> worth keeping: a phone-frame demonstration
+      (<code>viewBox="0 0 360 720"</code>) and the numbered
+      ships-today/comes-from ledger table for drawn options.</li>
+      <li>Enforcement unifies: camera&rsquo;s <code>check-docs.py</code>
+      generalizes into a workspace-level contract checker that any entry&rsquo;s
+      pre-commit hook calls; the writer keeps its write-time rubric report; and
+      a proposal whose recommendation ships flips Status to Adopted in the
+      shipping commit.</li>
+      <li>A child entry adopts the system by delegating its view writing to the
+      writer and calling the shared checker &mdash; behavioral coupling through
+      one gate, not prose copied into its README.</li>
+    </ol>
+
+    <p>Change&nbsp;7 is cheaper than it looks, and change&nbsp;1&rsquo;s cost is
+    the thing to watch.</p>
+
+    <details>
+      <summary>The checker already separates the generic part from the camera part</summary>
+      <p><code>camera/script/docs_chapters.py</code> derives the chapter model
+      from <code>INDEX.md</code> and each contract from its template&rsquo;s own
+      comment, and its docstring states the property that makes it portable:
+      &ldquo;everything here is a calculation over text passed in by the caller
+      &hellip; no caller has to teach this module where its bytes came
+      from.&rdquo; What is camera-specific sits in
+      <code>check-docs.py</code> instead &mdash; the camera-roll leak patterns
+      and the <code>Category</code> field &mdash; so generalizing means lifting
+      the 5.3&nbsp;KB calculation module and leaving the entry-specific checks
+      behind it.</p>
+    </details>
+
+    <p>The recommendation flips if <code>document-writer.md</code> outgrows its
+    job. It serves two audiences by design, and the spec-rules section is read
+    by doing agents rather than by the writer, so every writer invocation pays
+    for prose it never uses. At today&rsquo;s sizes &mdash; 44 lines of writer
+    definition against 84 lines of README &mdash; that cost is small and the
+    locality is worth it. If the spec rules grow to where the file reads as two
+    documents stapled together, split them into a spec-rules file the spec
+    template points at, and the constitution becomes two files that still hold
+    each rule once.</p>
+
+    <p>The smallest first step is one commit: rewrite
+    <code>document-writer.md</code> to hold the rule set, and shrink
+    <code>README.md</code> to the two-kinds table and a pointer. Nothing else
+    has to move for that commit to leave the system correct &mdash; the
+    remaining sites keep working as stale copies until the phases below reach
+    them, and the phases can then land one at a time.</p>
+
+    <div class="callout notice">
+      <span class="tag">Why the Status rule</span> Change&nbsp;7&rsquo;s last
+      clause has its evidence in this file. The previous revision of
+      <code>docs/agent-document-writing.html</code> recommended adopting the
+      parent system; the system was built at <code>3e3d22f</code> and minimized
+      at <code>50aac0f</code>; and at <code>a4d8e2b</code> the document still
+      read <code>Status: Open</code>. Nothing flipped it, because nothing was
+      responsible for flipping it.
     </div>
+
+    <h2 id="migration">Forty-five documents move in four phases, each exiting on
+    a machine check rather than on review</h2>
+
+    <p>Backward compatibility is not owed &mdash; the owner deferred it with the
+    migration itself (2026-08-02, owner decision, <code>docs/README.md</code>)
+    &mdash; so a document is rewritten onto the new contract, never shimmed to
+    satisfy both. Each phase exits when the
+    generalized contract checker passes over that entry&rsquo;s
+    <code>docs/</code> &mdash; a criterion an owner can run, not a judgment a
+    reviewer renders. The four phases cover every document that exists at
+    <code>a4d8e2b</code>.</p>
+
+    <table>
+      <thead><tr><th>Phase</th><th>What moves</th><th>Owner</th><th>Exit criterion</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>0 &mdash; constitution</strong></td>
+          <td>Changes&nbsp;1&ndash;7: rewrite the agent definition, shrink <code>README.md</code>, trim <code>CLAUDE.md</code>, demote the four templates and five components, add the per-shape contracts, generalize the checker.</td>
+          <td>Workspace session</td>
+          <td>The checker passes over <code>workspace/docs</code>: 3 views (<code>agent-config-scopes.html</code>, <code>service-tailnet-hostname.html</code>, this proposal), 0 specs.</td>
+        </tr>
+        <tr>
+          <td><strong>1 &mdash; camera specs</strong></td>
+          <td>28 <code>.md</code> documents re-headed onto the unified <code>spec.md</code> contract &mdash; 3 product, 3 engineering, 2 process, 20 feature. Feature documents take the capability shape and keep their Behavior/Configuration/Acceptance triad; product decisions take the dated decision shape; the deferred-work ledgers survive as ledger shapes.</td>
+          <td>A camera session, as the doing agent</td>
+          <td>The checker passes over <code>camera/docs</code>, with camera&rsquo;s 9 templates and its README&rsquo;s system prose deleted &mdash; leaving only its vocabulary (Surface, Category, the glossary) as a short local contract file.</td>
+        </tr>
+        <tr>
+          <td><strong>2 &mdash; camera views</strong></td>
+          <td>5 <code>.html</code> documents re-rendered from their sources: 3 explanations, 1 benchmark, 1 proposal. The benchmark doctype folds into explanation &mdash; a measurement is an explanation whose question is &ldquo;what does it cost&rdquo; &mdash; per the parent rule that a recurring shape becomes a section pattern, never a new doctype.</td>
+          <td>The writer, one delegation per view</td>
+          <td>The checker still passes over <code>camera/docs</code> with every view carrying <code>Doctype</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>3 &mdash; board</strong></td>
+          <td>9 <code>.html</code> documents re-rendered lazily, on each one&rsquo;s next content change, since board already half-follows the parent. One fix lands immediately: <code>INDEX.md</code>&rsquo;s &ldquo;three templates&rdquo; sentence becomes a pointer at the constitution.</td>
+          <td>Board sessions</td>
+          <td>The checker passes over <code>board/docs</code> for every document it has re-rendered, and the stale sentence is gone at the start of the phase, not the end.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>The four phases sum to 45 documents, which is every document under a
+    <code>docs/</code> directory at the pinned commit. That sum is the
+    plan&rsquo;s own check: a phase that finishes without accounting for its
+    share has left documents on the old contract.</p>
   </section>
 
 </article>

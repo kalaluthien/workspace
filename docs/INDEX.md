@@ -34,6 +34,7 @@ Template: `templates/guide.html`
 
 Template: `templates/proposal.html`
 
-- [`agent-document-writing.html`](agent-document-writing.html) — adopt one
-  parent document system (this directory's templates, components, and
-  writer agent) for every docs/ directory; Open.
+- [`agent-document-writing.html`](agent-document-writing.html) — move the
+  document system's rules out of the six files that restate them and into
+  the `document-writer` agent's own definition, with a shared contract
+  checker and a four-phase migration of all 45 documents; Open.
