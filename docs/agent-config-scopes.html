@@ -469,6 +469,54 @@ kalaluthien.github.io/:      (no .claude — routed to _config.yml)</pre>
         <td>5 project entries; no <code>board</code>; claude-memory-viewer active</td>
         <td>6 entries; <code>board</code> added with its empty pool; claude-memory-viewer marked retiring</td></tr>
     </table>
+
+    <h2 id="connectivity">Appendix: template connectivity check (2026-08-02)</h2>
+    <p>The document templates are self-contained by decision, so their
+    instructions connect only through explicit references. This check walks
+    five author scenarios through the references that exist at commit
+    05f4c0d and records where a walk dead-ends. Each scenario starts where a
+    real author starts — <code>docs/README.md</code> or a copied template —
+    and follows only what the files themselves say.</p>
+    <table>
+      <tr><th>scenario</th><th>path walked</th><th>verdict</th></tr>
+      <tr><td>Route a new document to its template</td>
+        <td>README's chapter table carries a reader's-question column
+          (why / what shape / how); the practice template's own example
+          restates the same chooser in its first step — two independent
+          paths</td>
+        <td>connected</td></tr>
+      <tr><td>Add a document end to end</td>
+        <td>README: "to add a document, follow the practice template's own
+          example" — the example walks copy, fill, catalogue row, one
+          commit</td>
+        <td>connected</td></tr>
+      <tr><td>Resolve the cited research</td>
+        <td>the templates and README cite seven <code>notes/wiki/*.md</code>
+          pages by path; all seven exist in the notes vault</td>
+        <td>connected</td></tr>
+      <tr><td>Add a figure to a practice or principle</td>
+        <td>the figure discipline — C4 checklist, SVG conventions, figure
+          CSS — lives only in <code>pattern.html</code>;
+          <code>practice.html</code> says "a practice owes no figure" with
+          no pointer, <code>principle.html</code> says nothing</td>
+        <td>dead end</td></tr>
+      <tr><td>Warn in a pattern or principle</td>
+        <td>the warning form — hazard, consequence, avoidance, placed at
+          the step it names — and the <code>.warning</code> CSS live only
+          in <code>practice.html</code>; the other two carry neither the
+          rule nor a pointer</td>
+        <td>dead end</td></tr>
+    </table>
+    <p>Reading of the two dead ends: within its own genre every template is
+    complete, but the shared component disciplines sit in exactly one
+    sibling, and nothing routes an author there. This document is the
+    evidence — its figures required opening <code>pattern.html</code> by
+    hand and importing the figure CSS, a step no instruction named. The
+    consistent fix is one pointer line in each template's header comment
+    ("for a figure, follow pattern.html's checklist and copy its figure
+    CSS; for a warning, practice.html's outline form"), keeping each rule
+    written once while making every path to it explicit. The fix belongs to
+    the template owners; this appendix only records the check.</p>
   </section>
 
 </article>

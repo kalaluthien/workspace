@@ -25,7 +25,8 @@ Template: `templates/practice.html`
   Claude configuration scopes (global, workspace, project entry) into one
   matrix over CLAUDE.md, rules, skills, agents, and memory pools, with the
   location of every routing rule, responsibility declaration, and file-format
-  definition.
+  definition; appendixes record the practice-template migration and a
+  connectivity check over the document templates.
 - [`service-tailnet-hostname.html`](service-tailnet-hostname.html) — giving a
   service its own tailnet node and hostname with a `tailscale/tailscale`
   sidecar, so several services stay installable as phone apps at once; the
