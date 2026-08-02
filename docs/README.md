@@ -1,78 +1,31 @@
-# docs/ — how this directory works
+# docs/ — catalogue of the document system
 
-The workspace root's own document store: proposals and how-to guides about
-the container itself — its tooling, its layout, its agent conventions. A
-document about one project entry belongs in that entry's own `docs/`, never
-here.
+The workspace root's document store: self-contained `.html` views about the
+container itself, reviewable from `file://` with nothing else installed.
+Every rule of the system lives inside the three templates — each template is
+a whole filled example carrying its own contract — so this file only says
+what exists and where.
 
-Every document is a self-contained `.html` view. There is no specification
-(`.md`) layer here — the normative record for the workspace is
-`.claude/CLAUDE.md`, and a document that starts stating rules is that file
-trying to get out.
+| chapter | template | reader's question | holds |
+|---|---|---|---|
+| Principles | `templates/principle.html` | why is it this way? | a decision argued (Open) or recorded (Accepted), with the reasons that keep it true |
+| Patterns | `templates/pattern.html` | what shape does it have? | a structure or relation drawn and named, existing or proposed |
+| Practices | `templates/practice.html` | how do I do it? | one procedure walked to a goal at a known commit |
 
-Expected readers are humans and coding agents. Write for someone who has the
-workspace and nothing else, and will act on what they read.
+- `INDEX.md` — the catalogue of documents: every document, its chapter, one
+  line of scope. Changes in the same commit as the document.
+- `templates/` — the three templates above. To add a document, follow the
+  practice template's own example, which is that procedure.
+- Filing summary (normative text in each template's header): one topic, one
+  file, `<plane>-<kebab-slice>.html` with plane prefix `agent-` or
+  `service-`, updated in place; the workspace's normative rules stay in
+  `.claude/CLAUDE.md`.
 
-## Stable titles
-
-One topic, one file, updated in place: `<kebab-title>.html`, flat in this
-directory. Git history holds every earlier state, and a document's header
-pins the commit it rendered, so dated snapshot filenames are not needed.
-`INDEX.md` is the catalogue — every document, its chapter, its scope — and
-changes in the same commit that adds, renames, or retires a document.
-
-A title has to be generic against change and specific about scope at once:
-it carries no state, verdict, or measurement, because updating in place makes
-any of those false; and it names the slice of the workspace it owns, not the
-genre, which the chapter already carries.
-
-The workspace is a control plane over two planes at once — **agents**, held by
-the catalogue and the `delegating` skill, and **services**, the long-running
-things its repositories expose. A slice name alone does not say which one a
-document owns, so every filename carries the plane as a prefix:
-`agent-<slice>.html` or `service-<slice>.html`. The chapter says what kind of
-document it is; the prefix says which half of the control plane it governs, and
-that is the split a reader routes by first.
-
-## Chapters and templates
-
-| chapter | template | holds |
-|---|---|---|
-| How-to guides | `templates/how-to-guide.html` | one path walked through a procedure at a known commit |
-| Proposals | `templates/proposal.html` | a change argued but not decided |
-
-Copy the chapter's template and fill it in. Each template is a whole file —
-doctype, inline styles, header, outline — and documents duplicate that
-skeleton rather than sharing one, because an author copies a template exactly
-once and then owns the result: a shared skeleton is an indirection paid on
-every read to save a duplication nobody maintains. Convention carried over
-from `camera/docs` (2026-08-01).
-
-## Consolidation (2026-08-02)
-
-This directory is now the one home of the docs convention; the per-repository
-systems in `camera/docs` and `claude-memory-viewer/docs` are its ancestors,
-not its peers. `explanation.html`, `benchmark.html`, and `mockup.html` are
-imported verbatim from `camera/docs/templates` as raw material — their
-header comments still say "camera" — and the whole template set is being
-reshaped by the innovation pass (see the workspace backlog): view (`.html`)
-documents only, no specification (`.md`) layer, templates self-contained and
-example-included. Until that pass lands, the two chapters above remain the
-only ones a new document may join.
-
-A template carries a contract: `required-fields` are the header fields a
-document must have, `required-sections` the structure it should have. No hook
-checks them in this repository — the author checks the document against its
-template before commit.
-
-## Rules beyond general craft
-
-- **Self-contained, always.** One file, inline `<style>`, no JavaScript, no
-  webfonts, no CDN. It must open from `file://` in ten years.
-- **Readable at phone width.** Wide content scrolls inside its own container;
-  the page never scrolls sideways; nothing depends on hover.
-- **Nothing is decided here.** A proposal argues; acceptance lands where the
-  decision lives — a rule in `.claude/CLAUDE.md`, a script, a skill — and the
-  proposal's Status field then points there.
-- **A guide goes stale by design.** It is pinned to a commit; when a guide
-  and the tooling disagree, the guide is stale — fix it, or retire it.
+Ancestry: consolidated 2026-08-02 from the `camera/docs` and
+`claude-memory-viewer/docs` conventions; the decision to hold views only is
+recorded in the principle template's own example. Style research behind the
+templates: `notes/wiki/document-argument-structures.md`,
+`notes/wiki/procedural-instruction-design.md`,
+`notes/wiki/structured-writing.md`,
+`notes/wiki/software-architecture-view-models.md`,
+`notes/wiki/information-visualization-principles.md`.

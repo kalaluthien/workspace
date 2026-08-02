@@ -1,0 +1,222 @@
+<!doctype html>
+<!--
+  Template for the Practices chapter (docs/INDEX.md) — one procedure walked
+  to a goal at a known commit. It replaces the former How-to guides chapter.
+  A practice is pinned and expected to go stale: when it and the tooling
+  disagree, the practice is stale — fix it, or retire it.
+
+  This template is its own example: the article below is a real, filled
+  document. Copy the file to docs/<plane>-<kebab-slice>.html (plane prefix
+  agent- or service-), replace the example content, keep the shape, and
+  delete every comment, this one included. One topic, one file, updated in
+  place; the INDEX.md row changes in the same commit. The template carries
+  the whole skeleton rather than pointing at a shared one, because an author
+  copies a template exactly once and then owns the result (2026-07-28, owner
+  decision).
+
+  Self-contained by rule: inline <style>, no JavaScript, no webfonts, no
+  CDN. The document must open from file:// with no network, forever.
+
+  The step rules (per notes/wiki/procedural-instruction-design.md, from the
+  wikiHow skeleton plus the Stanford assembly principles):
+  - The title begins with a verb; the Goal field states what the reader
+    will have done, and it leads — a practice owes no figure.
+  - The introduction is two or three sentences, no filler.
+  - Each step opens with an action verb, and its first sentence summarizes
+    the whole step, because readers skim first sentences. A step is one
+    compositional action: a procedure that renders as twenty steps has
+    mis-sized its unit (IKEA ships a modal three steps, max ten). A step
+    longer than three or four lines becomes labelled sub-items.
+  - A condition comes before the command it governs ("If X, do Y" — the
+    one rule every studied style system agrees on, per
+    notes/wiki/technical-writing-style-systems.md).
+  - No step refers to another step by number — numbering changes; name the
+    operation instead.
+  - The command goes verbatim in a <pre>, with what a working run prints
+    under it, inside the step it belongs to (spatial contiguity: output a
+    paragraph away is paid for on every glance).
+  - A warning sits embedded at the step whose hazard it names (proximity
+    is the settled half of warning research), in outline form, carrying
+    only the components another one does not make obvious: hazard,
+    consequence, avoidance. No obvious hazards.
+  - Sections are Parts, not Methods: every section is needed to reach the
+    goal. If any one section alone would suffice, this is two practices —
+    split the document.
+
+  Recovery is a required section because it is the half with the better
+  evidence: warnings prevent errors, but Carroll's minimalism results come
+  from training error RECOGNITION and RECOVERY, and both reference styles
+  omit it. Name how a failed run looks and the way back, per failure.
+
+  Prerequisites excludes what its wikiHow ancestors exclude: no obvious
+  items, no non-physical needs. Name the memory or document that gets the
+  reader each prerequisite, rather than restating it.
+
+  required-fields: Category, Goal, Source, Updated, Commit
+  required-sections: Prerequisites, Steps, Acceptance, Recovery
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Add a document to docs/ — workspace</title>
+<style>
+  /* Charter ships with macOS, Georgia everywhere else, so the page needs no
+     font download. Tufte's #fffff8 / #111 instead of pure black-on-white:
+     nearly indistinguishable, without the harsh contrast. */
+  html { font-size: 16px; }
+  body {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 8rem;
+    background: #fffff8;
+    color: #111;
+    font-family: Charter, "Bitstream Charter", Georgia, serif;
+    line-height: 1.62;
+    overflow-wrap: break-word;
+  }
+
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
+  h2 { font-size: 1.3rem; margin: 3rem 0 .5rem; font-weight: 600; }
+  h3 { font-size: 1.02rem; margin: 2rem 0 .3rem; font-weight: 600; }
+  p, li { margin: .7rem 0; }
+  ul, ol { padding-left: 1.2rem; }
+  a { color: inherit; text-decoration-color: #aaa; }
+  strong { font-weight: 600; }
+
+  code, pre, .provenance dd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85em;
+  }
+  /* Wide content scrolls inside itself; the page never scrolls sideways. */
+  pre {
+    overflow-x: auto;
+    background: #f2f2ea;
+    padding: 1rem;
+    line-height: 1.45;
+    margin: 1.4rem 0;
+  }
+
+  table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e2e2d8; }
+  th { font-weight: 600; }
+  /* phone-width table scroll: below the body's own max-width a multi-column
+     table would crush to one word per line (width:100% leaves nothing to
+     overflow, so nothing scrolls). The cell minimum keeps columns readable
+     and pushes the table wide; display:block lets it pan inside its own box. */
+  @media (max-width: 42rem) {
+    table { display: block; overflow-x: auto; }
+    th, td { min-width: 9rem; }
+  }
+
+  .provenance {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: .15rem 1rem;
+    margin: 0;
+    font-size: .85rem;
+    color: #555;
+  }
+  .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
+  .provenance dd { margin: 0; }
+
+  .warning {
+    border-left: 3px solid #8a5a00;
+    padding: .1rem 0 .1rem .9rem;
+    margin: .9rem 0;
+  }
+  .warning ul { margin: .3rem 0; }
+</style>
+</head>
+<body>
+<article>
+
+  <header>
+    <h1>Add a document to docs/</h1>
+    <dl class="provenance">
+      <dt>Category</dt> <dd>practice</dd>
+      <dt>Goal</dt>     <dd>a new document renders complete from file://, sits in its chapter, and is committed with its catalogue row</dd>
+      <dt>Source</dt>   <dd>docs/README.md; templates/</dd>
+      <dt>Updated</dt>  <dd>2026-08-02</dd>
+      <dt>Commit</dt>   <dd>6b7821c</dd>
+    </dl>
+  </header>
+
+  <section>
+    <p>
+      Every document here starts as a copy of its chapter's template, which
+      is itself a filled example. The whole procedure is three steps and
+      one commit.
+    </p>
+
+    <h2 id="prerequisites">Prerequisites</h2>
+    <ul>
+      <li>A branch off the workspace root's <code>main</code> — the
+        installed guard blocks direct commits to <code>main</code>
+        (<code>~/.claude/CLAUDE.md</code>, "Code to work").</li>
+    </ul>
+
+    <h2 id="steps">Steps</h2>
+    <ol>
+      <li>
+        <p>
+          Copy the chapter's template to the document's stable name. If the
+          document records or argues a decision, take
+          <code>templates/principle.html</code>; if it draws a structure,
+          <code>templates/pattern.html</code>; if it walks a procedure,
+          <code>templates/practice.html</code>. The name is
+          <code>&lt;plane&gt;-&lt;kebab-slice&gt;.html</code>, where the
+          plane prefix is <code>agent-</code> or <code>service-</code>.
+        </p>
+<pre>cp docs/templates/practice.html docs/service-example-slice.html</pre>
+      </li>
+      <li>
+        <p>
+          Replace the example content with your own, keep every required
+          section, and delete every authoring comment. The contract sits at
+          the top of the template you copied; a clean document has no
+          comment left.
+        </p>
+        <div class="warning">
+          <ul>
+            <li>A webfont, CDN link, or script breaks the
+              <code>file://</code> rule — the page must open with no
+              network, so keep everything inline.</li>
+          </ul>
+        </div>
+<pre>grep -c '&lt;!--' docs/service-example-slice.html
+0</pre>
+      </li>
+      <li>
+        <p>
+          Add the document's row under its chapter in
+          <code>INDEX.md</code>, then commit both files in one change and
+          merge the branch.
+        </p>
+<pre>git add docs/service-example-slice.html docs/INDEX.md
+git commit -m "docs: add service-example-slice"</pre>
+      </li>
+    </ol>
+
+    <h2 id="acceptance">Acceptance</h2>
+    <p>
+      Open the file from <code>file://</code> with the network off: the
+      page renders complete, and nothing pans sideways at phone width.
+      <code>INDEX.md</code> lists the document under exactly one chapter,
+      in the same commit.
+    </p>
+
+    <h2 id="recovery">Recovery</h2>
+    <ul>
+      <li>The commit was refused with a main-branch message: you are on
+        <code>main</code>. Create the branch now and repeat the commit —
+        the staged files survive the switch.</li>
+      <li>A table pans the whole page sideways on a phone: the template's
+        table CSS is missing or was edited out — restore the
+        <code>@media (max-width: 42rem)</code> block from the template.</li>
+    </ul>
+  </section>
+
+</article>
+</body>
+</html>

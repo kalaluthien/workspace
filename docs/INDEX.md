@@ -3,11 +3,23 @@
 Every document in `docs/`, as the chapter list. A chapter is a `##` heading,
 a `Template:` line, and the documents that belong to it in reading order.
 Update in the same commit that adds, renames, or retires a document.
-Conventions: `README.md`.
+Catalogue of the system: `README.md`.
 
-## How-to guides
+## Principles
 
-Template: `templates/how-to-guide.html`
+Template: `templates/principle.html`
+
+(none yet — the template's own example records the views-only decision)
+
+## Patterns
+
+Template: `templates/pattern.html`
+
+(none yet)
+
+## Practices
+
+Template: `templates/practice.html`
 
 - [`agent-config-scopes.html`](agent-config-scopes.html) — surveying the three
   Claude configuration scopes (global, workspace, project entry) into one
@@ -18,9 +30,3 @@ Template: `templates/how-to-guide.html`
   service its own tailnet node and hostname with a `tailscale/tailscale`
   sidecar, so several services stay installable as phone apps at once; the
   state-directory trap, the host-allowlist move, and retiring the old mount.
-
-## Proposals
-
-Template: `templates/proposal.html`
-
-(none yet)
