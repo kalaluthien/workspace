@@ -268,19 +268,9 @@ kalaluthien.github.io/.claude/      (no such directory)</pre>
     working directory. Rules from any scope stay dormant until the session
     reads a file their <code>paths</code> key matches, so a rule is the only
     configuration whose arrival depends on what the session opens. Subagents
-    inherit the same composition, snapshotted at session start (per the notes
-    pool's <code>reference-subagent-inheritance</code>, verified 2026-07-16).</p>
-
-    <div class="callout gap">
-      <span class="tag">gap</span>
-      The memory just cited is misfiled. The snapshot fact holds for every
-      session on this machine, but
-      <code>reference-subagent-inheritance</code> lives in the notes pool, so
-      a session in any other entry cannot see it. Per "Filing" route 3, a
-      harness behavior fact belongs in a global <code>setup-*</code> memory —
-      the same route the rule format already takes. Move the file, and leave a
-      <code>[[name]]</code> link in the notes pool if that pool still needs it.
-    </div>
+    inherit the same composition, snapshotted at session start (per the
+    global pool's <code>setup-claude-subagents</code>, verified
+    2026-07-16).</p>
 
     <figure>
       <svg viewBox="0 0 660 270" role="img">
