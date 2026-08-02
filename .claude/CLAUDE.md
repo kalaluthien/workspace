@@ -9,13 +9,15 @@ these. A change here is committed to the root repository:
 | directory | holds | read first |
 | --- | --- | --- |
 | `.claude/` | workspace instructions, conditional rules, skills, output styles | this file |
-| `docs/` | workspace-level proposals and how-to guides, over both planes | `docs/README.md` |
+| `docs/` | the parent document system (templates, components) plus workspace-level specs and views, over both planes | `docs/README.md` |
 | `scripts/` | workspace-level herdr tooling (`herdr-survey`, `herdr-spawn-claude`) | script headers |
 
 A document request whose topic belongs to no project entry lands in `docs/`,
-as one of its two chapters — never in a project entry it does not fit, and
-never in chat alone. A document about one project entry still belongs in that
-entry's own document store.
+as a spec (`.md`) or a view (`.html`) per `docs/README.md` — never in a
+project entry it does not fit, and never in chat alone. A document about one
+project entry still belongs in that entry's own document store, which follows
+the same parent system; view writing is delegated to the `document-writer`
+subagent.
 
 The workspace is a control plane over **agents** — the entries above and the
 sessions that work them — and over **services**, the long-running things those
