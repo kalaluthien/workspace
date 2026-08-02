@@ -15,18 +15,16 @@ Template: `templates/principle.html`
 
 Template: `templates/pattern.html`
 
-(none yet)
+- [`agent-config-scopes.html`](agent-config-scopes.html) — the shape of the
+  three Claude configuration scopes (global, workspace, project entry): one
+  matrix over CLAUDE.md, rules, skills, agents, and memory pools, with the
+  location of every routing rule, responsibility declaration, and file-format
+  definition; appendixes hold the survey evidence, the migration record, and
+  a connectivity check over the document templates.
 
 ## Practices
 
 Template: `templates/practice.html`
-
-- [`agent-config-scopes.html`](agent-config-scopes.html) — surveying the three
-  Claude configuration scopes (global, workspace, project entry) into one
-  matrix over CLAUDE.md, rules, skills, agents, and memory pools, with the
-  location of every routing rule, responsibility declaration, and file-format
-  definition; appendixes record the practice-template migration and a
-  connectivity check over the document templates.
 - [`service-tailnet-hostname.html`](service-tailnet-hostname.html) — giving a
   service its own tailnet node and hostname with a `tailscale/tailscale`
   sidecar, so several services stay installable as phone apps at once; the

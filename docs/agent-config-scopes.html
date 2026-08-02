@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Survey the Claude configuration scopes — workspace</title>
+<title>The Claude configuration scopes — workspace</title>
 <style>
   /* Charter ships with macOS, Georgia everywhere else, so the page needs no
      font download. White background by owner preference (2026-08-02). */
@@ -101,10 +101,10 @@
 <article>
 
   <header>
-    <h1>Survey the Claude configuration scopes</h1>
+    <h1>The Claude configuration scopes</h1>
     <dl class="provenance">
-      <dt>Category</dt> <dd>practice</dd>
-      <dt>Goal</dt>     <dd>a filled scope matrix — global, workspace, project — over CLAUDE.md, rules, skills, agents, and memory pools, plus the location of every routing rule, responsibility declaration, and file-format definition</dd>
+      <dt>Category</dt> <dd>pattern</dd>
+      <dt>Question</dt> <dd>where does each kind of Claude configuration — instruction, rule, skill, agent, memory — live, and what routes it there?</dd>
       <dt>Source</dt>   <dd>~/.claude/CLAUDE.md &sect;Filing, &sect;Claude Code; ~/workspace/.claude/CLAUDE.md &sect;Workspace layout</dd>
       <dt>Updated</dt>  <dd>2026-08-02</dd>
       <dt>Commit</dt>   <dd>3789e39</dd>
@@ -112,20 +112,13 @@
   </header>
 
   <section>
-    <p>
-      Claude configuration lives in three scopes, and each file kind has one
-      correct home. This practice walks the survey that fills the matrix, so
-      a reader can name the destination of any new instruction, rule, skill,
-      agent, or memory without re-deriving the layout.
-    </p>
-
     <div class="callout gap">
       <span class="tag">gap</span>
       This document carries two commit pins. The header pins
       <code>3789e39</code>; the connectivity appendix walks the tree at
-      <code>05f4c0d</code>. The Recovery section says: re-pin the Commit
-      field to the tree of the newest re-walk. Apply that rule at the next
-      update.
+      <code>05f4c0d</code>. The staleness rule in the survey evidence
+      appendix says: re-pin the Commit field to the tree of the newest
+      re-walk. Apply that rule at the next update.
     </div>
 
     <figure>
@@ -186,81 +179,27 @@
       </figcaption>
     </figure>
 
-    <h2 id="prerequisites">Prerequisites</h2>
-    <ul>
-      <li>The workspace is checked out at <code>~/workspace</code> with its
-        project entries in place (<code>~/workspace/.claude/CLAUDE.md</code>,
-        "Workspace layout").</li>
-      <li>The global instruction file <code>~/.claude/CLAUDE.md</code> exists;
-        its "Filing" section is the taxonomy this survey reads the tree
-        against.</li>
-    </ul>
+    <p>
+      Claude configuration lives in three scopes, and each file kind has one
+      correct home. This pattern draws the shape — the scope matrix, the
+      session composition, and the routing — so a reader can name the
+      destination of any new instruction, rule, skill, agent, or memory
+      without re-deriving the layout. The listings that filled the matrix
+      are in the survey evidence appendix.
+    </p>
 
-    <h2 id="steps">Steps</h2>
-    <ol>
-      <li>
-        <p>List the global scope. Only <code>CLAUDE.md</code> and
-        <code>rules/</code> hold content; <code>skills/</code> and
-        <code>agents/</code> are empty by design, because machine-wide
-        behavior lives in the instruction file and the conditional rules.</p>
-<pre>$ ls ~/.claude/{CLAUDE.md,rules,skills,agents}
-CLAUDE.md
-rules/:  skill-authoring.md
-skills/: (empty)
-agents/: (empty)</pre>
-      </li>
-      <li>
-        <p>List the workspace scope. It adds the one cross-entry skill and the
-        services-plane rule; it defines no agents.</p>
-<pre>$ ls ~/workspace/.claude/{CLAUDE.md,rules,skills,output-styles}
-CLAUDE.md
-rules/:         services.md
-skills/:        delegating/
-output-styles/: simplified-technical.md</pre>
-        <div class="callout gap">
-          <span class="tag">gap</span>
-          This step lists <code>output-styles/</code>, but the scope matrix
-          below has no <code>output-styles</code> row. The file kind enters
-          the survey and then drops out of the summary. Add the row, or
-          state why the matrix omits it.
-        </div>
-      </li>
-      <li>
-        <p>List each project entry. Every entry carries its own
-        <code>CLAUDE.md</code>; only <code>notes/</code> defines skills and
-        agents; no entry defines rules.</p>
-<pre>$ for p in notes camera mabinogi-mobile-automation board \
-           claude-memory-viewer kalaluthien.github.io; do
-    ls ~/workspace/$p/.claude/; done
-notes/:      CLAUDE.md  skills/ (6)  agents/ (3)
-camera/:     CLAUDE.md
-mabinogi-mobile-automation/: CLAUDE.md
-board/:      CLAUDE.md
-claude-memory-viewer/:       CLAUDE.md   (retiring)
-kalaluthien.github.io/:      (no .claude — routed to _config.yml)</pre>
-      </li>
-      <li>
-        <p>List the memory pools. The global pool and the workspace pool map
-        to the two upper scopes; five project pools exist, and the newest —
-        <code>board</code> — is still empty.</p>
-<pre>$ ls ~/.claude/projects/*/memory/
--Users-hyungmokim--claude/:   MEMORY.md + 10 setup-* files
--Users-hyungmokim-workspace/: MEMORY.md + 5 files
-...-workspace-notes/:         MEMORY.md + 5 files
-...-workspace-camera/:        MEMORY.md + 3 files
-...-workspace-mabinogi-mobile-automation/: MEMORY.md + 1 file
-...-workspace-claude-memory-viewer/:       MEMORY.md + 1 file
-...-workspace-board/:                      (empty)</pre>
-        <div class="callout gap">
-          <span class="tag">gap</span>
-          The board pool does not reproduce. On 2026-08-02, the path
-          <code>…-workspace-board/memory/</code> does not exist — the
-          harness creates a pool only when a session first runs in the
-          entry. Four project pools exist, not five. Per the Acceptance
-          section, this is a staleness signal for this step and the matrix.
-        </div>
-      </li>
-    </ol>
+    <h2 id="elements">Elements</h2>
+    <table>
+      <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>global scope</td><td>configuration directory</td><td><code>~/.claude/</code> — the instruction file and conditional rules that bind any repository</td></tr>
+        <tr><td>workspace scope</td><td>configuration directory</td><td><code>~/workspace/.claude/</code> — layout, the entry routing table, the one cross-entry skill</td></tr>
+        <tr><td>project scope</td><td>configuration directory</td><td><code>&lt;entry&gt;/.claude/</code> &#215;6 — one CLAUDE.md each; notes adds skills and agents</td></tr>
+        <tr><td>global pool</td><td>memory pool</td><td><code>…--claude/memory</code> — single-tool <code>setup-*</code> facts, visible from every project</td></tr>
+        <tr><td>workspace pool</td><td>memory pool</td><td><code>…-workspace/memory</code> — what coordinates more than one project or service</td></tr>
+        <tr><td>project pools</td><td>memory pool</td><td><code>…-workspace-&lt;entry&gt;/memory</code> — one entry's own durable takeaways</td></tr>
+      </tbody>
+    </table>
 
     <h2 id="matrix">Scope matrix</h2>
     <p>The three scopes divide cleanly: the global scope holds rules true
@@ -294,8 +233,8 @@ kalaluthien.github.io/:      (no .claude — routed to _config.yml)</pre>
       <span class="tag">notice</span>
       The project column counts 5 CLAUDE.md files for 6 entries. This is
       not an error: <code>kalaluthien.github.io/</code> has no
-      <code>.claude/</code> by design. The Recovery section records this,
-      but a reader meets the matrix first — hence this pointer.
+      <code>.claude/</code> by design. The survey evidence appendix records
+      this trap, but a reader meets the matrix first — hence this pointer.
     </div>
 
     <h2 id="session">Session composition</h2>
@@ -495,14 +434,90 @@ kalaluthien.github.io/:      (no .claude — routed to _config.yml)</pre>
       rule format.
     </div>
 
-    <h2 id="acceptance">Acceptance</h2>
-    <p>Given any new configuration file — an instruction, a rule, a skill,
-    an agent, a memory — the reader names its destination scope from the
-    matrix and the routing figure without re-deriving the layout. The four
-    survey steps, re-run against the current tree, reproduce the matrix
-    exactly; a difference means this document is stale, not the tree.</p>
+    <h2 id="not-shown">What is not shown</h2>
+    <p>The figures and the matrix claim placement and routing only. Not
+    shown: the contents of any configuration file; the harness's load
+    mechanics beyond the conditions the session figure names;
+    <code>settings.json</code>, permissions, and hooks in every scope —
+    the survey covers the five matrix file kinds and no more; and the
+    history of retired scopes, which lives in the workspace pool's
+    <code>history-workspace-refactor</code> memory.</p>
 
-    <h2 id="recovery">Recovery</h2>
+    <h2 id="evidence">Appendix: survey evidence</h2>
+    <p>The four listings that filled the matrix, taken against the tree at
+    the pinned commit. They assume the workspace checked out at
+    <code>~/workspace</code>, and they read the tree against the "Filing"
+    taxonomy in <code>~/.claude/CLAUDE.md</code>.</p>
+    <ol>
+      <li>
+        <p>List the global scope. Only <code>CLAUDE.md</code> and
+        <code>rules/</code> hold content; <code>skills/</code> and
+        <code>agents/</code> are empty by design, because machine-wide
+        behavior lives in the instruction file and the conditional rules.</p>
+<pre>$ ls ~/.claude/{CLAUDE.md,rules,skills,agents}
+CLAUDE.md
+rules/:  skill-authoring.md
+skills/: (empty)
+agents/: (empty)</pre>
+      </li>
+      <li>
+        <p>List the workspace scope. It adds the one cross-entry skill and the
+        services-plane rule; it defines no agents.</p>
+<pre>$ ls ~/workspace/.claude/{CLAUDE.md,rules,skills,output-styles}
+CLAUDE.md
+rules/:         services.md
+skills/:        delegating/
+output-styles/: simplified-technical.md</pre>
+        <div class="callout gap">
+          <span class="tag">gap</span>
+          This listing shows <code>output-styles/</code>, but the scope
+          matrix has no <code>output-styles</code> row. The file kind enters
+          the survey and then drops out of the summary. Add the row, or
+          state why the matrix omits it.
+        </div>
+      </li>
+      <li>
+        <p>List each project entry. Every entry carries its own
+        <code>CLAUDE.md</code>; only <code>notes/</code> defines skills and
+        agents; no entry defines rules.</p>
+<pre>$ for p in notes camera mabinogi-mobile-automation board \
+           claude-memory-viewer kalaluthien.github.io; do
+    ls ~/workspace/$p/.claude/; done
+notes/:      CLAUDE.md  skills/ (6)  agents/ (3)
+camera/:     CLAUDE.md
+mabinogi-mobile-automation/: CLAUDE.md
+board/:      CLAUDE.md
+claude-memory-viewer/:       CLAUDE.md   (retiring)
+kalaluthien.github.io/:      (no .claude — routed to _config.yml)</pre>
+      </li>
+      <li>
+        <p>List the memory pools. The global pool and the workspace pool map
+        to the two upper scopes; five project pools exist, and the newest —
+        <code>board</code> — is still empty.</p>
+<pre>$ ls ~/.claude/projects/*/memory/
+-Users-hyungmokim--claude/:   MEMORY.md + 10 setup-* files
+-Users-hyungmokim-workspace/: MEMORY.md + 5 files
+...-workspace-notes/:         MEMORY.md + 5 files
+...-workspace-camera/:        MEMORY.md + 3 files
+...-workspace-mabinogi-mobile-automation/: MEMORY.md + 1 file
+...-workspace-claude-memory-viewer/:       MEMORY.md + 1 file
+...-workspace-board/:                      (empty)</pre>
+        <div class="callout gap">
+          <span class="tag">gap</span>
+          The board pool does not reproduce. On 2026-08-02, the path
+          <code>…-workspace-board/memory/</code> does not exist — the
+          harness creates a pool only when a session first runs in the
+          entry. Four project pools exist, not five. Per the staleness rule
+          below, this is a staleness signal for this listing and the
+          matrix.
+        </div>
+      </li>
+    </ol>
+    <p><strong>Staleness rule.</strong> Re-run the four listings against
+    the current tree; they must reproduce the matrix exactly. A difference
+    means this document is stale, not the tree: update the matrix and the
+    figures in place, re-pin the Commit field to the tree the re-walk ran
+    on, and do not fork a dated copy. Two traps while re-walking:</p>
     <ul>
       <li>A pool path under <code>~/.claude/projects/</code> does not
         resolve: the encoded name mirrors the working directory
@@ -512,10 +527,6 @@ kalaluthien.github.io/:      (no .claude — routed to _config.yml)</pre>
         table in the workspace CLAUDE.md before treating it as a gap —
         <code>kalaluthien.github.io/</code> is routed to
         <code>_config.yml</code> by design.</li>
-      <li>The matrix and the tree disagree — a new entry, a new rule file, a
-        retired pool: re-run the four survey steps, update the matrix and
-        the figures, and re-pin the Commit field to the tree the re-walk
-        ran on. Update this document in place; do not fork a dated copy.</li>
     </ul>
 
     <h2 id="appendix">Appendix: migration record (2026-08-02)</h2>
@@ -543,6 +554,14 @@ kalaluthien.github.io/:      (no .claude — routed to _config.yml)</pre>
         <td>5 project entries; no <code>board</code>; claude-memory-viewer active</td>
         <td>6 entries; <code>board</code> added with its empty pool; claude-memory-viewer marked retiring</td></tr>
     </table>
+    <p>Re-categorized from practice to pattern later the same day
+    (2026-08-02): the reader's question this document answers is "what
+    shape does the configuration have?", not "how do I do it?" — the four
+    listings are evidence behind the figures, not a procedure walked to a
+    goal. The change moved the listings to the survey evidence appendix,
+    folded Acceptance and Recovery into its staleness rule, and added the
+    Elements table and the "What is not shown" section per the pattern
+    contract.</p>
 
     <h2 id="connectivity">Appendix: template connectivity check (2026-08-02)</h2>
     <p>The document templates are self-contained by decision, so their
