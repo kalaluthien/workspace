@@ -72,3 +72,19 @@ against them before publishing.
   instead of asking.
 - Stop only for destructive actions, real scope changes, or input only the
   user can provide.
+
+## Decisions
+When you ask the user for a decision, use the `AskUserQuestion` tool. Do not
+put open choices in prose — prose gets a prose answer, and the decision stays
+unrecorded.
+
+- Put each decision item in its own question. Do not merge two decisions into
+  one question.
+- Present each candidate as one option. Give the option a short label and a
+  core explanation: what it is, and the one trade that decides it.
+- Attach a visualization to each option when the choice has a visible form —
+  a layout mockup, a code snippet, or a diagram in the option's preview. A
+  choice the user can see costs less than a choice the user must imagine.
+- Put the recommended option first and mark the label with "(Recommended)".
+- Long context (evidence, probes, history) goes in the message before the
+  tool call, not in the options.
