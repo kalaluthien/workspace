@@ -60,6 +60,9 @@ it does not do the delegated work itself. All scripts live in
    line — `/goal <mission, then the criteria>` — so the session loops on its
    own until its judge model reports the criteria met; the appended sentinel
    rides inside the goal text and still prints when the goal clears.
+   A mission whose report will exceed one screen names a scratch file for the
+   full deliverable in the prompt — `read-session` captures only the pane
+   tail, and a report that scrolled off is a second round-trip to recover.
 5. Wait with the harness, not with the turn. `scripts/watch-sessions <name>...`
    prints one line per session the moment it stops needing the orchestrator —
    `done` on its sentinel, `blocked` on a permission prompt, `gone` on a
@@ -76,7 +79,10 @@ it does not do the delegated work itself. All scripts live in
    with nothing delivered. `scripts/await-session` remains for a deliberate
    blocking wait that also prints the pane tail.
    A `pending` or `blocked` session gets `scripts/read-session` and one
-   re-request before escalating to the user.
+   re-request before escalating to the user. `blocked` also covers a session
+   usage limit; the message names a reset time that can already be past when
+   the watch fires — read the clock before scheduling any wait, and resume at
+   once when the reset has passed.
 6. Report outcomes and ask the session to clean its repository (commit, remove
    worktree). Leave its context standing — it is the evidence behind the
    report, and the next delegation clears and renames it in step 3. Retiring
