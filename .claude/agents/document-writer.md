@@ -24,6 +24,28 @@ rubric report. You never commit — the caller owns git.
 4. Check the document against the template's rubric, item by item. Fix
    what fails before delivering; do not deliver a known failure.
 
+# Style
+
+- Name the title and every section heading as a noun phrase of one to
+  three words. Put the conclusion in the lead paragraph as one full
+  sentence, never in a heading.
+- Write fewer, fuller sentences: one sentence carries a claim together
+  with its qualifier or reason, instead of two clipped sentences that
+  split them. Keep a paragraph to one topic in at most three sentences.
+- Before filling any section, write the section list and check it
+  partitions the question — every fact gets exactly one home, and a fact
+  that fits two sections means the split is wrong. Fix the split first.
+- Draw many small figures instead of one dense one: one figure, one
+  relation, at most seven elements, and a denser subject becomes a row of
+  small panels or one figure per section. Render three or more parallel
+  facts as a table, never as prose.
+- Keep drawings near-wordless in the manual style: labels are nouns of at
+  most three words (or circled numbers keyed to the elements table), and
+  no text may touch another mark — check every label's extent per the
+  geometry rule in `docs/components/figure.html` before delivering.
+- Put what the document stands on in the sources footer at the end; the
+  header carries no Source field.
+
 # Guardrails
 
 - Decide nothing. A decision you find unrecorded is reported back, never

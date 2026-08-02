@@ -35,7 +35,8 @@ architecture rules, processes, features, and runbooks alike.
 
 Three, chosen by the reader's question; a document answering two questions
 is two documents. Each view carries a `Doctype` field and the one field its
-doctype adds.
+doctype adds, and closes with a sources footer — the header carries no
+Source field.
 
 | doctype | the reader's question | stands on | field it adds |
 |---|---|---|---|
@@ -56,10 +57,33 @@ option is drawn.
   `required-sections`), and a **rubric** — binary checks the writer
   verifies before delivering and the reviewer scores against.
 - `components/` — the doctype-independent layer, copied never linked:
-  `base` (page skeleton), `provenance` (header block), `callout`
+  `base` (page skeleton), `provenance` (header block and sources footer), `callout`
   (notice/gap/warning/recovery blocks), `figure` (form choice and
   notation), `disclosure` (accessible detail). Each file demonstrates
   itself and states its own rules.
+
+## House style
+
+Five rules bind every view; each template's rubric checks them.
+
+- **Naming** — the title and every section heading are noun phrases of one
+  to three words. The conclusion is a full sentence in the lead paragraph
+  (or the Goal field), never in the heading.
+- **Prose rhythm** — a paragraph holds one topic in at most three
+  sentences. Prefer one full sentence that carries a claim together with
+  its qualifier over two clipped sentences that split them.
+- **MECE structure** — the section set partitions the document's question:
+  every fact has exactly one home, and a fact that fits two sections marks
+  a wrong split. Fix the split before writing prose into it.
+- **Figures and tables** — many and small: one figure carries one relation
+  among at most seven elements, and a denser subject splits into panel rows
+  or per-section figures; three or more parallel facts are a table, never
+  prose. No text in a figure touches another mark
+  (`components/figure.html` carries the geometry rule).
+- **Design language** — manual-style minimalism (owner decision,
+  2026-08-02): flat black-on-white, system sans-serif, thin rules, numbered
+  landmarks, generous whitespace, and near-wordless drawings whose words
+  live in the elements table.
 
 ## Writing pipeline
 
@@ -75,9 +99,10 @@ option is drawn.
 ## Naming and catalogue
 
 One topic, one file, updated in place — git history holds earlier states,
-and a view's header pins the commit it rendered. A title is generic
-against change (no state, verdict, or measurement in the name) and
-specific about scope (it names the slice it owns, not the genre).
+and a view's header pins the commit it rendered. A title is a noun phrase
+of one to three words, generic against change (no state, verdict, or
+measurement in the name) and specific about scope (it names the slice it
+owns, not the genre).
 Workspace files carry a plane prefix, `agent-` or `service-`; an entry's
 files follow the entry's own naming. `INDEX.md` is the catalogue — every
 document, its chapter, one line of scope — and changes in the same commit

@@ -1,8 +1,8 @@
 <!doctype html>
 <!--
   Component: figure — the diagram kit for view documents.
-  This file demonstrates itself: the figure below follows every rule it
-  states, and the CSS between the component markers is its style.
+  This file demonstrates itself: the panels below follow every rule they
+  state, and the CSS between the component markers is its style.
 
   Choose the form before drawing anything. The form follows the data and the
   reader's task, never the domain noun; position beats length beats area
@@ -12,6 +12,30 @@
   item count and the task first — if the relation is not genuinely 2D, the
   right figure is a table or a list, and the document owes no SVG.
 
+  Size rule — many small figures beat one dense one:
+  - One figure carries one relation among at most seven elements. A subject
+    that needs more splits into a row of small panels (.figure-row), each
+    with its own caption, read left to right like manual panels; a shared
+    elements table under the row serves all of them.
+  - Three or more parallel facts are a table, never prose and never boxes.
+
+  Label rule — the drawing stays near-wordless, the table carries the words:
+  - A label inside the drawing is a noun phrase of at most three words; its
+    description lives in the elements table. When even a short label cannot
+    fit its part, a circled number marks the part and keys the table row.
+  - Words sit on the part they describe; identity, value, and condition stay
+    adjacent to the mark (spatial contiguity, the largest measured effect in
+    the family — research: notes/wiki/procedural-instruction-design.md).
+
+  Overlap rule — no text touches another mark:
+  - Estimate a label's width as 0.6 × font-size per character (0.66 when
+    bold), then check that span against every neighboring box, line, and
+    text; keep at least 8 units of clearance in the viewBox scale.
+  - An edge label sits in the empty band beside its line, never across a box
+    border. When the band is too narrow, break the label into stacked lines,
+    shorten it to its noun, or replace it with a circled number — never
+    shrink the font to force a fit.
+
   Notation checklist — every diagram obeys all of it (the C4 checklist,
   research: notes/wiki/software-architecture-view-models.md):
   - The caption states the diagram's type and scope, and carries the key.
@@ -19,10 +43,6 @@
     table under the figure is that contract.
   - Every line is unidirectional and labelled with its intent — never a
     bare "uses"; a line between deployable things names the protocol.
-  - Words sit on the part they describe: label elements inside the drawing;
-    identity, value, and condition stay in words adjacent to the mark
-    (spatial contiguity, the largest measured effect in the family —
-    research: notes/wiki/procedural-instruction-design.md).
   - A speculative element is drawn dashed, so the split between what ships
     and what is proposed reads before any table does.
   - A frame — a thin enclosing box labelled with what the set is — groups
@@ -48,23 +68,25 @@
   html { font-size: 16px; }
   body { max-width: 42rem; margin: 0 auto; padding: 4rem 1.5rem 8rem;
          background: #ffffff; color: #111;
-         font-family: Charter, "Bitstream Charter", Georgia, serif;
-         line-height: 1.62; overflow-wrap: break-word; }
-  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .9rem; font-weight: 600; }
-  p { margin: .7rem 0; }
+         font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+         line-height: 1.55; overflow-wrap: break-word; }
+  h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 .9rem; font-weight: 700; letter-spacing: -.01em; }
+  p { margin: .6rem 0; }
   code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
   table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
   th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
-  th { font-weight: 600; }
+  th { font-weight: 700; }
   @media (max-width: 42rem) {
     table { display: block; overflow-x: auto; }
     th, td { min-width: 9rem; }
   }
 
   /* component: figure */
-  figure { margin: 2.6rem 0; }
+  figure { margin: 2.2rem 0; }
   figure svg { display: block; width: 100%; height: auto; }
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
+  .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
+  .figure-row figure { margin: 0; }
   /* end component: figure */
 </style>
 </head>
@@ -72,40 +94,61 @@
 <article>
   <h1>figure</h1>
   <p>
-    The figure below demonstrates the kit: solid box, dashed speculative
-    box, one labelled unidirectional line, a suffixed marker id, labels on
-    the parts, key in the caption, elements contract underneath.
+    The row below demonstrates the kit as two small panels instead of one
+    dense drawing: the left panel shows the notation — solid box, dashed
+    speculative box, one labelled unidirectional line, a suffixed marker id
+    — and the right panel shows the circled-number fallback for a part too
+    narrow to label. The shared elements table under the row is the
+    contract for both.
   </p>
 
-  <figure>
-    <svg viewBox="0 0 660 150" role="img">
-      <title>A shipped element feeding a proposed element, as the notation example</title>
-      <defs>
-        <marker id="arrow-kit" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
-          <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
-        </marker>
-      </defs>
-      <rect x="20" y="45" width="220" height="60" fill="none" stroke="currentColor"/>
-      <text x="34" y="70" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">shipped element</text>
-      <text x="34" y="90" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".65">exists at the pinned commit</text>
-      <rect x="420" y="45" width="220" height="60" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
-      <text x="434" y="70" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">proposed element</text>
-      <text x="434" y="90" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".65">dashed: does not ship yet</text>
-      <line x1="240" y1="75" x2="418" y2="75" stroke="currentColor" marker-end="url(#arrow-kit)"/>
-      <text x="330" y="66" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">feeds: rendered pages</text>
-    </svg>
-    <figcaption>
-      Notation example, this component only. Key: solid box — an element that
-      exists; dashed box — a proposed element; arrow — one channel, labelled
-      with its intent, pointing from source to consumer.
-    </figcaption>
-  </figure>
+  <div class="figure-row">
+    <figure>
+      <svg viewBox="0 0 320 150" role="img">
+        <title>Panel 1 — a shipped part feeding a proposed part, as the notation example</title>
+        <defs>
+          <marker id="arrow-kit" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <rect x="12" y="45" width="120" height="60" fill="none" stroke="currentColor"/>
+        <text x="22" y="72" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">shipped part</text>
+        <text x="22" y="90" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">solid: exists</text>
+        <rect x="200" y="45" width="112" height="60" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="210" y="72" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">proposed part</text>
+        <text x="210" y="90" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">dashed: planned</text>
+        <line x1="132" y1="75" x2="198" y2="75" stroke="currentColor" marker-end="url(#arrow-kit)"/>
+        <text x="165" y="66" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">feeds</text>
+      </svg>
+      <figcaption>
+        Panel 1, notation. Key: solid box — an element that exists at the
+        pinned commit; dashed box — a proposed element; arrow — one channel,
+        labelled with its intent, pointing from source to consumer.
+      </figcaption>
+    </figure>
+
+    <figure>
+      <svg viewBox="0 0 320 150" role="img">
+        <title>Panel 2 — a circled number marking a part too narrow for a label</title>
+        <rect x="130" y="45" width="60" height="60" fill="none" stroke="currentColor"/>
+        <circle cx="160" cy="75" r="11" fill="none" stroke="currentColor"/>
+        <text x="160" y="75" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">1</text>
+      </svg>
+      <figcaption>
+        Panel 2, the number fallback. Key: circled number — a part whose
+        label does not fit the drawing; the elements table row keyed
+        "1" carries its name and description.
+      </figcaption>
+    </figure>
+  </div>
 
   <table>
     <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td>shipped element</td><td>example box</td><td>stands for anything observable at the pinned commit</td></tr>
-      <tr><td>proposed element</td><td>example box, speculative</td><td>stands for anything a proposal or mockup introduces</td></tr>
+      <tr><td>shipped part</td><td>example box</td><td>stands for anything observable at the pinned commit</td></tr>
+      <tr><td>proposed part</td><td>example box, speculative</td><td>stands for anything a proposal or mockup introduces</td></tr>
+      <tr><td>feeds</td><td>channel</td><td>one labelled unidirectional line from source to consumer</td></tr>
+      <tr><td>1</td><td>numbered part</td><td>a part too narrow to carry words; the number keys this row</td></tr>
     </tbody>
   </table>
 </article>
