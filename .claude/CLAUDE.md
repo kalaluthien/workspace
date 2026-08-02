@@ -103,6 +103,10 @@ Several agents work these repositories at the same time.
    it as a security incident. (2026-07-26)
 4. A background agent quiet for about 10 minutes is suspect: probe its process
    with `pgrep` instead of waiting longer. Its shell can die silently here.
+5. Before reporting that a delegate exceeded its scope, survey the live panes
+   and match commit subjects to session names. A sibling launched by another
+   operator often owns the surprising commit, and a wrong attribution turns a
+   correct report into a false incident.
 
 # Git identity
 There is no global `user.name`/`user.email` — identity is per-repo. Confirm
