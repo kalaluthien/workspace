@@ -53,6 +53,7 @@
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
   .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
   .figure-row figure { margin: 0; }
+  figure.pan { overflow-x: auto; }
   footer.sources { margin-top: 4rem; border-top: 1px solid #e4e4e4; padding-top: 1rem; font-size: .85rem; color: #555; }
   footer.sources h2 { font-size: .8rem; margin: 0 0 .3rem; font-variant: small-caps; letter-spacing: .06em; font-weight: 600; }
   footer.sources ul { margin: 0; padding-left: 1.1rem; }
@@ -284,8 +285,8 @@
     every entry, so its definition is where the source of truth and the point of
     use become the same file.</p>
 
-    <figure>
-      <svg viewBox="0 0 760 220" role="img" aria-labelledby="proposed-shape">
+    <figure class="pan">
+      <svg viewBox="0 0 760 220" style="min-width:760px" role="img" aria-labelledby="proposed-shape">
         <title id="proposed-shape">The proposed shape: one file holds every rule, and the sites that hold rules today defer to it.</title>
         <defs>
           <marker id="arrow-shape" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
