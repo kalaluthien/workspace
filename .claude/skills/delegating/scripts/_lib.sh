@@ -106,6 +106,13 @@ shell_verdict() {
 # counts only when no later prompt line reopened the session, and an unnamed
 # session carries no sentinel to match. Splitting on a marker avoids assuming
 # its byte width, and a read that comes back with nothing is a failed read.
+#
+# A usage-limit stop reads as blocked, and it outranks an earlier sentinel:
+# a /goal session can print its sentinel, have the judge send it back to
+# work, and then hit the limit — a screen whose last event is the limit
+# message is a session waiting on the clock, whatever it printed before.
+# The limit line counts only when nothing came after it: a later prompt or
+# a later assistant bullet means the session already resumed.
 session_verdict() {
   case $3 in
     idle|done) ;;
@@ -115,8 +122,9 @@ session_verdict() {
     awk -v name="$2" '
       BEGIN { sentinel = (name == "" ? "" : "DONE " name) }
       { seen = NR }
-      index($0, "\342\217\272") { output = 1 }                   # the assistant bullet
+      index($0, "\342\217\272") { output_at = NR }               # the assistant bullet
       index($0, "\342\226\220\342\226\233") { banner = 1 }       # the welcome banner
+      index($0, "hit your session limit") { limit_at = NR }      # the usage-limit stop
       sentinel != "" && index($0, sentinel) { done_at = NR }
       {
         if (index($0, "\342\235\257")) {                         # the prompt marker
@@ -127,8 +135,10 @@ session_verdict() {
       }
       END {
         if (!seen)                                  print "unknown"
+        else if (limit_at > done_at && limit_at > input_at \
+                 && limit_at > output_at)           print "blocked"
         else if (done_at > 0 && done_at > input_at) print "done"
-        else if (output || input_at)                print "pending"
+        else if (output_at || input_at)             print "pending"
         else if (banner)                            print "empty"
         else                                        print "unknown"
       }'

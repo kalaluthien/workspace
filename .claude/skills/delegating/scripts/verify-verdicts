@@ -84,6 +84,29 @@ fixture reopened pending <<'EOF'
 ❯
 EOF
 
+# A /goal session that printed its sentinel, was sent back to work by the
+# judge, and then hit the usage limit. The limit is the last event, so the
+# stale sentinel must not read as done — the session waits on the clock.
+fixture limited blocked <<'EOF'
+❯ Rebuild the docs and print the sentinel when the goal clears.
+⏺ Halfway through the corpus.
+
+  DONE curate-doc-chapters
+
+⏺ Background command "Wait for renders" failed with exit code 1
+  ⎿  You've hit your session limit · resets 2:30am (Asia/Seoul)
+❯
+EOF
+
+# The same session after a resume: the limit line is still on screen, but a
+# later prompt and a later bullet say the session is working again.
+fixture resumed pending <<'EOF'
+  ⎿  You've hit your session limit · resets 2:30am (Asia/Seoul)
+❯ Resume the goal.
+⏺ Continuing the corpus from the fourth view.
+❯
+EOF
+
 # The stub answers only what sweep-sessions asks: the agent roster, and one
 # pane read per agent. Every fixture is idle, so every one reaches the reader.
 {
