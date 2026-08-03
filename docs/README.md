@@ -79,7 +79,13 @@ Five rules bind every view; each template's rubric checks them.
   among at most seven elements, and a denser subject splits into panel rows
   or per-section figures; three or more parallel facts are a table, never
   prose. No text in a figure touches another mark
-  (`components/figure.html` carries the geometry rule).
+  (`components/figure.html` carries the geometry rule). Form follows the
+  subject: a directory anatomy is a file map, a text artifact whose field
+  order is the grammar is a specimen anatomy, and a sequence with a
+  feedback edge is a keyed stage figure — `components/figure.html`
+  demonstrates all three. A figure wider than 360 viewBox units pans
+  (`figure.pan`) instead of shrinking, and dashed marks the speculative
+  and nothing else.
 - **Design language** — manual-style minimalism (owner decision,
   2026-08-02): flat black-on-white, system sans-serif, thin rules, numbered
   landmarks, generous whitespace, and near-wordless drawings whose words

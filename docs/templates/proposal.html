@@ -80,9 +80,14 @@
   - [ ] Three to five top-level sections, three heading levels maximum.
   - [ ] No paragraph exceeds three sentences.
   - [ ] Nothing is decided in the document; Status carries the state.
-  - [ ] Any drawing dashes its speculative elements and names them in a
-        table; no position is described in prose; no figure exceeds seven
+  - [ ] Any drawing dashes its speculative elements — and only the
+        speculative: a loop, a held arm, or a not-taken path is drawn
+        solid and labelled with its intent — and names them in a table;
+        no position is described in prose; no figure exceeds seven
         elements; no text in a figure touches another mark.
+  - [ ] No figure exceeds 620 viewBox units in width; a figure wider than
+        360 units carries class="pan" with an inline min-width equal to
+        its viewBox width, so it pans instead of shrinking.
   - [ ] The sources footer lists what the proposal stands on; the header
         carries no Source field.
   - [ ] Wide content scrolls inside its own container at phone width.
@@ -143,6 +148,10 @@
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
   .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
   .figure-row figure { margin: 0; }
+  figure.pan { overflow-x: auto; }
+  table.filemap td { border-bottom: none; padding: .12rem .8rem .12rem 0; }
+  table.filemap td:first-child { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; white-space: pre; }
+  figure pre { margin: 0; }
   footer.sources { margin-top: 4rem; border-top: 1px solid #e4e4e4; padding-top: 1rem; font-size: .85rem; color: #555; }
   footer.sources h2 { font-size: .8rem; margin: 0 0 .3rem; font-variant: small-caps; letter-spacing: .06em; font-weight: 600; }
   footer.sources ul { margin: 0; padding-left: 1.1rem; }

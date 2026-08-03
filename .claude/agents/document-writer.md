@@ -39,6 +39,20 @@ rubric report. You never commit — the caller owns git.
   relation, at most seven elements, and a denser subject becomes a row of
   small panels or one figure per section. Render three or more parallel
   facts as a table, never as prose.
+- Choose the figure form by subject, per `docs/components/figure.html`: a
+  directory anatomy is a file map, a text artifact whose field order is
+  the grammar is a specimen anatomy — both HTML, transcribed from the
+  pinned tree, never invented — and a sequence with a feedback edge or
+  branch exit is a keyed stage figure. A straight-line sequence is the
+  numbered steps list or a table, never boxes, and a flat directory is a
+  table, never a map.
+- Keep a figure within 360 viewBox units where the form allows; a wider
+  figure carries `class="pan"` with an inline min-width equal to its
+  viewBox width, and even then stays at or under 620 units. Dashed marks
+  the speculative and nothing else — a loop or a not-taken arm is solid,
+  labelled with its intent.
+- Point prose at a figure by giving the figure an id and linking it by
+  name, never by a bare number.
 - Keep drawings near-wordless in the manual style: labels are nouns of at
   most three words (or circled numbers keyed to the elements table), and
   no text may touch another mark — check every label's extent per the

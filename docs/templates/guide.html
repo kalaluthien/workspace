@@ -26,7 +26,8 @@
     Add one only where a step turns on a spatial relation, placed inside
     that step, next to the words it serves; such a figure is small (at most
     seven elements) and follows docs/components/figure.html, including the
-    overlap rule.
+    overlap rule and the width budget — within 360 viewBox units, or
+    class="pan" with an inline min-width equal to the viewBox width.
   - The four sections partition the walk with nothing counted twice:
     Prerequisites hold what precedes step 1, Steps hold the path,
     Acceptance holds the end state, Recovery holds the way back. A fact
@@ -83,7 +84,9 @@
         way back; when none were met, or the record does not say which
         were met, it says exactly that.
   - [ ] Any figure sits inside the step it serves, holds at most seven
-        elements, and no text in it touches another mark.
+        elements, no text in it touches another mark, and it stays within
+        360 viewBox units or carries class="pan" with an inline min-width
+        equal to its viewBox width.
   - [ ] The sources footer lists what the guide stands on; the header
         carries no Source field.
   - [ ] Wide content scrolls inside its own container at phone width.
@@ -144,6 +147,10 @@
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
   .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
   .figure-row figure { margin: 0; }
+  figure.pan { overflow-x: auto; }
+  table.filemap td { border-bottom: none; padding: .12rem .8rem .12rem 0; }
+  table.filemap td:first-child { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; white-space: pre; }
+  figure pre { margin: 0; }
   ol.steps { padding-left: 1.6rem; }
   ol.steps > li { margin: 1.3rem 0; }
   ol.steps > li::marker { font-weight: 700; }

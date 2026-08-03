@@ -54,6 +54,13 @@
   panels (.figure-row) or one small figure per section, each at the section
   it serves. Three or more parallel facts are a table, never prose. The
   lead figure is the overview; detail figures follow their sections.
+  A directory anatomy is a file map, a text artifact whose field order is
+  the grammar is a specimen anatomy, and a sequence with a feedback edge
+  or branch exit is a keyed stage figure — docs/components/figure.html
+  demonstrates all three; a straight-line sequence stays a numbered list,
+  never boxes. Keep a figure within 360 viewBox units where the form
+  allows; a wider figure carries class="pan" with an inline min-width
+  equal to its viewBox width, and stays at or under 620 units.
   Follow docs/components/figure.html for form choice, notation, the
   three-word label rule, and the overlap rule — no text touches another
   mark, ever. Evidence a reader verifies rather than needs (listings, raw
@@ -88,8 +95,18 @@
   - [ ] No text in any figure touches another mark; edge labels sit in
         clear whitespace, never across a box.
   - [ ] The caption states the diagram's type and scope and carries the key.
-  - [ ] Every figure element appears in the Elements table with a type and a
-        description; every line is unidirectional and labelled with intent.
+  - [ ] Every figure element is documented with a type and a one-line
+        description — in the Elements table or, for a sequential or
+        specimen figure, in a numbered legend under Elements keyed to the
+        figure's numerals or field names (a file map's role column is its
+        own carrier); every line is unidirectional and labelled with
+        intent.
+  - [ ] No figure exceeds 620 viewBox units in width; a figure wider than
+        360 units carries class="pan" with an inline min-width equal to
+        its viewBox width, so it pans instead of shrinking.
+  - [ ] A file map transcribes paths that exist at the pinned commit, and
+        a specimen is a real instance observable there; neither invents an
+        entry.
   - [ ] Labels sit on the parts inside the drawing (nouns of at most three
         words, or circled numbers keyed to the Elements table).
   - [ ] Every claim is observable at the pinned commit or cites a recorded
@@ -160,6 +177,10 @@
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
   .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
   .figure-row figure { margin: 0; }
+  figure.pan { overflow-x: auto; }
+  table.filemap td { border-bottom: none; padding: .12rem .8rem .12rem 0; }
+  table.filemap td:first-child { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; white-space: pre; }
+  figure pre { margin: 0; }
   footer.sources { margin-top: 4rem; border-top: 1px solid #e4e4e4; padding-top: 1rem; font-size: .85rem; color: #555; }
   footer.sources h2 { font-size: .8rem; margin: 0 0 .3rem; font-variant: small-caps; letter-spacing: .06em; font-weight: 600; }
   footer.sources ul { margin: 0; padding-left: 1.1rem; }

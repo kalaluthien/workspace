@@ -36,6 +36,59 @@
     shorten it to its noun, or replace it with a circled number — never
     shrink the font to force a fit.
 
+  Width budget — an SVG shrinks to fit the measure, so width is legibility:
+  - The page measure is 42rem; a phone shows about 312 px of it. A figure
+    wider than 360 viewBox units, left to shrink, renders 9-unit text below
+    8 px on a phone. Draw within 360 units when the form allows — vertical
+    beats horizontal.
+  - A figure that must be wider carries class="pan" on the <figure> and an
+    inline min-width equal to its viewBox width on the <svg>, so it pans at
+    drawn size instead of shrinking. Even a panning figure stays at or
+    under 620 units, the desktop measure.
+
+  Two HTML forms — for text-dense subjects, markup beats SVG: the text
+  stays real (screen readers, search, copy) and pans at full size on a
+  phone, with no coordinate arithmetic to get wrong.
+  - File map — a directory whose nesting is part of the answer. A table
+    (class="filemap") whose first cell carries the tree glyphs and the
+    path, second cell the part's role; the role column is the map's
+    elements carrier, so the figure owes no separate table. Transcribe the
+    paths from the tree at the pinned commit; invent nothing. Counts go in
+    the figcaption as a sentence, never as chips. A flat directory is a
+    plain table, not a map: use this only at depth two or more, where a
+    child's role depends on its parent.
+  - Specimen anatomy — a text artifact whose field order is the grammar
+    (a filename grammar, a log line, a message format, a flag string). Put
+    one real instance from the pinned commit in a <pre>, rule each field
+    on the lines below with box-drawing characters, and end each leader at
+    the field's name alone (a noun of at most three words); the meaning
+    lives in the Elements carrier. Every ruler character sits under a
+    character of the field it spans. An artifact whose fields name
+    themselves (JSON, key=value) is a table, not a specimen.
+
+  Keyed stage figure — the SVG form for a sequence with a feedback edge or
+  a branch exit; a straight-line sequence is <ol class="steps"> or a
+  table, never boxes:
+  - Each stage box carries a circled numeral punched into its border — the
+    circle is drawn after the box with fill #ffffff, so the border does
+    not strike the digit — plus a bold title of at most three words and at
+    most two monospace detail lines.
+  - The loop edge is solid and labelled with its intent; dashed stays
+    reserved for the speculative, here and everywhere. Exit outcomes sit
+    as bare text outside any box. At most four stages, vertical where
+    that keeps the figure under 360 units.
+
+  The Elements carrier — the table under the figure, or, for a sequential
+  or specimen figure, a numbered legend in the Elements section keyed to
+  the figure's numerals or field names, each entry still carrying the
+  name, the type, and a one-line description. Order is the legend's extra
+  claim over the table.
+
+  Cross-reference — prose that points at a figure gives the figure an id
+  and links it by name ("the run loop", href="#fig-run-loop"), never a
+  bare number: a number goes stale on the next inserted figure, a name
+  survives.
+
   Notation checklist — every diagram obeys all of it (the C4 checklist,
   research: notes/wiki/software-architecture-view-models.md):
   - The caption states the diagram's type and scope, and carries the key.
@@ -72,7 +125,8 @@
          line-height: 1.55; overflow-wrap: break-word; }
   h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 .9rem; font-weight: 700; letter-spacing: -.01em; }
   p { margin: .6rem 0; }
-  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
+  pre { overflow-x: auto; background: #f4f4f4; padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
   table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
   th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
   th { font-weight: 700; }
@@ -87,6 +141,14 @@
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
   .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
   .figure-row figure { margin: 0; }
+  /* A figure wider than 360 viewBox units pans at drawn size (inline
+     min-width on the svg equals its viewBox width) instead of shrinking. */
+  figure.pan { overflow-x: auto; }
+  /* File map: the first cell keeps the tree glyphs aligned by the table,
+     not by hand-counted spaces. */
+  table.filemap td { border-bottom: none; padding: .12rem .8rem .12rem 0; }
+  table.filemap td:first-child { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; white-space: pre; }
+  figure pre { margin: 0; }
   /* end component: figure */
 </style>
 </head>
@@ -151,6 +213,111 @@
       <tr><td>1</td><td>numbered part</td><td>a part too narrow to carry words; the number keys this row</td></tr>
     </tbody>
   </table>
+
+  <p>
+    The file map below is the first HTML form, shown on this component set
+    itself: the table aligns the two columns, so no hand-counted spaces can
+    drift, and the role column is the map's own elements carrier.
+  </p>
+
+  <figure id="fig-filemap">
+    <table class="filemap">
+      <tbody>
+        <tr><td>docs/</td><td>the parent document system</td></tr>
+        <tr><td>├── README.md</td><td>the rules and the machine contract</td></tr>
+        <tr><td>├── INDEX.md</td><td>the catalogue, one line per document</td></tr>
+        <tr><td>├── components/</td><td>the doctype-independent layer, copied never linked</td></tr>
+        <tr><td>│   ├── base.html</td><td>page skeleton</td></tr>
+        <tr><td>│   └── figure.html</td><td>this diagram kit</td></tr>
+        <tr><td>└── templates/</td><td>one file per doctype</td></tr>
+        <tr><td>    └── spec.md</td><td>the one specification template</td></tr>
+      </tbody>
+    </table>
+    <figcaption>
+      File map, <code>docs/</code> at the pinned commit, trimmed to one
+      member per directory. Key: indentation — directory nesting; right
+      column — the part's role. Two directories; the untrimmed set holds
+      five components and four templates.
+    </figcaption>
+  </figure>
+
+  <p>
+    The specimen anatomy below is the second HTML form: one real filename,
+    its fields ruled with box-drawing characters, each leader ending at the
+    field's name alone. The legend under it is the Elements carrier in its
+    keyed form — name, type, and description, in field order.
+  </p>
+
+  <figure id="fig-specimen">
+<pre>agent-config-scopes.html
+└─┬─┘ └─────┬─────┘ └─┬┘
+  │         │         └── extension
+  │         └── slice
+  └── plane</pre>
+    <figcaption>
+      Specimen anatomy, one workspace view filename that exists at the
+      pinned commit. Key: each ruler spans the characters of the field
+      named on its leader line; field order is the grammar.
+    </figcaption>
+  </figure>
+
+  <ol>
+    <li><strong>plane</strong> — field. <code>agent-</code> or
+      <code>service-</code>; carried by workspace files only, never by an
+      entry's files.</li>
+    <li><strong>slice</strong> — field. The subject the document owns, in
+      kebab-case, generic against change.</li>
+    <li><strong>extension</strong> — field. Always <code>.html</code>; a
+      view is never <code>.md</code>.</li>
+  </ol>
+
+  <p>
+    The keyed stage figure below is the looped-sequence form: circled
+    numerals punched into the borders, a solid labelled feedback edge —
+    dashed stays reserved for the speculative — and a bare-text exit. Its
+    numbered legend is the Elements carrier, keyed by the numerals.
+  </p>
+
+  <figure id="fig-stages">
+    <svg viewBox="0 0 320 235" role="img">
+      <title>The writer's delivery loop: render, then rubric check, looping back on failure until delivery</title>
+      <defs>
+        <marker id="arrow-stages" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <rect x="30" y="20" width="160" height="56" fill="none" stroke="currentColor"/>
+      <circle cx="54" cy="20" r="11" fill="#ffffff" stroke="currentColor"/>
+      <text x="54" y="20" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">1</text>
+      <text x="44" y="48" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Render</text>
+      <text x="44" y="64" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">fill the template</text>
+      <line x1="110" y1="76" x2="110" y2="102" stroke="currentColor" marker-end="url(#arrow-stages)"/>
+      <rect x="30" y="104" width="160" height="56" fill="none" stroke="currentColor"/>
+      <circle cx="54" cy="104" r="11" fill="#ffffff" stroke="currentColor"/>
+      <text x="54" y="104" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">2</text>
+      <text x="44" y="132" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Rubric check</text>
+      <text x="44" y="148" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">item by item</text>
+      <path d="M190,132 H280 V48 H192" fill="none" stroke="currentColor" marker-end="url(#arrow-stages)"/>
+      <text x="235" y="94" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">on failure</text>
+      <line x1="110" y1="160" x2="110" y2="188" stroke="currentColor" marker-end="url(#arrow-stages)"/>
+      <text x="110" y="206" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">delivered</text>
+    </svg>
+    <figcaption>
+      Keyed stage figure, the writer's delivery loop at 320 viewBox units —
+      inside the width budget, so it carries no pan class. Key: circled
+      numeral — one stage, keyed to the legend; solid arrow — the forward
+      path; the labelled solid edge — the feedback loop; bare text outside
+      any box — an exit.
+    </figcaption>
+  </figure>
+
+  <ol>
+    <li><strong>Render</strong> — stage. The writer fills the doctype
+      template from the named sources.</li>
+    <li><strong>Rubric check</strong> — stage. Every rubric item is checked;
+      a failure sends the document back to the render stage, and only a
+      clean pass exits as delivered.</li>
+  </ol>
 </article>
 </body>
 </html>
