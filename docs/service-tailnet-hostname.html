@@ -22,7 +22,7 @@
   p, li { margin: .6rem 0; }
   ul, ol { padding-left: 1.2rem; }
   a { color: inherit; text-decoration-color: #aaa; }
-  strong { font-weight: 600; }
+  strong { font-weight: 700; }
   code, pre, .provenance dd {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: .85em;
@@ -38,7 +38,7 @@
   .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
   .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
   .provenance dd { margin: 0; }
-  .callout { border: 1px solid #ccc; border-left-width: 4px; padding: .55rem .9rem; margin: 1.2rem 0; font-size: .88rem; line-height: 1.55; }
+  .callout { border: 1px solid #ccc; border-left-width: 4px; padding: .55rem .9rem; margin: 1.2rem 0; font-size: .88rem; line-height: 1.5; }
   .callout .tag { font-variant: small-caps; letter-spacing: .06em; font-weight: 600; margin-right: .45rem; }
   .callout.notice   { border-left-color: #556; }
   .callout.gap      { border-left-color: #8a5a00; }
@@ -70,7 +70,7 @@
     <dl class="provenance">
       <dt>Doctype</dt> <dd>guide</dd>
       <dt>Goal</dt>    <dd>A service reachable at <code>https://&lt;name&gt;.&lt;tailnet&gt;.ts.net</code> on its own tailnet node, installable on a phone beside every other service, with no handler left on the machine node.</dd>
-      <dt>Updated</dt> <dd>2026-08-02</dd>
+      <dt>Updated</dt> <dd>2026-08-03</dd>
       <dt>Commit</dt>  <dd>3e3d22f</dd>
     </dl>
   </header>
@@ -141,6 +141,9 @@ JSON</pre>
   -e TS_STATE_DIR=/var/lib/tailscale \
   -e TS_SERVE_CONFIG="/config/$app/serve.json" \
   tailscale/tailscale:stable</pre>
+        <p>The container starts detached, so nothing about the node's identity
+        is visible here — the logs and the status line carry it, and reading
+        them is the next action.</p>
         <div class="callout warning">
           <span class="tag">warning</span>
           Omitting <code>TS_STATE_DIR</code> makes the container pass
@@ -184,9 +187,7 @@ curl -sI "https://$app.$(tailscale status --json | /usr/bin/python3 -c \
           <li>An <strong>allowlist of accepted Host headers</strong>. Derive it
           from the node name plus the tailnet suffix, never from the machine
           node's own FQDN — reading <code>Self.DNSName</code> whole re-pins the
-          retired name and answers 400 to every phone request. The value belongs
-          in the service's own launch path, not in a shell one-off, or the next
-          deploy undoes it (<code>.claude/rules/services.md</code>).</li>
+          retired name and answers 400 to every phone request.</li>
           <li>An <strong>identity gate</strong>. It keeps working: the proxy now
           arrives from a container rather than the host loopback, but the tailnet
           identity of the requesting device still reaches the service. Verified
@@ -194,7 +195,9 @@ curl -sI "https://$app.$(tailscale status --json | /usr/bin/python3 -c \
           sidecar with its trusted-user setting unchanged.</li>
         </ul>
         <p>Where each setting lives differs per service, so this walk records no
-        single command for it.</p>
+        single command; the move is done when the derived value sits in the
+        service's own launch path rather than in a shell one-off, which the next
+        deploy would undo (<code>.claude/rules/services.md</code>).</p>
       </li>
 
       <li>
@@ -226,8 +229,9 @@ tailscale status | grep "$app"</pre>
 
       <li>
         <p>Reinstall the app on the phone from the new URL. An installed web app
-        belongs to its origin, so the old install is a different app and will not
-        follow the move.</p>
+        belongs to its origin, so the old install is a different app that will
+        not follow the move: it is removed and installed again from the new
+        hostname, leaving one installed app per origin.</p>
       </li>
     </ol>
 
@@ -243,43 +247,49 @@ tailscale status | grep "$app"</pre>
 
     <h2 id="recovery">Recovery</h2>
     <p>The failure modes this procedure records, with what each looks like and
-    the way back. The record does not mark which of them the walk itself hit.</p>
-    <ul>
-      <li>
-        <strong>400 instead of 200</strong>, most often after a service
-        redeploy, while the node itself is up and correctly named: the service's
-        own host allowlist has fallen back to the machine FQDN. Fix the
-        derivation in the service's launch script — node name plus tailnet
-        suffix — and redeploy. Setting it by hand works until the next deploy
-        repeats the failure.
-      </li>
-      <li>
-        <strong>No response at all</strong> from the new hostname: the
-        certificate is still being issued, or the tailnet lacks HTTPS
-        certificates. Wait out the first minute, then enable HTTPS certificates
-        for the tailnet.
-      </li>
-      <li>
-        <strong>The name comes back with a <code>-1</code> suffix</strong> after
-        <code>docker restart</code>: the state directory is not persisted, and
-        the hostname every installed app was built against has just moved. This
-        walk records the recognition only — no way back from a taken
-        <code>-1</code> name is recorded.
-      </li>
-      <li>
-        <strong>A check fails right after a mount is retired</strong>: restore
-        the mount that was just removed and stop, rather than retiring the next
-        port. This walk records no command for restoring a removed mount.
-      </li>
-    </ul>
+    the way back. The record does not mark which of them the walk itself hit,
+    and a cell reading "not recorded" is a gap in the record rather than an
+    absent failure.</p>
+    <table>
+      <tr><th>Symptom</th><th>Cause</th><th>Way back</th></tr>
+      <tr>
+        <td>400 instead of 200, most often after a service redeploy, while the
+        node itself is up and correctly named</td>
+        <td>The service's own host allowlist has fallen back to the machine
+        FQDN</td>
+        <td>Fix the derivation in the service's launch script — node name plus
+        tailnet suffix — and redeploy; setting it by hand works until the next
+        deploy repeats the failure</td>
+      </tr>
+      <tr>
+        <td>No response at all from the new hostname</td>
+        <td>The certificate is still being issued, or the tailnet lacks HTTPS
+        certificates</td>
+        <td>Wait out the first minute, then enable HTTPS certificates for the
+        tailnet</td>
+      </tr>
+      <tr>
+        <td>The name comes back with a <code>-1</code> suffix after
+        <code>docker restart</code></td>
+        <td>The state directory is not persisted, and the hostname every
+        installed app was built against has just moved</td>
+        <td>Not recorded — this walk carries the recognition only</td>
+      </tr>
+      <tr>
+        <td>A check fails right after a mount is retired</td>
+        <td>Not recorded</td>
+        <td>Restore the mount just removed and stop, rather than retiring the
+        next port; no command for restoring a removed mount is recorded</td>
+      </tr>
+    </table>
   </section>
 
   <footer class="sources">
     <h2 id="sources">Sources</h2>
     <ul>
-      <li><code>.claude/rules/services.md</code></li>
+      <li><code>~/workspace/.claude/rules/services.md</code></li>
       <li>memory <code>setup-tailnet-services</code></li>
-      <li>knowledge: <code>notes/wiki/tailscale-in-containers.md</code></li>
+      <li>knowledge: <code>~/workspace/notes/wiki/tailscale-in-containers.md</code></li>
     </ul>
   </footer>
 
