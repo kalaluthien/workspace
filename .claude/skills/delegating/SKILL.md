@@ -111,6 +111,23 @@ it does not do the delegated work itself. All scripts live in
    run it when a session is misclassified, since the agent's screen markers
    are the only evidence it has.
 
+## Board-dispatched missions
+The board's start action spawns a session whose whole prompt is one line:
+`/delegating <pool board file> <item title and body>`. When the arguments open
+with a pool board file path, the mission is that one backlog item, and the
+item's marker is the user-visible state of the job — the board renders the
+file on every scan. Two writes to that file are part of the mission, not
+bookkeeping:
+
+1. Claim the item before anything else: flip its marker to `[/]` in the named
+   file. The tap that spawned this session promised "working", and until the
+   marker moves the board shows a promise the corpus denies.
+2. Close the item on completion, per the Filing rules in `~/.claude/CLAUDE.md`:
+   delete the row when the work shipped, after lifting any owed remainder into
+   its own `#need-you` item; retag `#need-you` or `#blocked` when the work now
+   waits on someone. A session that ends with the marker still `[/]` leaves a
+   card that reads as running forever.
+
 ## Worked example — "add object detection to camera"
 1. Not workspace-level work → this skill. Route: research → `notes`,
    implementation → `camera`.
