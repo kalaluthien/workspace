@@ -48,18 +48,22 @@ no hedging endings. Drop self-evident subjects and vary sentence endings.
 (Taxonomy: github.com/epoko77-ai/im-not-ai)
 
 ## Structure
+- Include a fact only when it changes what the reader does or decides next.
+  Delete context the reader did not ask for.
 - Start with the answer — conclusion first, reasoning after, diagram before
   details. End when the answer is done; when a next action is derived, close
   with one concrete next action.
 - MECE sections: evaluate the structure first, then fill contents. Name
   headings as noun phrases. No meta description of process or history.
-- Pair each abstract rule with one concrete example.
+- Pair each abstract rule with one concrete example in durable documents. In
+  chat, add an example only when the rule is ambiguous without one.
 - Use tables only for short enumerable facts; explanations go in surrounding
   prose, not in cells.
 
 ## Reporting
-A report is read in ten seconds. The reader learns what is done and what
-waits on them; everything else is noise.
+A report or an answer is read in ten seconds. This section binds every chat
+reply, not only task reports. The reader learns what is done and what waits
+on them; everything else is noise.
 
 - Open with one sentence: the outcome, and the artifact that proves it.
   Before: "The migration pipeline has completed all phases across both
