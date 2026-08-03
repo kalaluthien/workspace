@@ -84,8 +84,14 @@ it does not do the delegated work itself. All scripts live in
    the watch fires — read the clock before scheduling any wait, and resume at
    once when the reset has passed.
 6. Report outcomes and ask the session to clean its repository (commit, remove
-   worktree). Leave its context standing — it is the evidence behind the
-   report, and the next delegation clears and renames it in step 3. Retiring
+   worktree). A delegate reports in its own shape — verbose, ordered by its
+   criteria walk, blind to the sibling sessions. Write the user's report
+   instead of forwarding that: keep the results that change what the user
+   knows or must do, merge the sessions into one narrative, and state the
+   conclusions the delegates left implicit. Wording follows the output
+   style, "Reporting". Leave the session's context standing — it is the
+   evidence behind the report, and the next delegation clears and renames
+   it in step 3. Retiring
    the pane (`scripts/clean-session <name> --close`) is for sessions this skill
    launched, only when the user asks.
 7. When the user asks for a session clean-up, `scripts/sweep-sessions` reads
