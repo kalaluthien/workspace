@@ -119,16 +119,16 @@ carrying its own copy — the board service's docs surface and the
 shape is made here, in the same commit as the prose it follows. A rule
 encoded twice is a rule that drifts.
 
-Each role lists its accepted `<dt>` terms, primary first. That is what lets
-`Doctype` become the term today while the entries' documents on the retired
-`Category` vocabulary finish migrating: both terms are read, and neither
-side needs a change when a document moves between them.
+Each role lists its accepted `<dt>` terms, primary first. The retired
+`Category` term was read beside `Doctype` while the entries migrated; the
+migration finished on 2026-08-03 (board `4ee9f83`, camera `140ac74`), and
+the contract reads `Doctype` alone.
 
 ```json contract=docs
 {
   "contract": "docs",
   "version": 1,
-  "updated": "2026-08-02",
+  "updated": "2026-08-03",
 
   "view": { "dir": "docs", "extension": ".html", "depth": 1 },
 
@@ -142,7 +142,7 @@ side needs a change when a document moves between them.
   "provenance": {
     "selector": "dl.provenance",
     "roles": {
-      "doctype": ["Doctype", "Category"],
+      "doctype": ["Doctype"],
       "question": ["Question", "Goal"],
       "updated": ["Updated"]
     }
