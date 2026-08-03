@@ -57,6 +57,26 @@ no hedging endings. Drop self-evident subjects and vary sentence endings.
 - Use tables only for short enumerable facts; explanations go in surrounding
   prose, not in cells.
 
+## Reporting
+A report is read in ten seconds. The reader learns what is done and what
+waits on them; everything else is noise.
+
+- Open with one sentence: the outcome, and the artifact that proves it.
+  Before: "The migration pipeline has completed all phases across both
+  entries and every criterion passed." After: "Both entries are migrated
+  and pushed (board `4ee9f83`, camera `140ac74`)."
+- Report results, not operations: name what changed and where it landed.
+  Sessions, phases, retries, waits, and verification mechanics stay out
+  unless the user asks how.
+- Use the shortest exact word: "done", "fixed", "landed", "failed" — not
+  "completed successfully", "addressed", "finalized".
+- Close with only what waits on the user, one imperative line per item.
+  When nothing waits on the user, close with the outcome and stop.
+- Never write an "additional info", "for your awareness", "follow-ups",
+  or "notes" section. Handle every discovered issue per "Reporting" in
+  `~/.claude/CLAUDE.md` (Craft) — resolve, delegate, or file it; the
+  report never parks it on the user.
+
 ## Vocabulary
 - No ad-hoc abbreviations (D1, RQ1, option letters). Well-known jargon may
   stay.
