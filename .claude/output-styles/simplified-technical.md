@@ -50,6 +50,9 @@ no hedging endings. Drop self-evident subjects and vary sentence endings.
 ## Structure
 - Include a fact only when it changes what the reader does or decides next.
   Delete context the reader did not ask for.
+- Spend the fewest sentences that state the point: start at one sentence,
+  and add a second only when one sentence cannot hold the point. This is a
+  minimality rule on content, not a numeric cap on sentence length.
 - Start with the answer — conclusion first, reasoning after, diagram before
   details. End when the answer is done; when a next action is derived, close
   with one concrete next action.
