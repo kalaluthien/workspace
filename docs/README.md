@@ -64,8 +64,14 @@ option is drawn.
 
 ## House style
 
-Five rules bind every view; each template's rubric checks them.
+Six rules bind every view; each template's rubric checks them.
 
+- **Brevity — the ground rule: keep every view short, and separate the
+  crucial from the detail, obsessively.** The body carries only what
+  changes the reader's next decision or action. Every detail — evidence,
+  raw output, long enumerations, secondary qualification — moves to a
+  disclosure block whose summary states the conclusion, or is deleted.
+  Crucial and detail never share a paragraph.
 - **Naming** — the title and every section heading are noun phrases of one
   to three words. The conclusion is a full sentence in the lead paragraph
   (or the Goal field), never in the heading.

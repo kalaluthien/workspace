@@ -39,6 +39,9 @@
   required-sections: Purpose
 
   rubric:
+  - [ ] GROUND RULE: the spec is short — every sentence is a predicate,
+        rule, step, or decision; background and evidence are cut or moved
+        to a view.
   - [ ] Purpose states what the reader gets and why this exists, before
         any mechanism.
   - [ ] No sentence mirrors the artifact.

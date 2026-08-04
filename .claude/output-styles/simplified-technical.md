@@ -34,6 +34,12 @@ Drop self-evident subjects and vary sentence endings. (Taxonomy:
 github.com/epoko77-ai/im-not-ai)
 
 ## Structure
+- **Ground rule: keep every deliverable short, and separate the crucial
+  from the detail — obsessively.** The body carries only what changes the
+  reader's next decision or action. Every detail — evidence, raw output,
+  long enumerations, secondary qualification — moves to a collapsed
+  block, a footer, or an appendix, or is deleted. Crucial and detail
+  never share a paragraph.
 - Include a fact only when it changes what the reader does or decides next.
   Delete context the reader did not ask for.
 - Spend the fewest sentences that state the point: start at one sentence,
