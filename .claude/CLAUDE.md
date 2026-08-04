@@ -9,21 +9,22 @@ these. A change here is committed to the root repository:
 | directory | holds | read first |
 | --- | --- | --- |
 | `.claude/` | workspace instructions, conditional rules, skills, output styles | this file |
-| `docs/` | the parent document system (templates, components) plus workspace-level specs and views, over both planes | `docs/README.md` |
+| `docs/` | workspace-level specs and views, over both planes, plus the machine contract every `docs/` reader parses | `docs/README.md` |
 | `scripts/` | workspace-level herdr tooling (`herdr-survey`, `herdr-spawn-claude`) | script headers |
 
 A document request whose topic belongs to no project entry lands in `docs/`,
-as a spec (`.md`) or a view (`.html`) per `docs/README.md` — never in a
-project entry it does not fit, and never in chat alone. A document about one
-project entry still belongs in that entry's own document store, which follows
-the same parent system; view writing is delegated to the `document-writer`
-subagent.
+as a spec (`.md`) or a view (`.html`) — never in a project entry it does not
+fit, and never in chat alone. The document system's rules live in the writer
+constitution, `~/.claude/agents/document-writer.md`, with its templates and
+components beside it; a document about one project entry still belongs in
+that entry's own document store, which follows the same system; view writing
+is delegated to the `document-writer` subagent.
 
 The workspace is a control plane over **agents** — the entries above and the
 sessions that work them — and over **services**, the long-running things those
-entries expose. A `docs/` filename carries its plane as a prefix,
-`agent-<slice>` or `service-<slice>`, and the plane's own rules load from
-`.claude/rules/` when a matching document is read.
+entries expose. A `docs/` filename carries a plane prefix (naming: the
+writer constitution), and the plane's own rules load from `.claude/rules/`
+when a matching document is read.
 
 **Project entries** are independent git repositories, each with its own
 context, all git-ignored by the root. Never run one git command across
