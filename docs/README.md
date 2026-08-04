@@ -95,9 +95,10 @@ Five rules bind every view; each template's rubric checks them.
 
 1. A spec is written by the agent doing the work, in the same change as
    what it governs.
-2. A view is delegated to the `document-writer` subagent
-   (`.claude/agents/document-writer.md`) with the doctype, the target
-   path, and the named sources. The writer fills the template, checks the
+2. A view is delegated to the `document-writer` subagent, defined at the
+   user level (`~/.claude/agents/document-writer.md`) so a session in any
+   project entry can spawn it, with the doctype, the target path, and the
+   named sources. The writer fills the template, checks the
    rubric, and reports the rubric result with the file.
 3. The reviewer scores against the same rubric. A rubric failure is fixed
    in the document; a rubric ambiguity is fixed in the template.
