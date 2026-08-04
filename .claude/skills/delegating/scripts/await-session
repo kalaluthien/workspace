@@ -23,12 +23,14 @@ while [ $# -gt 0 ]; do
 done
 
 pane=$(pane_of "$target")
+# herdr 0.8.0 renamed the wait commands: `wait output` -> `pane wait-output`,
+# `wait agent-status` -> `agent wait --until`.
 if [ -n "$match" ]; then
-  herdr wait output "$pane" --match "$match" \
+  herdr pane wait-output "$pane" --match "$match" \
     --source recent-unwrapped --timeout "$timeout" >/dev/null ||
     die "timeout: '$match' not seen in $pane within ${timeout}ms"
 else
-  herdr wait agent-status "$pane" --status "$status" --timeout "$timeout" \
+  herdr agent wait "$pane" --until "$status" --timeout "$timeout" \
     >/dev/null || die "timeout: $pane not $status within ${timeout}ms"
 fi
 herdr pane read "$pane" --source recent-unwrapped --lines "$lines"

@@ -41,30 +41,51 @@ role=$(role_of "$name")
 [ -n "$model" ] || model=opus
 [ -n "$effort" ] || effort=medium
 
-ws=$(workspace_id_for_label "$label")
+# herdr 0.8.0: `agent start` no longer creates its pane — it claims an
+# existing shell pane (--kind --pane) and appends AGENT_ARGs to the kind's
+# canonical executable. Creating a workspace or a tab yields a root pane;
+# only a reused tab needs a split.
+ws=$(workspace_id_for_label "$label") pane= tab=
 if [ -z "$ws" ]; then
-  ws=$(herdr workspace create --cwd "$path" --label "$label" --no-focus |
-    jq -r '.result.workspace.workspace_id')
+  created=$(herdr workspace create --cwd "$path" --label "$label" --no-focus)
+  ws=$(printf '%s' "$created" | jq -r '.result.workspace.workspace_id // empty')
   [ -n "$ws" ] || die "could not create a workspace for $label"
+  tab=$(printf '%s' "$created" | jq -r '.result.tab.tab_id // empty')
+  pane=$(printf '%s' "$created" | jq -r '.result.root_pane.pane_id // empty')
 fi
 
-tab=$(herdr tab list --workspace "$ws" |
-  jq -r 'first(.result.tabs[] | select(.pane_count < 4) | .tab_id) // empty')
-if [ -z "$tab" ]; then
-  tab=$(herdr tab create --workspace "$ws" --cwd "$path" --no-focus |
-    jq -r '.result.tab.tab_id')
-  [ -n "$tab" ] || die "could not create a tab in $ws"
+if [ -z "$pane" ]; then
+  tab=$(herdr tab list --workspace "$ws" |
+    jq -r 'first(.result.tabs[] | select(.pane_count < 4) | .tab_id) // empty')
+  if [ -n "$tab" ]; then
+    base=$(herdr pane list |
+      jq -r --arg t "$tab" \
+        'first(.result.panes[] | select(.tab_id == $t) | .pane_id) // empty')
+    [ -n "$base" ] || die "no pane found in tab $tab"
+    pane=$(herdr pane split --pane "$base" --direction down \
+      --cwd "$path" --no-focus | jq -r '.result.pane.pane_id // empty')
+  else
+    created=$(herdr tab create --workspace "$ws" --cwd "$path" --no-focus)
+    tab=$(printf '%s' "$created" | jq -r '.result.tab.tab_id // empty')
+    pane=$(printf '%s' "$created" | jq -r '.result.root_pane.pane_id // empty')
+  fi
 fi
+[ -n "$pane" ] || die "could not obtain a shell pane in $ws"
 
-started=$(herdr agent start "$name" \
-  --cwd "$path" --workspace "$ws" --tab "$tab" \
-  --split down --no-focus \
-  -- claude --model "$model" --effort "$effort" \
-     ${extra[@]+"${extra[@]}"})
-pane=$(printf '%s' "$started" | jq -r '.result.agent.pane_id')
-[ -n "$pane" ] && [ "$pane" != null ] || die "agent start failed: $started"
+# A fresh pane's shell takes a moment to reach its prompt, and agent start
+# refuses a pane that is not an available shell (agent_pane_busy) — retry.
+attempts=0 started=
+until started=$(herdr agent start "$name" --kind claude --pane "$pane" \
+    --timeout 90000 \
+    -- --model "$model" --effort "$effort" ${extra[@]+"${extra[@]}"} 2>&1); do
+  attempts=$((attempts + 1))
+  [ "$attempts" -lt 10 ] || die "agent start failed: $started"
+  sleep 1
+done
+pane=$(printf '%s' "$started" | jq -r '.result.agent.pane_id // empty')
+[ -n "$pane" ] || die "agent start failed: $started"
 
-herdr wait agent-status "$pane" --status idle --timeout 90000 >/dev/null ||
+herdr agent wait "$pane" --until idle --timeout 90000 >/dev/null ||
   die "session $name ($pane) did not become idle in 90s"
 
 jq -nc --arg n "$name" --arg r "$role" --arg m "$model" --arg e "$effort" \
