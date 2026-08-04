@@ -51,8 +51,6 @@
   figure { margin: 2.2rem 0; }
   figure svg { display: block; width: 100%; height: auto; }
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
-  .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
-  .figure-row figure { margin: 0; }
   ol.steps { padding-left: 1.6rem; }
   ol.steps > li { margin: 1.3rem 0; }
   ol.steps > li::marker { font-weight: 700; }
@@ -70,7 +68,7 @@
     <dl class="provenance">
       <dt>Doctype</dt> <dd>guide</dd>
       <dt>Goal</dt>    <dd>A service reachable at <code>https://&lt;name&gt;.&lt;tailnet&gt;.ts.net</code> on its own tailnet node, installable on a phone beside every other service, with no handler left on the machine node.</dd>
-      <dt>Updated</dt> <dd>2026-08-03</dd>
+      <dt>Updated</dt> <dd>2026-08-04</dd>
       <dt>Commit</dt>  <dd>3e3d22f</dd>
     </dl>
   </header>
@@ -79,35 +77,29 @@
     <details>
       <summary>One node per service — two ports on one node cannot both be installed as phone apps</summary>
       <p>
-        A tailnet node carries exactly one <code>*.ts.net</code> name. There is
-        no alias, MagicDNS accepts no custom record, and
-        <code>tailscale cert</code> is bound to the node's own certificate
-        domains, so a second name always means a second node. Publishing two
-        services as two ports on one node looks equivalent and is not: Android
-        matches an installed web app to a URL by scheme and host and
-        <em>ignores the port</em>, so the app installed first claims the second
-        service's URL, and the browser offers "open the other app" where the
-        install entry belongs.
+        A node carries exactly one <code>*.ts.net</code> name: no alias, no
+        custom MagicDNS record, and <code>tailscale cert</code> is bound to the
+        node&#39;s own domains. Android matches an installed web app by scheme and
+        host while ignoring the port, so the app installed first claims the
+        second service&#39;s URL.
       </p>
     </details>
 
     <h2 id="prerequisites">Prerequisites</h2>
     <ul>
-      <li>colima running with the docker CLI, per the <code>setup-colima</code> memory in the global pool. The sidecar is a container like any other.</li>
-      <li>The service already answering on a host loopback port — for example <code>127.0.0.1:8300</code>. The sidecar publishes an existing port; it does not start the service.</li>
-      <li>MagicDNS and HTTPS certificates enabled for the tailnet, per <code>notes/wiki/tailscale.md</code>. Without them the node hangs on certificate provisioning.</li>
-      <li>A Tailscale auth key that is <strong>reusable and not ephemeral</strong>, saved at <code>~/.config/ts-sidecar/authkey</code> with mode 600. An ephemeral key deletes the device when it goes offline, which destroys the identity the node exists to hold. Only the user creates this; an agent never prints it or puts it on a command line.</li>
+      <li>colima running with the docker CLI, per the <code>setup-colima</code> memory.</li>
+      <li>The service already answering on a host loopback port such as <code>127.0.0.1:8300</code> — the sidecar publishes it, never starts it.</li>
+      <li>MagicDNS and HTTPS certificates enabled for the tailnet, per <code>notes/wiki/tailscale.md</code>, or the node hangs on certificate provisioning.</li>
+      <li>A <strong>reusable, non-ephemeral</strong> auth key written by the owner to <code>~/.config/ts-sidecar/authkey</code>, mode 600 — an ephemeral key deletes the identity the node exists to hold.</li>
     </ul>
 
     <h2 id="steps">Steps</h2>
     <ol class="steps">
       <li>
-        <p>Name the node after the service and write its serve configuration.
-        The name becomes the hostname, so it takes the service's name, not the
-        machine's; the configuration points at the loopback port the service
-        already answers on.</p>
+        <p>Name the node after the service and write its serve configuration,
+        since the name becomes the hostname.</p>
 <pre>app=board          # → board.&lt;tailnet&gt;.ts.net
-port=8300          # the service's existing host port
+port=8300          # the service&#39;s existing host port
 
 mkdir -p ~/.config/ts-sidecar/$app
 cat &gt; ~/.config/ts-sidecar/$app/serve.json &lt;&lt;JSON
@@ -120,18 +112,17 @@ cat &gt; ~/.config/ts-sidecar/$app/serve.json &lt;&lt;JSON
   }
 }
 JSON</pre>
-        <p>The <code>${TS_CERT_DOMAIN}</code> placeholder is substituted by the
-        container at startup.</p>
         <div class="callout notice">
           <span class="tag">notice</span>
           <code>host.docker.internal</code> is what reaches a macOS
-          loopback-only bind under colima. <code>--network host</code> means the
+          loopback-only bind under colima; <code>--network host</code> means the
           Linux VM and would not reach the service.
         </div>
       </li>
 
       <li>
-        <p>Start the sidecar node as a container of its own.</p>
+        <p>Start the sidecar node as a container of its own; the run prints the
+        container id and nothing else.</p>
 <pre>docker run -d --name "ts-$app" --restart unless-stopped \
   -v "$HOME/.local/state/ts-$app:/var/lib/tailscale" \
   -v "$HOME/.config/ts-sidecar:/config:ro" \
@@ -141,63 +132,60 @@ JSON</pre>
   -e TS_STATE_DIR=/var/lib/tailscale \
   -e TS_SERVE_CONFIG="/config/$app/serve.json" \
   tailscale/tailscale:stable</pre>
-        <p>The container starts detached, so nothing about the node's identity
-        is visible here — the logs and the status line carry it, and reading
-        them is the next action.</p>
         <div class="callout warning">
           <span class="tag">warning</span>
           Omitting <code>TS_STATE_DIR</code> makes the container pass
           <code>--state=mem:</code>.
           <ul>
-            <li>Consequence: the node registers as ephemeral, so the control
-            plane deletes it when the container stops and the replacement can
-            take the name <code>&lt;name&gt;-1</code> permanently. The same
-            directory holds the TLS certificates, so the node also re-issues
-            from Let's Encrypt on every restart.</li>
-            <li>Avoidance: set <code>TS_STATE_DIR</code> and bind-mount a host
-            directory onto it, both as shown above.</li>
+            <li>Consequence: the node registers as ephemeral, so it is deleted
+            when the container stops and the replacement can hold
+            <code>&lt;name&gt;-1</code> permanently; the certificates live there
+            too, so every restart re-issues from Let&#39;s Encrypt.</li>
+            <li>Avoidance: set it and bind-mount a host directory onto it, both
+            as shown above.</li>
           </ul>
         </div>
-        <div class="callout notice">
-          <span class="tag">notice</span>
-          Two variable names people reach for do not exist:
-          <code>TS_AUTHKEY_FILE</code> and <code>TS_SERVE_PORT</code>. The real
-          mechanisms are the <code>file:</code> prefix on the
-          <code>TS_AUTHKEY</code> value and <code>TS_SERVE_CONFIG</code>. Mount
-          the directory holding <code>serve.json</code>, never the file: the
-          watch is on the directory.
-        </div>
+        <details>
+          <summary><code>TS_AUTHKEY_FILE</code> and <code>TS_SERVE_PORT</code> do not exist — the real mechanisms are already in the command</summary>
+          <p>
+            A <code>file:</code> prefix on the <code>TS_AUTHKEY</code> value
+            reads the key from a path, <code>TS_SERVE_CONFIG</code> is the only
+            serve mechanism, and the mount is the directory holding
+            <code>serve.json</code> rather than the file, because the watch is
+            on the directory.
+          </p>
+        </details>
       </li>
 
       <li>
-        <p>Verify the new hostname answers before changing anything else. The
-        first certificate takes up to a minute.</p>
+        <p>Verify the new hostname answers before changing anything else,
+        allowing up to a minute for the first certificate.</p>
 <pre>docker logs "ts-$app" | tail -20
 tailscale status | grep "$app"
 curl -sI "https://$app.$(tailscale status --json | /usr/bin/python3 -c \
-  'import json,sys; print(json.load(sys.stdin)["Self"]["DNSName"].rstrip(".").split(".", 1)[1])')/" | head -1</pre>
-        <p>A working run prints <code>HTTP/2 200</code>, and a status line whose
-        name is exactly the one chosen, with no <code>-1</code> suffix.</p>
+  &#39;import json,sys; print(json.load(sys.stdin)["Self"]["DNSName"].rstrip(".").split(".", 1)[1])&#39;)/" | head -1</pre>
+        <p>A working run prints <code>HTTP/2 200</code> and a status line
+        carrying exactly the chosen name, with no <code>-1</code> suffix.</p>
       </li>
 
       <li>
-        <p>Move the service's own host settings onto the node name. Two kinds
-        exist, and both bind a hostname that has just changed.</p>
-        <ul>
-          <li>An <strong>allowlist of accepted Host headers</strong>. Derive it
-          from the node name plus the tailnet suffix, never from the machine
-          node's own FQDN — reading <code>Self.DNSName</code> whole re-pins the
-          retired name and answers 400 to every phone request.</li>
-          <li>An <strong>identity gate</strong>. It keeps working: the proxy now
-          arrives from a container rather than the host loopback, but the tailnet
-          identity of the requesting device still reaches the service. Verified
-          2026-08-02 by sending a message through Collie's phone app across its
-          sidecar with its trusted-user setting unchanged.</li>
-        </ul>
-        <p>Where each setting lives differs per service, so this walk records no
-        single command; the move is done when the derived value sits in the
-        service's own launch path rather than in a shell one-off, which the next
-        deploy would undo (<code>.claude/rules/services.md</code>).</p>
+        <p>Move the service&#39;s Host-header allowlist onto the node name,
+        deriving it from that name plus the tailnet suffix — the machine node&#39;s
+        <code>Self.DNSName</code> re-pins the retired name and answers 400 to
+        every phone request.</p>
+        <p>Where the setting lives differs per service, so the move is done when
+        the derived value sits in the service&#39;s launch path rather than in a
+        shell one-off the next deploy undoes.</p>
+        <details>
+          <summary>An identity gate keeps working across the move, verified 2026-08-02</summary>
+          <p>
+            The proxy now arrives from a container rather than the host
+            loopback, yet the tailnet identity of the requesting device still
+            reaches the service: a message sent through Collie&#39;s phone app
+            across its sidecar was accepted with the trusted-user setting
+            unchanged.
+          </p>
+        </details>
       </li>
 
       <li>
@@ -205,81 +193,72 @@ curl -sI "https://$app.$(tailscale status --json | /usr/bin/python3 -c \
         only once the new hostname answers 200.</p>
 <pre>tailscale serve --https=8443 off
 tailscale serve status</pre>
-        <p><code>tailscale serve status</code> then reports no configuration for
-        that port.</p>
+        <p>The status output then reports no configuration for that port.</p>
         <div class="callout warning">
           <span class="tag">warning</span>
           <code>tailscale serve reset</code> is never the way to turn a mount
           off.
           <ul>
             <li>Consequence: it removes every handler on the host, including
-            other services'.</li>
+            other services&#39;.</li>
             <li>Avoidance: name the one port, as above.</li>
           </ul>
         </div>
       </li>
 
       <li>
-        <p>Restart the container to prove the identity survives, which is what
-        the state volume is for.</p>
+        <p>Restart the container to prove the identity survives.</p>
 <pre>docker restart "ts-$app"
 tailscale status | grep "$app"</pre>
         <p>The name comes back unchanged.</p>
       </li>
 
       <li>
-        <p>Reinstall the app on the phone from the new URL. An installed web app
-        belongs to its origin, so the old install is a different app that will
-        not follow the move: it is removed and installed again from the new
-        hostname, leaving one installed app per origin.</p>
+        <p>Reinstall the app on the phone from the new URL, because an installed
+        web app belongs to its origin and the old install is a different app
+        that will not follow the move.</p>
       </li>
     </ol>
 
     <h2 id="acceptance">Acceptance</h2>
     <p>
       Each service answers 200 at its own
-      <code>https://&lt;name&gt;.&lt;tailnet&gt;.ts.net</code>,
-      <code>tailscale serve status</code> on the machine node reports no
-      configuration for them, both nodes keep their names across a container
-      restart, and each app installs from the phone on its own — the outcome a
-      shared hostname made impossible.
+      <code>https://&lt;name&gt;.&lt;tailnet&gt;.ts.net</code>, the machine
+      node&#39;s <code>tailscale serve status</code> reports no configuration for
+      it, both names survive a container restart, and each app installs from the
+      phone on its own.
     </p>
 
     <h2 id="recovery">Recovery</h2>
-    <p>The failure modes this procedure records, with what each looks like and
-    the way back. The record does not mark which of them the walk itself hit,
-    and a cell reading "not recorded" is a gap in the record rather than an
-    absent failure.</p>
+    <p>The record does not mark which of these the walk itself hit, and a cell
+    reading &quot;not recorded&quot; is a gap in the record rather than an absent
+    failure.</p>
     <table>
       <tr><th>Symptom</th><th>Cause</th><th>Way back</th></tr>
       <tr>
-        <td>400 instead of 200, most often after a service redeploy, while the
-        node itself is up and correctly named</td>
-        <td>The service's own host allowlist has fallen back to the machine
-        FQDN</td>
-        <td>Fix the derivation in the service's launch script — node name plus
-        tailnet suffix — and redeploy; setting it by hand works until the next
-        deploy repeats the failure</td>
+        <td>400 rather than 200, usually after a redeploy, node up and correctly
+        named</td>
+        <td>The host allowlist fell back to the machine FQDN</td>
+        <td>Fix the derivation in the launch script and redeploy; a hand-set
+        value fails again next deploy</td>
       </tr>
       <tr>
         <td>No response at all from the new hostname</td>
-        <td>The certificate is still being issued, or the tailnet lacks HTTPS
+        <td>Certificate still issuing, or the tailnet lacks HTTPS
         certificates</td>
-        <td>Wait out the first minute, then enable HTTPS certificates for the
-        tailnet</td>
+        <td>Wait out the first minute, then enable HTTPS certificates</td>
       </tr>
       <tr>
-        <td>The name comes back with a <code>-1</code> suffix after
-        <code>docker restart</code></td>
-        <td>The state directory is not persisted, and the hostname every
-        installed app was built against has just moved</td>
-        <td>Not recorded — this walk carries the recognition only</td>
+        <td>A <code>-1</code> suffix on the name after <code>docker
+        restart</code></td>
+        <td>The state directory is not persisted</td>
+        <td>Not recorded — the recognition only</td>
       </tr>
       <tr>
         <td>A check fails right after a mount is retired</td>
         <td>Not recorded</td>
-        <td>Restore the mount just removed and stop, rather than retiring the
-        next port; no command for restoring a removed mount is recorded</td>
+        <td>Restore that mount and stop rather than retiring the next port; no
+        restore command is recorded</td>
       </tr>
     </table>
   </section>

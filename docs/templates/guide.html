@@ -5,6 +5,10 @@
   fill in; update the same file in place on re-walk. Delete every comment,
   including this one.
 
+  The Commit field pins the tree the walk ran on — the outputs shown were
+  observed there. A prose-only re-render keeps that pin and changes only
+  Updated; the pin moves only on a re-walk.
+
   A guide is the concrete twin of a process or runbook spec: the spec states
   what the procedure must guarantee; the guide gives the exact commands, the
   exact output, and the one path that worked on the pinned tree. When guide

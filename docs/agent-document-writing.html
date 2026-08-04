@@ -54,6 +54,9 @@
   .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
   .figure-row figure { margin: 0; }
   figure.pan { overflow-x: auto; }
+  table.filemap td { border-bottom: none; padding: .12rem .8rem .12rem 0; }
+  table.filemap td:first-child { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; white-space: pre; }
+  figure pre { margin: 0; }
   footer.sources { margin-top: 4rem; border-top: 1px solid #e4e4e4; padding-top: 1rem; font-size: .85rem; color: #555; }
   footer.sources h2 { font-size: .8rem; margin: 0 0 .3rem; font-variant: small-caps; letter-spacing: .06em; font-weight: 600; }
   footer.sources ul { margin: 0; padding-left: 1.1rem; }
@@ -68,169 +71,91 @@
     <dl class="provenance">
       <dt>Doctype</dt> <dd>proposal</dd>
       <dt>Status</dt>  <dd>Open</dd>
-      <dt>Updated</dt> <dd>2026-08-03</dd>
-      <dt>Commit</dt>  <dd>6c5ef3d</dd>
+      <dt>Updated</dt> <dd>2026-08-04</dd>
+      <dt>Commit</dt>  <dd>b969155</dd>
     </dl>
   </header>
 
   <section>
-    <p>Seven sites now state the document system&rsquo;s rules, two more than
-    before the entries migrated, so the writer agent&rsquo;s definition should
+    <p>Seven sites state this document system&rsquo;s rules, and the brevity
+    ground rule added today reached six files while all eight template copies in
+    camera and board missed it, so the writer agent&rsquo;s definition should
     hold the one normative description and every other mention should become a
     pointer.</p>
 
     <h2 id="problem">Problem</h2>
 
-    <p>Every site below carries normative text about how documents are written
-    &mdash; the rule itself, not a pointer at it &mdash; so changing one rule is
-    a seven-site change. The entries&rsquo; migration onto the parent templates
-    added two of those sites rather than removing any, because camera and board
-    each adopted the system by copying the four templates with their rule
-    comments intact (camera <code>140ac74</code>, board <code>4ee9f83</code>).
-    The owner pays for it as the only reviewer of every copy.</p>
+    <p>Adding one rule is a seven-site edit that nothing completes. The brevity
+    ground rule landed on 2026-08-04 in <code>docs/README.md</code>, in all four
+    parent templates, and in <code>~/.claude/agents/document-writer.md</code>
+    (workspace <code>b969155</code>, <code>~/.claude</code> <code>ed5b25f</code>);
+    the eight template copies under <code>camera/docs/templates/</code> and
+    <code>board/docs/templates/</code> do not contain the phrase. The owner pays
+    for it as the only reader of every copy.</p>
 
     <table>
-      <thead><tr><th>Site</th><th>Rules it holds</th><th>Observable at <code>6c5ef3d</code></th></tr></thead>
+      <thead><tr><th>Site</th><th>Rules it holds</th><th>State at <code>b969155</code></th></tr></thead>
       <tbody>
         <tr>
           <td><code>docs/README.md</code></td>
           <td>The whole rule set, plus the machine contract every reader parses.</td>
-          <td>168 lines: two kinds, three view doctypes, house style, naming, catalogue, pipeline, and the <code>json contract=docs</code> block.</td>
+          <td>181 lines.</td>
         </tr>
         <tr>
           <td><code>.claude/CLAUDE.md</code></td>
           <td>The plane-prefix naming rule, restated near-verbatim.</td>
-          <td>Line&nbsp;24 &ldquo;a <code>docs/</code> filename carries its plane as a prefix, <code>agent-&lt;slice&gt;</code> or <code>service-&lt;slice&gt;</code>&rdquo; against <code>README.md</code> line&nbsp;106 &ldquo;Workspace files carry a plane prefix, <code>agent-</code> or <code>service-</code>&rdquo;.</td>
+          <td>Line&nbsp;24 against <code>README.md</code> line&nbsp;119.</td>
         </tr>
         <tr>
-          <td><code>.claude/agents/document-writer.md</code></td>
-          <td>The read order, the pipeline, the rubric rule, and all five house-style rules.</td>
-          <td>66 lines; &sect;Procedure repeats <code>README.md</code> &sect;Writing pipeline step&nbsp;2, and &sect;Style repeats &sect;House style together with the size and label rules <code>figure.html</code> owns.</td>
+          <td><code>~/.claude/agents/document-writer.md</code></td>
+          <td>The read order, the pipeline, the rubric rule, and every house-style rule.</td>
+          <td>86 lines, and since <code>b6bff78</code> in a second git repository.</td>
         </tr>
         <tr>
           <td><code>docs/templates/</code> &times;4</td>
-          <td>Writing rules that go well past the machine contract each template owes.</td>
-          <td>386 comment lines &mdash; 128 of 229 in <code>explanation.html</code>, 105 of 207 in <code>guide.html</code>, 101 of 198 in <code>proposal.html</code>, 52 of 61 in <code>spec.md</code>. All three view templates state the plane-prefix rule on line&nbsp;4.</td>
+          <td>Writing rules well past the machine contract each template owes.</td>
+          <td>448 comment lines.</td>
         </tr>
         <tr>
           <td><code>docs/components/</code> &times;5</td>
           <td>Self-containment, form choice, drawing geometry, block choice.</td>
-          <td>153 comment lines &mdash; 60 in <code>figure.html</code>, 28 in <code>callout.html</code>, 23 in <code>base.html</code>, 22 in <code>provenance.html</code>, 20 in <code>disclosure.html</code>.</td>
+          <td>206 comment lines.</td>
         </tr>
         <tr>
           <td><code>camera/docs/templates/</code> &times;4</td>
-          <td>The parent&rsquo;s comment headers, copied whole and already drifted.</td>
-          <td>471 comment lines; <code>docs/&lt;kebab-title&gt;.html</code> where the parent says <code>docs/&lt;name&gt;.html</code>, and &ldquo;the one view allowed to describe what does not exist&rdquo; where the parent says &ldquo;the one prose view&rdquo;.</td>
+          <td>The parent&rsquo;s headers, copied whole and already drifted.</td>
+          <td>473 comment lines, none carrying the new ground rule.</td>
         </tr>
         <tr>
           <td><code>board/docs/templates/</code> &times;4</td>
           <td>The same headers, copied with a deference note.</td>
-          <td>459 comment lines; each header adds &ldquo;when the two disagree, the parent wins&rdquo;, which names the drift without preventing it.</td>
+          <td>461 comment lines, none carrying the new ground rule.</td>
         </tr>
       </tbody>
     </table>
 
-    <p>Two defects the previous revision recorded have since closed. The parent
-    relation is now asserted from both ends &mdash; <code>camera/docs/README.md</code>
-    line&nbsp;3 and <code>board/docs/INDEX.md</code> line&nbsp;7 each name
-    <code>~/workspace/docs/</code> as the system that owns the rules &mdash; and
-    the <strong>report</strong>/<strong>mockup</strong> doctype list is gone from
-    <code>provenance.html</code>, leaving the word in <code>figure.html</code>
-    line&nbsp;149 as its last trace.</p>
+    <details>
+      <summary>The drift is now demonstrated rather than predicted, in three independent places</summary>
+      <p>A <code>grep</code> for &ldquo;ground rule&rdquo; over the thirteen
+      template files hits all five in <code>~/workspace/docs/templates/</code>
+      and <code>docs/README.md</code>, and misses all eight entry copies at
+      camera <code>140ac74</code> and board <code>43358c0</code>. Two older
+      divergences sit beside it: camera&rsquo;s <code>proposal.html</code> says
+      <code>docs/&lt;kebab-title&gt;.html</code> where the parent says
+      <code>docs/&lt;name&gt;.html</code>, and calls a proposal &ldquo;the one
+      view allowed to describe what does not exist&rdquo; where the parent now
+      says &ldquo;the one <em>prose</em> view&rdquo;. Board&rsquo;s copies add
+      &ldquo;when the two disagree, the parent wins&rdquo;, which names the drift
+      without preventing it.</p>
+    </details>
 
-    <div class="figure-row">
-      <figure>
-        <svg viewBox="0 0 360 230" role="img" aria-labelledby="repeat-workspace">
-          <title id="repeat-workspace">Panel 1 — inside the workspace, three sites repeat rule text that docs/README.md also holds.</title>
-          <defs>
-            <marker id="arrow-repeat" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
-              <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
-            </marker>
-          </defs>
-
-          <rect x="105" y="12" width="150" height="34" fill="none" stroke="currentColor"/>
-          <text x="114" y="35" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">docs/README.md</text>
-
-          <rect x="6" y="120" width="104" height="34" fill="none" stroke="currentColor"/>
-          <text x="14" y="141" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">CLAUDE.md</text>
-
-          <rect x="128" y="120" width="104" height="34" fill="none" stroke="currentColor"/>
-          <text x="136" y="141" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">templates &times;4</text>
-
-          <rect x="250" y="120" width="104" height="34" fill="none" stroke="currentColor"/>
-          <text x="258" y="141" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">writer agent</text>
-
-          <polyline points="140,46 140,84 58,84 58,116" fill="none" stroke="currentColor" marker-end="url(#arrow-repeat)"/>
-          <circle cx="85" cy="64" r="9" fill="none" stroke="currentColor"/>
-          <text x="85" y="64" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">1</text>
-
-          <line x1="180" y1="46" x2="180" y2="116" stroke="currentColor" marker-end="url(#arrow-repeat)"/>
-          <circle cx="198" cy="82" r="9" fill="none" stroke="currentColor"/>
-          <text x="198" y="82" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">2</text>
-
-          <polyline points="220,46 220,96 302,96 302,116" fill="none" stroke="currentColor" marker-end="url(#arrow-repeat)"/>
-          <circle cx="261" cy="78" r="9" fill="none" stroke="currentColor"/>
-          <text x="261" y="78" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">3</text>
-        </svg>
-        <figcaption>
-          Panel 1, inside the workspace. The three arrows leave the file that
-          declares itself the constitution and land on the files that state the
-          same rules again.
-        </figcaption>
-      </figure>
-
-      <figure>
-        <svg viewBox="0 0 360 230" role="img" aria-labelledby="repeat-entries">
-          <title id="repeat-entries">Panel 2 — the parent templates, copied whole into camera and into board.</title>
-          <rect x="105" y="12" width="150" height="34" fill="none" stroke="currentColor"/>
-          <text x="114" y="35" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">templates &times;4</text>
-
-          <rect x="20" y="140" width="140" height="34" fill="none" stroke="currentColor"/>
-          <text x="28" y="161" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">camera copies</text>
-
-          <rect x="200" y="140" width="140" height="34" fill="none" stroke="currentColor"/>
-          <text x="208" y="161" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">board copies</text>
-
-          <polyline points="150,46 150,100 90,100 90,136" fill="none" stroke="currentColor" marker-end="url(#arrow-repeat)"/>
-          <circle cx="112" cy="82" r="9" fill="none" stroke="currentColor"/>
-          <text x="112" y="82" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">4</text>
-
-          <polyline points="210,46 210,100 270,100 270,136" fill="none" stroke="currentColor" marker-end="url(#arrow-repeat)"/>
-          <circle cx="248" cy="82" r="9" fill="none" stroke="currentColor"/>
-          <text x="248" y="82" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">5</text>
-        </svg>
-        <figcaption>
-          Panel 2, across the repository boundary. The migration reproduced the
-          headers rather than pointing at them, which is what turned five sites
-          into seven.
-        </figcaption>
-      </figure>
-    </div>
-
-    <table>
-      <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
-      <tbody>
-        <tr><td><code>docs/README.md</code></td><td>rule site</td><td>the declared constitution, and the origin of edges 1 to 3</td></tr>
-        <tr><td><code>CLAUDE.md</code></td><td>rule site</td><td><code>.claude/CLAUDE.md</code>, the workspace routing file</td></tr>
-        <tr><td><code>templates &times;4</code></td><td>rule site</td><td><code>docs/templates/</code>, the four parent templates</td></tr>
-        <tr><td><code>writer agent</code></td><td>rule site</td><td><code>.claude/agents/document-writer.md</code></td></tr>
-        <tr><td><code>camera copies</code>, <code>board copies</code></td><td>rule site</td><td>each entry&rsquo;s <code>docs/templates/</code>, four files apiece</td></tr>
-        <tr><td>1</td><td>repetition</td><td>the plane-prefix naming rule, restated</td></tr>
-        <tr><td>2</td><td>repetition</td><td>the plane-prefix naming rule, a third to fifth time</td></tr>
-        <tr><td>3</td><td>repetition</td><td>the pipeline, the rubric rule, and the house style</td></tr>
-        <tr><td>4</td><td>repetition</td><td>the comment headers, copied whole and since drifted</td></tr>
-        <tr><td>5</td><td>repetition</td><td>the comment headers, copied whole with a deference note</td></tr>
-      </tbody>
-    </table>
-
-    <p>Enforcement moved without unifying. <code>scripts/check-docs</code> reads
+    <p>Enforcement moved without unifying. <code>scripts/check-docs</code> parses
     the <code>json contract=docs</code> block out of <code>docs/README.md</code>
-    and checks any repository&rsquo;s <code>docs/</code> against it, and it
-    passes over the workspace, camera and board at <code>6c5ef3d</code>. Nothing
-    runs it: the workspace&rsquo;s only hook is the three-line no-main-commits
-    guard, camera&rsquo;s <code>hooks/pre-commit</code> runs its own 218-line
-    <code>script/check-docs.py</code>, and board&rsquo;s checks staged content
-    for credentials alone.</p>
+    and passes over all three repositories at <code>b969155</code>, covering the
+    twelve views their <code>INDEX</code> files list. Nothing runs it: the
+    workspace&rsquo;s only hook is the no-main-commits guard, camera&rsquo;s
+    <code>hooks/pre-commit</code> runs its own <code>script/check-docs.py</code>,
+    and board&rsquo;s checks staged content for credentials alone.</p>
 
     <h2 id="options">Options</h2>
 
@@ -245,48 +170,43 @@
       <tbody>
         <tr>
           <td><strong>README as master</strong></td>
-          <td>Keeps <code>docs/README.md</code> as the constitution and demotes every other site to a pointer at it.</td>
+          <td>Keeps <code>docs/README.md</code> as the constitution and demotes every other site to a pointer.</td>
           <td>Six sites trimmed; the README grows to absorb what they held.</td>
-          <td>Locality. A prose file enforces nothing, and the writer still needs the rules inside its own definition to act on them &mdash; so the README&ndash;agent duplication survives as structure, not accident. The reader of the rules and the home of the rules stay two files.</td>
+          <td>Locality. The writer still needs the rules inside its own definition to act on them, so the README&ndash;agent duplication survives as structure rather than accident.</td>
         </tr>
         <tr>
           <td><strong>Writer as constitution</strong></td>
-          <td>Makes <code>.claude/agents/document-writer.md</code> the one normative description of the whole system, spec rules included, with every other site a pointer.</td>
-          <td>One file serves two audiences &mdash; the writer&rsquo;s own system prompt and reference for the doing agents that write specs &mdash; so spec-only prose rides in the writer&rsquo;s context on every invocation.</td>
-          <td>A clean single audience per file. The spec rules are read by an agent that is not the file&rsquo;s owner, through a one-line pointer in the spec template header.</td>
+          <td>Makes <code>document-writer.md</code> the one normative description of the whole system, spec rules included.</td>
+          <td>One file serves two audiences, so spec-only prose rides in the writer&rsquo;s context on every invocation.</td>
+          <td>A clean single audience per file, and a single repository: the definition is versioned in <code>~/.claude</code>, not beside the documents it governs.</td>
         </tr>
         <tr>
           <td><strong>Writer as sole author</strong></td>
           <td>Routes every document, spec and view alike, through the writer, so its definition is total by construction.</td>
           <td>Every spec change becomes a delegation; all documentation serializes behind one agent.</td>
-          <td>&ldquo;A spec is written by the agent doing the work, in the same change as what it governs&rdquo; (<code>docs/README.md</code> &sect;Writing pipeline). The doing agent holds the context a spec needs, and a handoff through a second agent is lossy exactly where fidelity matters most.</td>
+          <td>&ldquo;A spec is written by the agent doing the work, in the same change as what it governs&rdquo; (<code>docs/README.md</code> &sect;Writing pipeline), whose whole point is that the doing agent holds the context.</td>
         </tr>
       </tbody>
     </table>
 
-    <p>On <strong>locality</strong>, only the second option puts the rules in a
-    file the acting agent already loads: the writer&rsquo;s definition is read
-    on every act of view writing, whereas a README is read when someone
-    remembers to. On <strong>enforcement</strong>, none of the three enforces
-    anything by itself, because enforcement is a machine check and all three
-    options need the same one.</p>
-
-    <p>That is why the recommendation carries a checker alongside it rather than
-    instead of it. <em>Writer as sole author</em> wins locality outright and is
-    still the weakest option, because it buys locality by moving the author,
-    which is the one thing the pipeline decision fixed.</p>
+    <p>On <strong>locality</strong>, only <em>Writer as constitution</em> puts
+    the rules in a file the acting agent already loads, whereas a README is read
+    when someone remembers to. On <strong>enforcement</strong>, none of the three
+    enforces anything by itself, because enforcement is a machine check that all
+    three need equally.</p>
 
     <h2 id="recommendation">Recommendation</h2>
 
-    <p><em>Writer as constitution</em> wins on locality and ties on enforcement.
-    The governing principle is one sentence: <strong>a rule lives in the single
-    file its actor loads at the moment the rule binds; every other mention is a
+    <p><em>Writer as constitution</em> wins on locality and ties on enforcement,
+    so it ships with a checker alongside it rather than instead of it. The
+    governing principle is one sentence: <strong>a rule lives in the single file
+    its actor loads at the moment the rule binds; every other mention is a
     pointer.</strong> The writer is the only actor that touches every view in
-    every entry, so its definition is where the source of truth and the point of
-    use become the same file.</p>
+    every entry, and its move to the user level at <code>b6bff78</code> already
+    put it where a session in any entry loads it.</p>
 
-    <figure class="pan">
-      <svg viewBox="0 0 760 220" style="min-width:760px" role="img" aria-labelledby="proposed-shape">
+    <figure id="fig-proposed-shape">
+      <svg viewBox="0 0 360 275" role="img" aria-labelledby="proposed-shape">
         <title id="proposed-shape">The proposed shape: one file holds every rule, and the sites that hold rules today defer to it.</title>
         <defs>
           <marker id="arrow-shape" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
@@ -294,32 +214,29 @@
           </marker>
         </defs>
 
-        <text x="20" y="18" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">pointer-only sites</text>
-        <rect x="20" y="30" width="720" height="96" fill="none" stroke="currentColor" stroke-dasharray="5 4" opacity=".6"/>
+        <text x="8" y="14" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">pointer-only sites</text>
+        <rect x="8" y="24" width="344" height="156" fill="none" stroke="currentColor" stroke-dasharray="5 4" opacity=".6"/>
 
-        <rect x="44" y="52" width="200" height="52" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
-        <text x="56" y="76" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">docs/README.md</text>
-        <text x="56" y="94" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">+ .claude/CLAUDE.md</text>
+        <rect x="24" y="38" width="312" height="36" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="36" y="61" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">workspace rule files</text>
 
-        <rect x="280" y="52" width="200" height="52" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
-        <text x="292" y="76" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">parent templates</text>
-        <text x="292" y="94" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">+ components</text>
+        <rect x="24" y="86" width="312" height="36" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="36" y="109" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">parent templates</text>
 
-        <rect x="516" y="52" width="200" height="52" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
-        <text x="528" y="76" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">entry copies</text>
-        <text x="528" y="94" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">camera and board</text>
+        <rect x="24" y="134" width="312" height="36" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="36" y="157" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">entry copies</text>
 
-        <line x1="380" y1="126" x2="380" y2="158" stroke="currentColor" stroke-dasharray="5 4" marker-end="url(#arrow-shape)"/>
-        <text x="392" y="146" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">defers to</text>
+        <line x1="180" y1="180" x2="180" y2="212" stroke="currentColor" stroke-dasharray="5 4" marker-end="url(#arrow-shape)"/>
+        <text x="192" y="200" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">defers to</text>
 
-        <rect x="230" y="160" width="300" height="48" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
-        <text x="244" y="182" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">document-writer.md</text>
-        <text x="244" y="198" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">the one normative description</text>
+        <rect x="64" y="214" width="232" height="48" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="78" y="238" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">document-writer.md</text>
+        <text x="78" y="252" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">the one normative description</text>
       </svg>
       <figcaption>
         Structure diagram, proposed; scope is where the rules are
         <em>written</em>, not what enforces them. Every element is dashed
-        because none of this arrangement exists at <code>6c5ef3d</code>. Key:
+        because none of this arrangement exists at <code>b969155</code>. Key:
         dashed box &mdash; a proposed element; frame &mdash; a set drawn as one,
         whose single edge stands for that edge from every member; arrow &mdash;
         the deference each pointer site would carry.
@@ -327,155 +244,82 @@
     </figure>
 
     <table>
-      <thead><tr><th>#</th><th>Element</th><th>Type</th><th>Comes from</th></tr></thead>
+      <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>1</td><td>pointer-only sites</td><td>frame</td><td>the governing principle above</td></tr>
-        <tr><td>2</td><td><code>docs/README.md</code> + <code>.claude/CLAUDE.md</code></td><td>pointer-only site</td><td>changes&nbsp;2 and&nbsp;3 below</td></tr>
-        <tr><td>3</td><td>parent templates + components</td><td>pointer-only site</td><td>changes&nbsp;4 to&nbsp;6 below</td></tr>
-        <tr><td>4</td><td>entry copies</td><td>pointer-only site</td><td>change&nbsp;8 below, phase&nbsp;4</td></tr>
-        <tr><td>5</td><td>defers to</td><td>edge, frame to constitution</td><td>the governing principle above</td></tr>
-        <tr><td>6</td><td><code>document-writer.md</code></td><td>the constitution</td><td>change&nbsp;1 below</td></tr>
+        <tr><td>pointer-only sites</td><td>frame</td><td>every site that holds rule text today, drawn as one set</td></tr>
+        <tr><td>workspace rule files</td><td>pointer-only site</td><td><code>docs/README.md</code> and <code>.claude/CLAUDE.md</code></td></tr>
+        <tr><td>parent templates</td><td>pointer-only site</td><td><code>docs/templates/</code> and <code>docs/components/</code></td></tr>
+        <tr><td>entry copies</td><td>pointer-only site</td><td><code>camera/docs/templates/</code> and <code>board/docs/templates/</code></td></tr>
+        <tr><td>defers to</td><td>edge, frame to constitution</td><td>the one-line pointer each site would carry instead of the rule</td></tr>
+        <tr><td><code>document-writer.md</code></td><td>the constitution</td><td><code>~/.claude/agents/document-writer.md</code>, holding every rule once</td></tr>
       </tbody>
     </table>
-
-    <p>Eight concrete changes carry it, and three of them are already part
-    way:</p>
-
-    <table>
-      <thead><tr><th>#</th><th>Change</th><th>State at <code>6c5ef3d</code></th></tr></thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td><code>document-writer.md</code> absorbs the normative content of <code>README.md</code>: the two-kinds split, the three view doctypes, naming and catalogue rules, the pipeline, and a new spec-rules section covering the five section shapes.</td>
-          <td>Open &mdash; the file carries procedure, style and guardrails only.</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td><code>docs/README.md</code> shrinks to the two-kinds table, the <code>json contract=docs</code> block its readers parse, and one pointer at the agent definition.</td>
-          <td>Open &mdash; the file grew to 168 lines when the contract block landed.</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td><code>.claude/CLAUDE.md</code> keeps one routing line &mdash; docs work delegates to <code>document-writer</code> &mdash; and drops the naming restatement.</td>
-          <td>Open &mdash; line&nbsp;24 still carries the rule.</td>
-        </tr>
-        <tr>
-          <td>4</td>
-          <td>Templates demote to skeleton plus machine contract, and the contract gains per-shape <code>required-sections</code> so the capability shape re-imposes Behavior, Configuration and Acceptance.</td>
-          <td>Open &mdash; the capability triad is prose in <code>spec.md</code>, whose contract still reads <code>required-sections: Purpose</code>.</td>
-        </tr>
-        <tr>
-          <td>5</td>
-          <td>Components demote to pure self-demonstration, their rule prose moving into the agent definition.</td>
-          <td>Part landed &mdash; the stale doctype list is gone from <code>provenance.html</code>; 153 comment lines remain.</td>
-        </tr>
-        <tr>
-          <td>6</td>
-          <td><code>figure.html</code> gains the two pieces of camera&rsquo;s retired <code>mockup.html</code> worth keeping: a phone-frame demonstration and the numbered comes-from ledger for drawn options.</td>
-          <td>Part landed &mdash; the ledger rule sits in <code>proposal.html</code> line&nbsp;47; no phone frame exists.</td>
-        </tr>
-        <tr>
-          <td>7</td>
-          <td>Enforcement unifies: every entry&rsquo;s <code>pre-commit</code> calls one workspace checker, the writer keeps its write-time rubric report, and a proposal whose recommendation ships flips Status in the shipping commit.</td>
-          <td>Part landed &mdash; <code>scripts/check-docs</code> exists and passes; no hook calls it, and no mechanism flips a Status.</td>
-        </tr>
-        <tr>
-          <td>8</td>
-          <td>A child entry adopts the system by delegating its view writing to the writer and calling the shared checker &mdash; behavioral coupling through one gate, not prose copied into the entry.</td>
-          <td>Open, and larger than before &mdash; both entries adopted by copying, adding 930 comment lines.</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p>Change&nbsp;7 is now the cheapest of the eight, and change&nbsp;1&rsquo;s
-    cost is the thing to watch.</p>
 
     <details>
-      <summary>The two checkers own different halves, so unifying is a call site rather than a rewrite</summary>
-      <p><code>scripts/check-docs</code> states its own boundary: &ldquo;What is
-      not checked: everything the templates own &mdash; required sections,
-      figures, rubric items. A template&rsquo;s contract is checked where the
-      template is filled (an entry&rsquo;s own <code>pre-commit</code>).&rdquo;
-      Camera&rsquo;s <code>script/docs_chapters.py</code> owns exactly that
-      half, parsing <code>required-fields</code>,
-      <code>required-sections</code> and <code>required-elements</code> out of
-      a template comment, and its docstring names the property that keeps it
-      portable: &ldquo;Everything here is a calculation over text passed in by
-      the caller &hellip; no caller has to teach this module where its bytes
-      came from.&rdquo; The two do not overlap, so an entry that wants both
-      adds a call rather than merging two scripts.</p>
+      <summary>Eight changes carry the recommendation; three are part-way, and only the first must land before any other</summary>
+      <table>
+        <thead><tr><th>#</th><th>Change</th><th>State at <code>b969155</code></th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><code>document-writer.md</code> absorbs the normative content of <code>README.md</code>: the two-kinds split, the three view doctypes, naming and catalogue rules, the pipeline, and a spec-rules section covering the five section shapes.</td><td>Open &mdash; the file carries procedure, style and guardrails only.</td></tr>
+          <tr><td>2</td><td><code>docs/README.md</code> shrinks to the two-kinds table, the <code>json contract=docs</code> block its readers parse, and one pointer at the agent definition.</td><td>Open &mdash; the file reached 181 lines.</td></tr>
+          <tr><td>3</td><td><code>.claude/CLAUDE.md</code> keeps one routing line and drops the naming restatement.</td><td>Open &mdash; line&nbsp;24 still carries the rule.</td></tr>
+          <tr><td>4</td><td>Templates demote to skeleton plus machine contract, and the contract gains per-shape <code>required-sections</code>.</td><td>Open &mdash; <code>spec.md</code>&rsquo;s contract still reads <code>required-sections: Purpose</code>.</td></tr>
+          <tr><td>5</td><td>Components demote to pure self-demonstration, their rule prose moving into the agent definition.</td><td>Open &mdash; 206 comment lines.</td></tr>
+          <tr><td>6</td><td><code>figure.html</code> gains a phone-frame demonstration and the numbered comes-from ledger for drawn options.</td><td>Part landed &mdash; the ledger rule sits in <code>proposal.html</code>; no phone frame exists.</td></tr>
+          <tr><td>7</td><td>Enforcement unifies: every entry&rsquo;s <code>pre-commit</code> calls the workspace checker, the writer keeps its write-time rubric report, and a proposal whose recommendation ships flips Status in the shipping commit.</td><td>Part landed &mdash; <code>scripts/check-docs</code> passes; no hook calls it, and nothing flips a Status, which is why this document still reads Open two systems later.</td></tr>
+          <tr><td>8</td><td>A child entry adopts the system by delegating its view writing to the writer and calling the shared checker, rather than by copying prose.</td><td>Part landed &mdash; the writer is user-level and reachable from every entry; 934 copied comment lines remain.</td></tr>
+        </tbody>
+      </table>
+      <p>Change&nbsp;7 is a call site rather than a rewrite: <code>scripts/check-docs</code>
+      states that it leaves &ldquo;everything the templates own&rdquo; alone, and
+      camera&rsquo;s <code>script/docs_chapters.py</code> owns exactly that half,
+      so the two do not overlap.</p>
     </details>
 
-    <p>The recommendation flips if <code>document-writer.md</code> outgrows its
-    job. It serves two audiences by design, and the spec-rules section is read
-    by doing agents rather than by the writer, so every writer invocation pays
-    for prose it never uses. At today&rsquo;s sizes &mdash; 66 lines of writer
-    definition against 168 lines of README &mdash; that cost is small and the
-    locality is worth it.</p>
+    <p>The recommendation flips on either of two costs. The definition would
+    serve two audiences, so every writer invocation pays for spec-rules prose it
+    never uses &mdash; at 86 lines against 181 that is cheap, and if the spec
+    rules grow until the file reads as two documents, they split into a
+    spec-rules file the spec template points at.</p>
 
-    <p>If the spec rules grow to where the file reads as two documents stapled
-    together, split them into a spec-rules file the spec template points at, and
-    the constitution becomes two files that still hold each rule once.</p>
+    <div class="callout gap">
+      <span class="tag">Not shown</span> The second cost arrived with
+      <code>b6bff78</code> and is not weighed anywhere. The constitution would
+      live in <code>~/.claude</code> while the documents live in the entries, so
+      no single commit can change a rule and the documents it governs together
+      &mdash; the property change&nbsp;1 was written to buy. Whether locality is
+      worth that is unrecorded, and this document does not decide it.
+    </div>
 
     <p>The smallest first step is one commit: rewrite
-    <code>document-writer.md</code> to hold the rule set, and shrink
-    <code>README.md</code> to the two-kinds table, the contract block and a
-    pointer. Nothing else has to move for that commit to leave the system
-    correct &mdash; the remaining sites keep working as stale copies until the
-    phases below reach them, and the phases can then land one at a time.</p>
-
-    <div class="callout notice">
-      <span class="tag">Why the Status rule</span> Change&nbsp;7&rsquo;s last
-      clause has its evidence in this file. The revision before last recommended
-      adopting the parent system; the system was built at <code>3e3d22f</code>,
-      minimized at <code>50aac0f</code>, and adopted by both entries (camera
-      <code>140ac74</code>, board <code>4ee9f83</code>) &mdash; and at
-      <code>6c5ef3d</code> this document still reads <code>Status: Open</code>.
-      Nothing flipped it, because nothing is responsible for flipping it.
-    </div>
+    <code>~/.claude/agents/document-writer.md</code> to hold the rule set, and
+    shrink <code>docs/README.md</code> to the two-kinds table, the contract block
+    and a pointer. The remaining sites keep working as stale copies until the
+    phases below reach them, so nothing else has to move for that commit to
+    leave the system correct.</p>
 
     <h2 id="migration">Migration</h2>
 
-    <p>Every document is already on the current contract, so what is left to
-    migrate is the rule sites rather than the documents. <code>scripts/check-docs</code>
-    passes over all three repositories at <code>6c5ef3d</code>, covering 46
-    documents &mdash; 33 in camera, 10 in board, 3 in the workspace. Backward
-    compatibility is still not owed (2026-08-02, owner decision,
-    <code>docs/README.md</code>), so a site is rewritten onto the constitution
-    rather than kept readable both ways.</p>
+    <p>What is left to migrate is the rule sites rather than the documents. All
+    51 documents are already on the current contract and
+    <code>scripts/check-docs</code> passes over all three repositories at
+    <code>b969155</code>; the document phases landed at camera <code>140ac74</code>
+    and board <code>43358c0</code>. Backward compatibility is still not owed
+    (2026-08-02, owner decision, <code>docs/README.md</code>), so a site is
+    rewritten onto the constitution rather than kept readable both ways.</p>
 
     <table>
-      <thead><tr><th>Phase</th><th>What moves</th><th>Owner</th><th>State at <code>6c5ef3d</code></th></tr></thead>
+      <thead><tr><th>Phase</th><th>What moves</th><th>Owner</th></tr></thead>
       <tbody>
         <tr>
           <td><strong>0 &mdash; constitution</strong></td>
-          <td>Changes&nbsp;1&ndash;7: rewrite the agent definition, shrink <code>README.md</code>, trim <code>CLAUDE.md</code>, demote the four templates and five components, add the per-shape contracts, and put the workspace checker behind a hook.</td>
+          <td>Changes&nbsp;1&ndash;7 over the five rule sites inside the workspace and <code>~/.claude</code>.</td>
           <td>Workspace session</td>
-          <td>Open, and none of it started.</td>
-        </tr>
-        <tr>
-          <td><strong>1 &mdash; camera specs</strong></td>
-          <td>28 <code>.md</code> documents re-headed onto the unified <code>spec.md</code> contract, feature documents keeping their Behavior/Configuration/Acceptance triad.</td>
-          <td>A camera session, as the doing agent</td>
-          <td>Landed at camera <code>140ac74</code>; the nine camera templates are gone and <code>camera/docs/README.md</code> carries only what is camera-specific.</td>
-        </tr>
-        <tr>
-          <td><strong>2 &mdash; camera views</strong></td>
-          <td>5 <code>.html</code> documents re-rendered from their sources, the benchmark doctype folding into explanation.</td>
-          <td>The writer, one delegation per view</td>
-          <td>Landed at camera <code>140ac74</code>; every view declares <code>Doctype</code> and the retired <code>Category</code> term is dead code removed.</td>
-        </tr>
-        <tr>
-          <td><strong>3 &mdash; board</strong></td>
-          <td>9 <code>.html</code> documents re-rendered, and the stale &ldquo;three templates&rdquo; sentence in <code>INDEX.md</code> replaced by a pointer.</td>
-          <td>Board sessions</td>
-          <td>Landed at board <code>4ee9f83</code>; <code>INDEX.md</code> now states that no rule of the system is restated in it.</td>
         </tr>
         <tr>
           <td><strong>4 &mdash; entry copies</strong></td>
-          <td>Change&nbsp;8 over the eight template copies the adoption added: each entry&rsquo;s templates keep what the entry adds and point at the constitution for the rest.</td>
+          <td>Change&nbsp;8 over the eight template copies the adoption added, each keeping only what its entry adds.</td>
           <td>Entry sessions</td>
-          <td>Open, and it did not exist as work before the adoption created it.</td>
         </tr>
       </tbody>
     </table>
@@ -483,26 +327,24 @@
     <div class="callout gap">
       <span class="tag">Not shown</span> Phase&nbsp;0&rsquo;s exit criterion no
       longer discriminates. The plan set it as the contract checker passing over
-      <code>workspace/docs</code>; the checker was built and passes at
-      <code>6c5ef3d</code> with the phase not started, so the criterion is
-      satisfied by a tree the phase has never touched. What replaces it is not
-      recorded anywhere, and this document does not decide it.
+      <code>workspace/docs</code>; the checker passes at <code>b969155</code>
+      with the phase not started, so a tree the phase has never touched already
+      satisfies it. What replaces it is recorded nowhere.
     </div>
 
-    <p>Phases&nbsp;1 through&nbsp;3 accounted for all 46 documents, and
-    phases&nbsp;0 and&nbsp;4 split the seven rule sites five to two along the
-    repository boundary. That split is the plan&rsquo;s own check: a phase that
-    finishes with a rule still written in two places has not finished.</p>
+    <p>The two phases split the seven rule sites five to two along the
+    repository boundary, and that split is the plan&rsquo;s own check: a phase
+    that finishes with a rule still written in two places has not finished.</p>
   </section>
 
   <footer class="sources">
     <h2 id="sources">Sources</h2>
     <ul>
-      <li><code>docs/README.md</code>; <code>docs/templates/</code>; <code>docs/components/</code></li>
-      <li><code>.claude/CLAUDE.md</code>; <code>.claude/agents/document-writer.md</code></li>
-      <li><code>scripts/check-docs</code>; <code>.git/hooks/pre-commit</code></li>
-      <li><code>camera/docs/README.md</code>; <code>camera/docs/templates/</code></li>
-      <li><code>camera/script/check-docs.py</code>; <code>camera/script/docs_chapters.py</code>; <code>camera/hooks/pre-commit</code></li>
+      <li>The previous revision of this document, rendered at <code>6c5ef3d</code></li>
+      <li><code>docs/README.md</code>; <code>docs/INDEX.md</code>; <code>docs/templates/</code>; <code>docs/components/</code></li>
+      <li><code>.claude/CLAUDE.md</code>; <code>scripts/check-docs</code>; <code>.git/hooks/pre-commit</code></li>
+      <li><code>~/.claude/agents/document-writer.md</code>, at <code>~/.claude</code> <code>ed5b25f</code></li>
+      <li><code>camera/docs/README.md</code>; <code>camera/docs/templates/</code>; <code>camera/script/check-docs.py</code>; <code>camera/script/docs_chapters.py</code>; <code>camera/hooks/pre-commit</code></li>
       <li><code>board/docs/INDEX.md</code>; <code>board/docs/templates/</code>; <code>board/hooks/pre-commit</code></li>
     </ul>
   </footer>
