@@ -23,6 +23,9 @@ Template: `~/.claude/agents/document-writer/templates/explanation.html`
 - [`agent-memtypes.html`](agent-memtypes.html) — the memory-file kinds
   read from one question — what would make this file wrong — and the
   three lifecycle classes and five filename prefixes that answer admits.
+- [`agent-hooks.html`](agent-hooks.html) — the hooks that fire around a
+  working session, split by the layer that owns them: four Claude Code
+  hooks in one settings file, and the git guard every repository runs.
 
 ## Guides
 
