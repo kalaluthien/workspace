@@ -16,17 +16,18 @@
     line-height: 1.55;
     overflow-wrap: break-word;
   }
-  h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 .9rem; font-weight: 700; letter-spacing: -.01em; }
+  h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 .6rem; font-weight: 700; letter-spacing: -.01em; }
   h2 { font-size: 1.25rem; margin: 3rem 0 .5rem; font-weight: 700; }
   h3 { font-size: 1rem; margin: 2rem 0 .3rem; font-weight: 700; }
   p, li { margin: .6rem 0; }
   ul, ol { padding-left: 1.2rem; }
-  a { color: inherit; text-decoration-color: #aaa; }
+  a { color: #14459b; text-decoration-color: #9bb0d8; }
   strong { font-weight: 700; }
   code, pre, .provenance dd {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: .85em;
   }
+  code { color: #14459b; }
   pre { overflow-x: auto; background: #f4f4f4; padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
   table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
   th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
@@ -35,16 +36,16 @@
     table { display: block; overflow-x: auto; }
     th, td { min-width: 9rem; }
   }
+  .kicker { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: #666; margin: 0 0 .6rem; }
   .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
   .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
   .provenance dd { margin: 0; }
-  .callout { border: 1px solid #ccc; border-left-width: 4px; padding: .55rem .9rem; margin: 1.2rem 0; font-size: .88rem; line-height: 1.5; }
-  .callout .tag { font-variant: small-caps; letter-spacing: .06em; font-weight: 600; margin-right: .45rem; }
-  .callout.notice   { border-left-color: #556; }
-  .callout.gap      { border-left-color: #8a5a00; }
-  .callout.warning  { border-left-color: #a33; }
-  .callout.recovery { border-left-color: #2a6; }
-  .callout ul { margin: .3rem 0; }
+  .box { border: 1px solid #111; padding: .85rem 1.1rem; margin: 1.3rem 0; }
+  .box .label { display: block; font-variant: small-caps; letter-spacing: .1em; font-size: .74rem; font-weight: 700; color: #666; margin-bottom: .35rem; }
+  .box ol { list-style: none; padding-left: 0; margin: 0; }
+  .box li { margin: .5rem 0; font-size: .95rem; }
+  .box .n { display: inline-block; min-width: 1.2rem; height: 1.2rem; line-height: 1.2rem; text-align: center; background: #ffffff; border: 1px solid #111; border-radius: 50%; font-size: .74rem; font-weight: 700; color: #111; margin-right: .4rem; }
+  mark { background: #fdf0a0; color: inherit; padding: 0 .1em; }
   details { border: 1px solid #e4e4e4; padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
   details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
   details[open] summary { margin-bottom: .5rem; }
@@ -54,9 +55,6 @@
   .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
   .figure-row figure { margin: 0; }
   figure.pan { overflow-x: auto; }
-  table.filemap td { border-bottom: none; padding: .12rem .8rem .12rem 0; }
-  table.filemap td:first-child { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; white-space: pre; }
-  figure pre { margin: 0; }
   footer.sources { margin-top: 4rem; border-top: 1px solid #e4e4e4; padding-top: 1rem; font-size: .85rem; color: #555; }
   footer.sources h2 { font-size: .8rem; margin: 0 0 .3rem; font-variant: small-caps; letter-spacing: .06em; font-weight: 600; }
   footer.sources ul { margin: 0; padding-left: 1.1rem; }
@@ -67,103 +65,137 @@
 <article>
 
   <header>
+    <p class="kicker">workspace &middot; docs &middot; constitution</p>
     <h1>Writer constitution</h1>
     <dl class="provenance">
       <dt>Doctype</dt> <dd>proposal</dd>
-      <dt>Status</dt>  <dd>Open</dd>
+      <dt>Status</dt>  <dd>Accepted 2026-08-04 &mdash; recorded in <code>docs/README.md</code>; no spec</dd>
       <dt>Updated</dt> <dd>2026-08-04</dd>
-      <dt>Commit</dt>  <dd>b969155</dd>
+      <dt>Commit</dt>  <dd>d599966</dd>
     </dl>
   </header>
 
   <section>
-    <p>Seven sites state this document system&rsquo;s rules, and the brevity
-    ground rule added today reached six files while all eight template copies in
-    camera and board missed it, so the writer agent&rsquo;s definition should
+
+    <p>Seven sites stated this document system&rsquo;s rules and a new rule
+    reached only six of them, so the writer agent&rsquo;s definition should
     hold the one normative description and every other mention should become a
-    pointer.</p>
+    pointer &mdash; which shipped on 2026-08-04, leaving the view shelf
+    inconsistent.</p>
+
+    <h2 id="answer">Answer</h2>
+
+    <div class="box">
+      <span class="label">Conclusion</span>
+      <ol>
+        <li><span class="n">1</span><strong>Constitution.</strong>
+          <code>~/.claude/agents/document-writer.md</code> now holds
+          <mark>the whole normative description</mark> &mdash; the two-kinds
+          split, the three doctypes, naming and catalogue, the procedure, the
+          style and the guardrails &mdash; in 192 lines, with
+          <code>templates/</code> and <code>components/</code> beside it.</li>
+        <li><span class="n">2</span><strong>Pointers.</strong> The restating
+          sites are pointers or gone: <code>docs/README.md</code> kept
+          <mark>the two-kinds table and the contract block</mark> alone,
+          <code>.claude/CLAUDE.md</code> kept one routing line, and both
+          entries&rsquo; template copies were deleted (workspace
+          <code>4ddc0d4</code>, camera <code>cf93d7f</code>, board
+          <code>ce99e34</code>).</li>
+        <li><span class="n">3</span><strong>Rules changed after the
+          move.</strong> Two owner decisions today edited the style layer that
+          <mark>only the constitution now carries</mark>: the header drops the
+          dek and the notice callout, with what qualifies the Commit pin going
+          to Omissions, and every section heading is a noun phrase of one to
+          three words (<code>~/.claude</code> <code>1094fb2</code>).</li>
+        <li><span class="n">4</span><strong>Remainder.</strong> Enforcement did
+          not follow: <code>scripts/check-docs</code> <mark>still has no
+          caller</mark>, and <mark>four of the five workspace views</mark>
+          predate the style layer, so whether to re-render them is an open
+          owner decision.</li>
+      </ol>
+    </div>
 
     <h2 id="problem">Problem</h2>
 
-    <p>Adding one rule is a seven-site edit that nothing completes. The brevity
-    ground rule landed on 2026-08-04 in <code>docs/README.md</code>, in all four
-    parent templates, and in <code>~/.claude/agents/document-writer.md</code>
-    (workspace <code>b969155</code>, <code>~/.claude</code> <code>ed5b25f</code>);
-    the eight template copies under <code>camera/docs/templates/</code> and
-    <code>board/docs/templates/</code> do not contain the phrase. The owner pays
-    for it as the only reader of every copy.</p>
+    <div class="box">
+      <span class="label">Conclusion</span>
+      <ol>
+        <li><span class="n">1</span><strong>Seven writing sites.</strong> At
+          workspace <code>b969155</code> the rule set was written in
+          <code>docs/README.md</code>, <code>.claude/CLAUDE.md</code>, the agent
+          definition, four parent templates, five components, and eight entry
+          template copies &mdash; <mark>934 copied comment lines</mark> in the
+          entries alone.</li>
+        <li><span class="n">2</span><strong>A rule reached six.</strong> The
+          brevity ground rule added on 2026-08-04 landed in six files and in
+          <mark>none of the eight entry copies</mark> (camera
+          <code>140ac74</code>, board <code>43358c0</code>), so adding one rule
+          was a seven-site edit that nothing completed.</li>
+      </ol>
+    </div>
 
-    <table>
-      <thead><tr><th>Site</th><th>Rules it holds</th><th>State at <code>b969155</code></th></tr></thead>
-      <tbody>
-        <tr>
-          <td><code>docs/README.md</code></td>
-          <td>The whole rule set, plus the machine contract every reader parses.</td>
-          <td>181 lines.</td>
-        </tr>
-        <tr>
-          <td><code>.claude/CLAUDE.md</code></td>
-          <td>The plane-prefix naming rule, restated near-verbatim.</td>
-          <td>Line&nbsp;24 against <code>README.md</code> line&nbsp;119.</td>
-        </tr>
-        <tr>
-          <td><code>~/.claude/agents/document-writer.md</code></td>
-          <td>The read order, the pipeline, the rubric rule, and every house-style rule.</td>
-          <td>86 lines, and since <code>b6bff78</code> in a second git repository.</td>
-        </tr>
-        <tr>
-          <td><code>docs/templates/</code> &times;4</td>
-          <td>Writing rules well past the machine contract each template owes.</td>
-          <td>448 comment lines.</td>
-        </tr>
-        <tr>
-          <td><code>docs/components/</code> &times;5</td>
-          <td>Self-containment, form choice, drawing geometry, block choice.</td>
-          <td>206 comment lines.</td>
-        </tr>
-        <tr>
-          <td><code>camera/docs/templates/</code> &times;4</td>
-          <td>The parent&rsquo;s headers, copied whole and already drifted.</td>
-          <td>473 comment lines, none carrying the new ground rule.</td>
-        </tr>
-        <tr>
-          <td><code>board/docs/templates/</code> &times;4</td>
-          <td>The same headers, copied with a deference note.</td>
-          <td>461 comment lines, none carrying the new ground rule.</td>
-        </tr>
-      </tbody>
-    </table>
+    <p>The owner paid for it as the only reader of every copy, and the drift
+    was demonstrated rather than predicted: camera&rsquo;s
+    <code>proposal.html</code> named a different filename grammar than the
+    parent&rsquo;s, and board&rsquo;s copies carried &ldquo;when the two
+    disagree, the parent wins&rdquo;, which names the drift without preventing
+    it.</p>
 
     <details>
-      <summary>The drift is now demonstrated rather than predicted, in three independent places</summary>
-      <p>A <code>grep</code> for &ldquo;ground rule&rdquo; over the thirteen
-      template files hits all five in <code>~/workspace/docs/templates/</code>
-      and <code>docs/README.md</code>, and misses all eight entry copies at
-      camera <code>140ac74</code> and board <code>43358c0</code>. Two older
-      divergences sit beside it: camera&rsquo;s <code>proposal.html</code> says
-      <code>docs/&lt;kebab-title&gt;.html</code> where the parent says
-      <code>docs/&lt;name&gt;.html</code>, and calls a proposal &ldquo;the one
-      view allowed to describe what does not exist&rdquo; where the parent now
-      says &ldquo;the one <em>prose</em> view&rdquo;. Board&rsquo;s copies add
-      &ldquo;when the two disagree, the parent wins&rdquo;, which names the drift
-      without preventing it.</p>
+      <summary>Each of the seven sites, and where its rules sit now</summary>
+      <table>
+        <thead><tr><th>Site</th><th>Rules it held at <code>b969155</code></th><th>Where they sit now</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>docs/README.md</code></td>
+            <td>The whole rule set plus the machine contract, 181 lines.</td>
+            <td>78 lines: the two-kinds table, the <code>json contract=docs</code> block, one pointer.</td>
+          </tr>
+          <tr>
+            <td><code>.claude/CLAUDE.md</code></td>
+            <td>The plane-prefix naming rule, restated near-verbatim.</td>
+            <td>One parenthetical, &ldquo;naming: the writer constitution&rdquo;.</td>
+          </tr>
+          <tr>
+            <td><code>document-writer.md</code></td>
+            <td>The read order, the pipeline, the rubric rule, the house style; 86 lines.</td>
+            <td>192 lines, holding the whole system.</td>
+          </tr>
+          <tr>
+            <td><code>docs/templates/</code> &times;4, <code>docs/components/</code> &times;5</td>
+            <td>Writing rules well past the machine contract each file owes.</td>
+            <td>Moved whole to <code>~/.claude/agents/document-writer/</code>; still 546 comment lines.</td>
+          </tr>
+          <tr>
+            <td><code>camera/docs/templates/</code> &times;4</td>
+            <td>The parent&rsquo;s headers, copied whole and already drifted; 473 comment lines.</td>
+            <td>Deleted; <code>camera/docs/README.md</code> points at the constitution.</td>
+          </tr>
+          <tr>
+            <td><code>board/docs/templates/</code> &times;4</td>
+            <td>The same headers with a deference note; 461 comment lines.</td>
+            <td>Deleted; <code>board/docs/</code> holds documents only.</td>
+          </tr>
+        </tbody>
+      </table>
     </details>
-
-    <p>Enforcement moved without unifying. <code>scripts/check-docs</code> parses
-    the <code>json contract=docs</code> block out of <code>docs/README.md</code>
-    and passes over all three repositories at <code>b969155</code>, covering the
-    twelve views their <code>INDEX</code> files list. Nothing runs it: the
-    workspace&rsquo;s only hook is the no-main-commits guard, camera&rsquo;s
-    <code>hooks/pre-commit</code> runs its own <code>script/check-docs.py</code>,
-    and board&rsquo;s checks staged content for credentials alone.</p>
 
     <h2 id="options">Options</h2>
 
-    <p>Two axes, named before any option is judged. <strong>Locality</strong>:
-    is the file that holds a rule loaded by the actor that must obey it, at the
-    moment the rule binds &mdash; or does obeying it require a second read the
-    actor may skip. <strong>Enforcement</strong>: what makes a violation fail,
-    rather than merely be discouraged.</p>
+    <div class="box">
+      <span class="label">Conclusion</span>
+      <ol>
+        <li><span class="n">1</span><strong>Two axes.</strong>
+          <mark>Locality</mark> &mdash; is the file that holds a rule loaded by
+          the actor that must obey it, at the moment the rule binds;
+          <mark>enforcement</mark> &mdash; what makes a violation fail rather
+          than merely be discouraged.</li>
+        <li><span class="n">2</span><strong>One axis decided it.</strong> Only
+          <em>Writer as constitution</em> puts the rules in a file the acting
+          agent already loads, and <mark>enforcement tied at nothing</mark>,
+          because it is a machine check all three options need equally.</li>
+      </ol>
+    </div>
 
     <table>
       <thead><tr><th>Option</th><th>What it does</th><th>Cost</th><th>What it gives up</th></tr></thead>
@@ -184,168 +216,160 @@
           <td><strong>Writer as sole author</strong></td>
           <td>Routes every document, spec and view alike, through the writer, so its definition is total by construction.</td>
           <td>Every spec change becomes a delegation; all documentation serializes behind one agent.</td>
-          <td>&ldquo;A spec is written by the agent doing the work, in the same change as what it governs&rdquo; (<code>docs/README.md</code> &sect;Writing pipeline), whose whole point is that the doing agent holds the context.</td>
+          <td>The rule that a spec is written by the agent doing the work, in the same change as what it governs, whose whole point is that the doing agent holds the context.</td>
         </tr>
       </tbody>
     </table>
 
-    <p>On <strong>locality</strong>, only <em>Writer as constitution</em> puts
-    the rules in a file the acting agent already loads, whereas a README is read
-    when someone remembers to. On <strong>enforcement</strong>, none of the three
-    enforces anything by itself, because enforcement is a machine check that all
-    three need equally.</p>
-
     <h2 id="recommendation">Recommendation</h2>
 
-    <p><em>Writer as constitution</em> wins on locality and ties on enforcement,
-    so it ships with a checker alongside it rather than instead of it. The
-    governing principle is one sentence: <strong>a rule lives in the single file
-    its actor loads at the moment the rule binds; every other mention is a
-    pointer.</strong> The writer is the only actor that touches every view in
-    every entry, and its move to the user level at <code>b6bff78</code> already
-    put it where a session in any entry loads it.</p>
+    <div class="box">
+      <span class="label">Conclusion</span>
+      <ol>
+        <li><span class="n">1</span><strong>Writer as constitution.</strong>
+          One sentence governs it &mdash; <mark>a rule lives in the single file
+          its actor loads at the moment the rule binds</mark>, and every other
+          mention is a pointer &mdash; and the writer is the only actor that
+          touches every view in every entry.</li>
+        <li><span class="n">2</span><strong>The cost it accepted.</strong> The
+          constitution lives in <code>~/.claude</code> while the documents live
+          in the entries, so <mark>no single commit changes a rule and the
+          documents it governs together</mark>.</li>
+        <li><span class="n">3</span><strong>The flip.</strong> It reverses if
+          that split starts costing more than the locality it bought, or if the
+          file grows until it reads as two documents, at which point
+          <mark>the spec rules split into a file the spec template points
+          at</mark>.</li>
+      </ol>
+    </div>
 
-    <figure id="fig-proposed-shape">
-      <svg viewBox="0 0 360 275" role="img" aria-labelledby="proposed-shape">
-        <title id="proposed-shape">The proposed shape: one file holds every rule, and the sites that hold rules today defer to it.</title>
-        <defs>
-          <marker id="arrow-shape" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
-            <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
-          </marker>
-        </defs>
+    <p>The smallest first step was one commit, and it is the one that landed:
+    workspace <code>4ddc0d4</code> rewrote the definition to hold the rule set
+    and shrank <code>docs/README.md</code> to the two-kinds table, the contract
+    block and a pointer. The writer&rsquo;s move to the user level at
+    <code>b6bff78</code> had already put it where a session in any entry loads
+    it, and the entry copies followed as deletions rather than rewrites.</p>
 
-        <text x="8" y="14" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">pointer-only sites</text>
-        <rect x="8" y="24" width="344" height="156" fill="none" stroke="currentColor" stroke-dasharray="5 4" opacity=".6"/>
+    <div class="figure-row">
+      <figure id="fig-deference">
+        <svg viewBox="0 0 320 180" role="img">
+          <title>Panel 1 — every rule site points at the constitution, which holds the rules</title>
+          <defs>
+            <marker id="arrow-deference" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+            </marker>
+          </defs>
+          <rect x="30" y="12" width="260" height="62" fill="none" stroke="currentColor"/>
+          <text x="42" y="36" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Constitution</text>
+          <text x="42" y="52" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">document-writer.md</text>
+          <text x="42" y="66" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">templates, components</text>
+          <line x1="160" y1="132" x2="160" y2="78" stroke="currentColor" marker-end="url(#arrow-deference)"/>
+          <text x="170" y="108" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">points at</text>
+          <rect x="30" y="134" width="260" height="40" fill="none" stroke="currentColor"/>
+          <text x="42" y="152" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Pointer sites</text>
+          <text x="42" y="166" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">4 files, 3 repositories</text>
+        </svg>
+        <figcaption>
+          Panel 1, the writing shape at the pin. Key: solid box &mdash; an
+          element that exists; solid arrow &mdash; the one-line deference each
+          pointer site carries.
+        </figcaption>
+      </figure>
 
-        <rect x="24" y="38" width="312" height="36" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
-        <text x="36" y="61" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">workspace rule files</text>
-
-        <rect x="24" y="86" width="312" height="36" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
-        <text x="36" y="109" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">parent templates</text>
-
-        <rect x="24" y="134" width="312" height="36" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
-        <text x="36" y="157" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">entry copies</text>
-
-        <line x1="180" y1="180" x2="180" y2="212" stroke="currentColor" stroke-dasharray="5 4" marker-end="url(#arrow-shape)"/>
-        <text x="192" y="200" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">defers to</text>
-
-        <rect x="64" y="214" width="232" height="48" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
-        <text x="78" y="238" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">document-writer.md</text>
-        <text x="78" y="252" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".65">the one normative description</text>
-      </svg>
-      <figcaption>
-        Structure diagram, proposed; scope is where the rules are
-        <em>written</em>, not what enforces them. Every element is dashed
-        because none of this arrangement exists at <code>b969155</code>. Key:
-        dashed box &mdash; a proposed element; frame &mdash; a set drawn as one,
-        whose single edge stands for that edge from every member; arrow &mdash;
-        the deference each pointer site would carry.
-      </figcaption>
-    </figure>
+      <figure id="fig-enforcement">
+        <svg viewBox="0 0 320 180" role="img">
+          <title>Panel 2 — the contract checker exists, but no pre-commit hook calls it</title>
+          <defs>
+            <marker id="arrow-enforcement" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+            </marker>
+          </defs>
+          <rect x="30" y="12" width="260" height="50" fill="none" stroke="currentColor"/>
+          <text x="42" y="34" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Pre-commit hooks</text>
+          <text x="42" y="50" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">three repositories</text>
+          <line x1="160" y1="64" x2="160" y2="118" stroke="currentColor" stroke-dasharray="5 4" marker-end="url(#arrow-enforcement)"/>
+          <text x="170" y="95" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">would call</text>
+          <rect x="30" y="120" width="260" height="50" fill="none" stroke="currentColor"/>
+          <text x="42" y="142" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Contract checker</text>
+          <text x="42" y="158" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">scripts/check-docs</text>
+        </svg>
+        <figcaption>
+          Panel 2, the enforcement shape at the pin. Key: solid box &mdash; an
+          element that exists; dashed arrow &mdash; the one channel that does
+          not, so nothing fails a violation.
+        </figcaption>
+      </figure>
+    </div>
 
     <table>
       <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>pointer-only sites</td><td>frame</td><td>every site that holds rule text today, drawn as one set</td></tr>
-        <tr><td>workspace rule files</td><td>pointer-only site</td><td><code>docs/README.md</code> and <code>.claude/CLAUDE.md</code></td></tr>
-        <tr><td>parent templates</td><td>pointer-only site</td><td><code>docs/templates/</code> and <code>docs/components/</code></td></tr>
-        <tr><td>entry copies</td><td>pointer-only site</td><td><code>camera/docs/templates/</code> and <code>board/docs/templates/</code></td></tr>
-        <tr><td>defers to</td><td>edge, frame to constitution</td><td>the one-line pointer each site would carry instead of the rule</td></tr>
-        <tr><td><code>document-writer.md</code></td><td>the constitution</td><td><code>~/.claude/agents/document-writer.md</code>, holding every rule once</td></tr>
+        <tr><td>Constitution</td><td>file, exists</td><td><code>~/.claude/agents/document-writer.md</code>, with <code>templates/</code> and <code>components/</code> beside it</td></tr>
+        <tr><td>Pointer sites</td><td>set, exists</td><td><code>docs/README.md</code>, <code>.claude/CLAUDE.md</code>, <code>camera/docs/README.md</code>, <code>board/docs/INDEX.md</code></td></tr>
+        <tr><td>points at</td><td>edge</td><td>the one-line deference each pointer site carries instead of the rule</td></tr>
+        <tr><td>Pre-commit hooks</td><td>set, exists</td><td>the installed hooks in workspace, camera and board</td></tr>
+        <tr><td>Contract checker</td><td>file, exists</td><td><code>scripts/check-docs</code>, which parses the <code>json contract=docs</code> block</td></tr>
+        <tr><td>would call</td><td>edge, speculative</td><td>a pre-commit hook invoking the checker; drawn dashed because no hook does</td></tr>
       </tbody>
     </table>
 
-    <details>
-      <summary>Eight changes carry the recommendation; three are part-way, and only the first must land before any other</summary>
-      <table>
-        <thead><tr><th>#</th><th>Change</th><th>State at <code>b969155</code></th></tr></thead>
-        <tbody>
-          <tr><td>1</td><td><code>document-writer.md</code> absorbs the normative content of <code>README.md</code>: the two-kinds split, the three view doctypes, naming and catalogue rules, the pipeline, and a spec-rules section covering the five section shapes.</td><td>Open &mdash; the file carries procedure, style and guardrails only.</td></tr>
-          <tr><td>2</td><td><code>docs/README.md</code> shrinks to the two-kinds table, the <code>json contract=docs</code> block its readers parse, and one pointer at the agent definition.</td><td>Open &mdash; the file reached 181 lines.</td></tr>
-          <tr><td>3</td><td><code>.claude/CLAUDE.md</code> keeps one routing line and drops the naming restatement.</td><td>Open &mdash; line&nbsp;24 still carries the rule.</td></tr>
-          <tr><td>4</td><td>Templates demote to skeleton plus machine contract, and the contract gains per-shape <code>required-sections</code>.</td><td>Open &mdash; <code>spec.md</code>&rsquo;s contract still reads <code>required-sections: Purpose</code>.</td></tr>
-          <tr><td>5</td><td>Components demote to pure self-demonstration, their rule prose moving into the agent definition.</td><td>Open &mdash; 206 comment lines.</td></tr>
-          <tr><td>6</td><td><code>figure.html</code> gains a phone-frame demonstration and the numbered comes-from ledger for drawn options.</td><td>Part landed &mdash; the ledger rule sits in <code>proposal.html</code>; no phone frame exists.</td></tr>
-          <tr><td>7</td><td>Enforcement unifies: every entry&rsquo;s <code>pre-commit</code> calls the workspace checker, the writer keeps its write-time rubric report, and a proposal whose recommendation ships flips Status in the shipping commit.</td><td>Part landed &mdash; <code>scripts/check-docs</code> passes; no hook calls it, and nothing flips a Status, which is why this document still reads Open two systems later.</td></tr>
-          <tr><td>8</td><td>A child entry adopts the system by delegating its view writing to the writer and calling the shared checker, rather than by copying prose.</td><td>Part landed &mdash; the writer is user-level and reachable from every entry; 934 copied comment lines remain.</td></tr>
-        </tbody>
-      </table>
-      <p>Change&nbsp;7 is a call site rather than a rewrite: <code>scripts/check-docs</code>
-      states that it leaves &ldquo;everything the templates own&rdquo; alone, and
-      camera&rsquo;s <code>script/docs_chapters.py</code> owns exactly that half,
-      so the two do not overlap.</p>
-    </details>
+    <h3 id="remainder">Remainder</h3>
 
-    <p>The recommendation flips on either of two costs. The definition would
-    serve two audiences, so every writer invocation pays for spec-rules prose it
-    never uses &mdash; at 86 lines against 181 that is cheap, and if the spec
-    rules grow until the file reads as two documents, they split into a
-    spec-rules file the spec template points at.</p>
+    <p>Three pieces of the recommendation did not land, and none of the three
+    is decided here.</p>
 
-    <div class="callout gap">
-      <span class="tag">Not shown</span> The second cost arrived with
-      <code>b6bff78</code> and is not weighed anywhere. The constitution would
-      live in <code>~/.claude</code> while the documents live in the entries, so
-      no single commit can change a rule and the documents it governs together
-      &mdash; the property change&nbsp;1 was written to buy. Whether locality is
-      worth that is unrecorded, and this document does not decide it.
-    </div>
+    <ul>
+      <li><strong>Enforcement</strong> &mdash; the workspace hook is the
+        <code>no-main-commits</code> guard alone, camera&rsquo;s runs its own
+        <code>script/check-docs.py</code>, and board&rsquo;s checks staged
+        content for credentials, so <code>scripts/check-docs</code> is written
+        and never run.</li>
+      <li><strong>The shelf</strong> &mdash; of the five views in
+        <code>docs/</code>, only <code>agent-hooks.html</code> carries the
+        style layer, and the other four predate the kicker, the boxed
+        conclusion and the highlight; whether to re-render them is an open
+        owner decision.</li>
+      <li><strong>The templates</strong> &mdash; the plan had them demote to
+        skeleton plus machine contract, but they moved beside the constitution
+        instead and still carry 546 comment lines of rule prose, and whether
+        that relocation satisfies the plan is recorded nowhere.</li>
+    </ul>
 
-    <p>The smallest first step is one commit: rewrite
-    <code>~/.claude/agents/document-writer.md</code> to hold the rule set, and
-    shrink <code>docs/README.md</code> to the two-kinds table, the contract block
-    and a pointer. The remaining sites keep working as stale copies until the
-    phases below reach them, so nothing else has to move for that commit to
-    leave the system correct.</p>
+    <h2 id="omissions">Omissions</h2>
 
-    <h2 id="migration">Migration</h2>
+    <p>This document claims what the rules said, which option won, and what of
+    it exists at the pin; nothing else. Not shown, deliberately:</p>
 
-    <p>What is left to migrate is the rule sites rather than the documents. All
-    51 documents are already on the current contract and
-    <code>scripts/check-docs</code> passes over all three repositories at
-    <code>b969155</code>; the document phases landed at camera <code>140ac74</code>
-    and board <code>43358c0</code>. Backward compatibility is still not owed
-    (2026-08-02, owner decision, <code>docs/README.md</code>), so a site is
-    rewritten onto the constitution rather than kept readable both ways.</p>
+    <ul>
+      <li><strong>The pin&rsquo;s reach</strong> &mdash; the Commit field pins
+        <code>~/workspace</code>, which holds none of the constitution: the
+        definition, templates and components are tracked in
+        <code>~/.claude</code> at <code>1094fb2</code>, and the entry deletions
+        are camera <code>cf93d7f</code> (repository at <code>2e6eb36</code>)
+        and board <code>ce99e34</code> (repository at
+        <code>0631c01</code>).</li>
+      <li><strong>The acceptance record</strong> &mdash; Status reads Accepted
+        on the owner decision dated 2026-08-04 in <code>docs/README.md</code>,
+        not on a specification; <code>docs/INDEX.md</code> lists no
+        specification at all, so nothing normative records this outcome.</li>
+      <li><strong>Whether the checker passes</strong> &mdash; the checker was
+        read as a file and its callers were read as files; it was not run at
+        this pin, so only its lack of a caller is claimed here.</li>
+      <li><strong>The other shelves</strong> &mdash; the style-layer count
+        covers <code>~/workspace/docs/</code>; camera&rsquo;s and
+        board&rsquo;s own view shelves were not surveyed.</li>
+    </ul>
 
-    <table>
-      <thead><tr><th>Phase</th><th>What moves</th><th>Owner</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><strong>0 &mdash; constitution</strong></td>
-          <td>Changes&nbsp;1&ndash;7 over the five rule sites inside the workspace and <code>~/.claude</code>.</td>
-          <td>Workspace session</td>
-        </tr>
-        <tr>
-          <td><strong>4 &mdash; entry copies</strong></td>
-          <td>Change&nbsp;8 over the eight template copies the adoption added, each keeping only what its entry adds.</td>
-          <td>Entry sessions</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="callout gap">
-      <span class="tag">Not shown</span> Phase&nbsp;0&rsquo;s exit criterion no
-      longer discriminates. The plan set it as the contract checker passing over
-      <code>workspace/docs</code>; the checker passes at <code>b969155</code>
-      with the phase not started, so a tree the phase has never touched already
-      satisfies it. What replaces it is recorded nowhere.
-    </div>
-
-    <p>The two phases split the seven rule sites five to two along the
-    repository boundary, and that split is the plan&rsquo;s own check: a phase
-    that finishes with a rule still written in two places has not finished.</p>
   </section>
 
   <footer class="sources">
     <h2 id="sources">Sources</h2>
     <ul>
-      <li>The previous revision of this document, rendered at <code>6c5ef3d</code></li>
-      <li><code>docs/README.md</code>; <code>docs/INDEX.md</code>; <code>docs/templates/</code>; <code>docs/components/</code></li>
-      <li><code>.claude/CLAUDE.md</code>; <code>scripts/check-docs</code>; <code>.git/hooks/pre-commit</code></li>
-      <li><code>~/.claude/agents/document-writer.md</code>, at <code>~/.claude</code> <code>ed5b25f</code></li>
-      <li><code>camera/docs/README.md</code>; <code>camera/docs/templates/</code>; <code>camera/script/check-docs.py</code>; <code>camera/script/docs_chapters.py</code>; <code>camera/hooks/pre-commit</code></li>
-      <li><code>board/docs/INDEX.md</code>; <code>board/docs/templates/</code>; <code>board/hooks/pre-commit</code></li>
+      <li>The previous revision of this document, rendered at <code>b969155</code></li>
+      <li><code>~/.claude/agents/document-writer.md</code>, with <code>templates/</code> and <code>components/</code>, at <code>~/.claude</code> <code>1094fb2</code></li>
+      <li>Owner decisions, 2026-08-04: the document system moves into the writer constitution (<code>docs/README.md</code>); the header carries no dek and no notice callout, and every section heading is a noun phrase (<code>~/.claude</code> <code>1094fb2</code>)</li>
+      <li><code>docs/README.md</code>; <code>docs/INDEX.md</code>; <code>.claude/CLAUDE.md</code>; <code>scripts/check-docs</code>; <code>.git/hooks/pre-commit</code></li>
+      <li><code>camera/docs/README.md</code>; <code>camera/hooks/pre-commit</code>; <code>board/docs/</code>; <code>board/hooks/pre-commit</code></li>
     </ul>
   </footer>
 

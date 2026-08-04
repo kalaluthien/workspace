@@ -40,7 +40,8 @@ Template: `~/.claude/agents/document-writer/templates/guide.html`
 
 Template: `~/.claude/agents/document-writer/templates/proposal.html`
 
-- [`agent-document-writing.html`](agent-document-writing.html) — move the
-  document system's rules out of the six files that restate them and into
-  the `document-writer` agent's own definition, with a shared contract
-  checker and a phased migration of every document; Open.
+- [`agent-document-writing.html`](agent-document-writing.html) — moving the
+  document system's rules out of the seven sites that restated them into the
+  `document-writer` agent's own definition: the options, why locality decided
+  it, and the enforcement and re-render work the shipped move left behind;
+  Accepted 2026-08-04.
