@@ -20,6 +20,9 @@ Template: `~/.claude/agents/document-writer/templates/explanation.html`
   of Claude configuration (instruction, rule, skill, agent, memory) lives
   across the global, workspace, and project scopes, and what routes it
   there.
+- [`agent-memtypes.html`](agent-memtypes.html) — the memory-file kinds
+  read from one question — what would make this file wrong — and the
+  three lifecycle classes and five filename prefixes that answer admits.
 
 ## Guides
 
