@@ -37,8 +37,6 @@
     th, td { min-width: 9rem; }
   }
   .kicker { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: #666; margin: 0 0 .6rem; }
-  .dek { font-size: 1rem; color: #333; margin: 0 0 1rem; }
-  .dek .pin { display: block; margin-top: .25rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .78rem; color: #666; }
   .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
   .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
   .provenance dd { margin: 0; }
@@ -80,10 +78,6 @@
   <header>
     <p class="kicker">workspace &middot; agents &middot; hooks</p>
     <h1>Hooks</h1>
-    <p class="dek">Every automatic check that fires around a working session
-      here, and which of the two layers — the Claude Code harness or git —
-      owns it.
-      <span class="pin">~/workspace at 9459de7 &middot; ~/.claude at a1eda25</span></p>
     <dl class="provenance">
       <dt>Doctype</dt>  <dd>explanation</dd>
       <dt>Question</dt> <dd>what hooks run around a working session, which layer owns each, and what does each guard? (runtime view)</dd>
@@ -94,17 +88,7 @@
 
   <section>
 
-    <div class="callout notice">
-      <span class="tag">Note</span>
-      The Commit field pins <code>~/workspace</code>, the tree this view lives
-      in, but no hook source is in it: the harness hooks and the shared git
-      guard are tracked in another repository, <code>~/.claude</code> at
-      <code>a1eda25</code>, and the per-repository wiring under
-      <code>.git/</code> is version-controlled nowhere — it was walked on
-      2026-08-04.
-    </div>
-
-    <h2 id="answer">0. Answer</h2>
+    <h2 id="answer">Answer</h2>
 
     <div class="box">
       <span class="label">Conclusion</span>
@@ -199,7 +183,7 @@
       </tbody>
     </table>
 
-    <h2 id="layers">1. Which layer owns a hook?</h2>
+    <h2 id="layers">Layer ownership</h2>
 
     <div class="box">
       <span class="label">Conclusion</span>
@@ -228,7 +212,7 @@
       </tbody>
     </table>
 
-    <h2 id="harness">2. What does each harness hook guard?</h2>
+    <h2 id="harness">Harness hooks</h2>
 
     <div class="box">
       <span class="label">Conclusion</span>
@@ -256,7 +240,7 @@
       </tbody>
     </table>
 
-    <h2 id="git">3. What does each git hook guard?</h2>
+    <h2 id="git">Git hooks</h2>
 
     <div class="box">
       <span class="label">Conclusion</span>
@@ -371,6 +355,11 @@
     <p>The figures and tables claim which hooks are installed, who owns each,
       and what each refuses; nothing else. Not shown, deliberately:</p>
     <ul>
+      <li><strong>The pin's reach</strong> — the Commit field pins
+        <code>~/workspace</code>, which holds no hook source: the harness
+        hooks and the shared guard are tracked in <code>~/.claude</code> at
+        <code>a1eda25</code>, and the per-repository wiring under
+        <code>.git/</code> is version-controlled nowhere.</li>
       <li><strong>Inside the chained hooks</strong> — the last column of the
         repository table names what each adds in one line; the checks
         themselves belong to those repositories' own documents.</li>
