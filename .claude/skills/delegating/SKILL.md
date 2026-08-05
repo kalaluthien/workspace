@@ -128,6 +128,12 @@ bookkeeping:
    waits on someone. A session that ends with the marker still `[/]` leaves a
    card that reads as running forever.
 
+When the orchestrator collects a board-dispatched session, it checks the
+item's marker before reporting: a delegate can ship the work, print its
+sentinel, and still leave the row `[/]`. Close the item yourself then — the
+work is verified by the report you just read, and re-asking the session costs
+a round-trip for one line.
+
 ## Worked example — "add object detection to camera"
 1. Not workspace-level work → this skill. Route: research → `notes`,
    implementation → `camera`.
