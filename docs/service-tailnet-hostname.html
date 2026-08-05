@@ -35,9 +35,23 @@
     table { display: block; overflow-x: auto; }
     th, td { min-width: 9rem; }
   }
+  .kicker { font-variant: small-caps; letter-spacing: .14em; font-size: .78rem; color: #555; margin: 0 0 .3rem; }
   .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
   .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
   .provenance dd { margin: 0; }
+  .conclusion { border: 1px solid #111; padding: .9rem 1.1rem .95rem; margin: 1.2rem 0 1.6rem; }
+  .conclusion .tag { display: block; font-variant: small-caps; letter-spacing: .09em; font-weight: 600; font-size: .76rem; color: #555; margin-bottom: .5rem; }
+  .conclusion p { margin: .55rem 0; font-size: .95rem; }
+  .conclusion p:first-of-type { margin-top: 0; }
+  .conclusion p:last-child { margin-bottom: 0; }
+  mark { background: #ffe89a; color: inherit; padding: 0 .12em; }
+  .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.25rem; height: 1.25rem;
+    border: 1px solid #111; border-radius: 50%;
+    background: #ffffff; color: #111;
+    font-size: .72rem; font-weight: 700; line-height: 1;
+  }
   .callout { border: 1px solid #ccc; border-left-width: 4px; padding: .55rem .9rem; margin: 1.2rem 0; font-size: .88rem; line-height: 1.5; }
   .callout .tag { font-variant: small-caps; letter-spacing: .06em; font-weight: 600; margin-right: .45rem; }
   .callout.notice   { border-left-color: #556; }
@@ -48,12 +62,20 @@
   details { border: 1px solid #e4e4e4; padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
   details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
   details[open] summary { margin-bottom: .5rem; }
-  figure { margin: 2.2rem 0; }
+  figure { margin: 2rem 0; }
   figure svg { display: block; width: 100%; height: auto; }
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
-  ol.steps { padding-left: 1.6rem; }
-  ol.steps > li { margin: 1.3rem 0; }
-  ol.steps > li::marker { font-weight: 700; }
+  ol.steps { list-style: none; padding-left: 0; margin: 1.4rem 0; counter-reset: step; }
+  ol.steps > li { position: relative; padding-left: 2.5rem; margin: 2rem 0; counter-increment: step; }
+  ol.steps > li::before {
+    content: counter(step);
+    position: absolute; left: 0; top: .15rem;
+    display: flex; align-items: center; justify-content: center;
+    width: 1.55rem; height: 1.55rem;
+    border: 1px solid #111; border-radius: 50%;
+    background: #ffffff; color: #111;
+    font-size: .82rem; font-weight: 700; line-height: 1;
+  }
   footer.sources { margin-top: 4rem; border-top: 1px solid #e4e4e4; padding-top: 1rem; font-size: .85rem; color: #555; }
   footer.sources h2 { font-size: .8rem; margin: 0 0 .3rem; font-variant: small-caps; letter-spacing: .06em; font-weight: 600; }
   footer.sources ul { margin: 0; padding-left: 1.1rem; }
@@ -64,24 +86,49 @@
 <article>
 
   <header>
+    <p class="kicker">workspace · services · tailnet hostname</p>
     <h1>Tailnet hostname</h1>
     <dl class="provenance">
       <dt>Doctype</dt> <dd>guide</dd>
       <dt>Goal</dt>    <dd>A service reachable at <code>https://&lt;name&gt;.&lt;tailnet&gt;.ts.net</code> on its own tailnet node, installable on a phone beside every other service, with no handler left on the machine node.</dd>
-      <dt>Updated</dt> <dd>2026-08-04</dd>
+      <dt>Updated</dt> <dd>2026-08-05</dd>
       <dt>Commit</dt>  <dd>3e3d22f</dd>
     </dl>
   </header>
 
   <section>
+    <h2 id="answer">Answer</h2>
+    <div class="conclusion">
+      <span class="tag">conclusion</span>
+      <p><span class="badge">1</span> &middot; <strong>One node per service.</strong>
+      A node carries exactly one <code>*.ts.net</code> name, and a phone matches
+      an installed web app by scheme and host while ignoring the port, so
+      <mark>a second service needs a second node</mark>, never a second port.</p>
+      <p><span class="badge">2</span> &middot; <strong>A sidecar container is that node.</strong>
+      One <code>tailscale/tailscale</code> container per service holds the name
+      and proxies <code>:443</code> to the service&#39;s existing host port;
+      <mark>it publishes the service, it never starts it</mark>.</p>
+      <p><span class="badge">3</span> &middot; <strong>Verify before retiring.</strong>
+      The new hostname must answer <code>HTTP/2 200</code> before the machine
+      node&#39;s old mount comes off, <mark>one named port at a time</mark> —
+      <code>tailscale serve reset</code> wipes every other service&#39;s handler
+      with it.</p>
+      <p><span class="badge">4</span> &middot; <strong>The node is not the last step.</strong>
+      The service&#39;s own hostname setting moves into its launch path, and
+      <mark>the phone app is reinstalled from the new URL</mark>, because an
+      installed app belongs to the origin it was installed from.</p>
+    </div>
+
     <details>
-      <summary>One node per service — two ports on one node cannot both be installed as phone apps</summary>
+      <summary>Two ports on one node cannot both be installed as phone apps — the collision is in the name, not the port</summary>
       <p>
-        A node carries exactly one <code>*.ts.net</code> name: no alias, no
+        A node carries one <code>*.ts.net</code> name with no alias and no
         custom MagicDNS record, and <code>tailscale cert</code> is bound to the
-        node&#39;s own domains. Android matches an installed web app by scheme and
-        host while ignoring the port, so the app installed first claims the
-        second service&#39;s URL.
+        node&#39;s own domains. Android matches an installed web app by scheme
+        and host and ignores the port, so the app installed first claims the
+        second service&#39;s URL — an installed app on <code>:443</code> claimed
+        a second service on <code>:8443</code>, and Chrome offered &quot;open&quot;
+        in the menu slot where &quot;install app&quot; belongs.
       </p>
     </details>
 
@@ -89,7 +136,7 @@
     <ul>
       <li>colima running with the docker CLI, per the <code>setup-colima</code> memory.</li>
       <li>The service already answering on a host loopback port such as <code>127.0.0.1:8300</code> — the sidecar publishes it, never starts it.</li>
-      <li>MagicDNS and HTTPS certificates enabled for the tailnet, per <code>notes/wiki/tailscale.md</code>, or the node hangs on certificate provisioning.</li>
+      <li>MagicDNS and HTTPS certificates enabled for the tailnet in the admin console — a tailnet-level setting, not a container variable, per <code>notes/wiki/tailscale.md</code>.</li>
       <li>A <strong>reusable, non-ephemeral</strong> auth key written by the owner to <code>~/.config/ts-sidecar/authkey</code>, mode 600 — an ephemeral key deletes the identity the node exists to hold.</li>
     </ul>
 
@@ -100,6 +147,7 @@
         since the name becomes the hostname.</p>
 <pre>app=board          # → board.&lt;tailnet&gt;.ts.net
 port=8300          # the service&#39;s existing host port
+tailnet=…          # the tailnet&#39;s MagicDNS suffix, as on any existing node
 
 mkdir -p ~/.config/ts-sidecar/$app
 cat &gt; ~/.config/ts-sidecar/$app/serve.json &lt;&lt;JSON
@@ -112,11 +160,42 @@ cat &gt; ~/.config/ts-sidecar/$app/serve.json &lt;&lt;JSON
   }
 }
 JSON</pre>
+
+        <figure id="fig-proxy-path">
+          <svg viewBox="0 0 320 200" role="img">
+            <title>The proxy target crosses the colima VM boundary: the sidecar container reaches the macOS loopback service through host.docker.internal</title>
+            <defs>
+              <marker id="arrow-proxy-path" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+              </marker>
+            </defs>
+            <rect x="10" y="12" width="210" height="76" fill="none" stroke="currentColor" opacity=".45"/>
+            <text x="18" y="26" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".6">colima vm</text>
+            <rect x="24" y="34" width="182" height="46" fill="none" stroke="currentColor"/>
+            <text x="34" y="54" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">sidecar node</text>
+            <text x="34" y="70" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">container · :443</text>
+            <line x1="115" y1="88" x2="115" y2="118" stroke="currentColor" marker-end="url(#arrow-proxy-path)"/>
+            <text x="125" y="107" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor">host.docker.internal</text>
+            <rect x="10" y="118" width="210" height="76" fill="none" stroke="currentColor" opacity=".45"/>
+            <text x="18" y="132" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".6">macos host</text>
+            <rect x="24" y="140" width="182" height="46" fill="none" stroke="currentColor"/>
+            <text x="34" y="160" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">service</text>
+            <text x="34" y="176" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">127.0.0.1:8300</text>
+          </svg>
+          <figcaption>
+            Deployment view of the proxy target written above, two namespaces.
+            Key: thin frame — a network namespace; solid box — a running
+            process, its second line the address it listens on; arrow — the one
+            HTTP channel, labelled with the name that resolves across the
+            boundary.
+          </figcaption>
+        </figure>
+
         <div class="callout notice">
           <span class="tag">notice</span>
-          <code>host.docker.internal</code> is what reaches a macOS
-          loopback-only bind under colima; <code>--network host</code> means the
-          Linux VM and would not reach the service.
+          <code>--network host</code> would place the proxy in the Linux VM
+          rather than on the Mac, and from there a <code>127.0.0.1</code>-only
+          bind is unreachable.
         </div>
       </li>
 
@@ -140,7 +219,9 @@ JSON</pre>
             <li>Consequence: the node registers as ephemeral, so it is deleted
             when the container stops and the replacement can hold
             <code>&lt;name&gt;-1</code> permanently; the certificates live there
-            too, so every restart re-issues from Let&#39;s Encrypt.</li>
+            too, so every restart re-issues from Let&#39;s Encrypt into the
+            duplicate-certificate limit, which resets at about one per 34
+            hours.</li>
             <li>Avoidance: set it and bind-mount a host directory onto it, both
             as shown above.</li>
           </ul>
@@ -152,7 +233,8 @@ JSON</pre>
             reads the key from a path, <code>TS_SERVE_CONFIG</code> is the only
             serve mechanism, and the mount is the directory holding
             <code>serve.json</code> rather than the file, because the watch is
-            on the directory.
+            on the directory and a bind-mounted file&#39;s inode is replaced on
+            edit.
           </p>
         </details>
       </li>
@@ -162,17 +244,15 @@ JSON</pre>
         allowing up to a minute for the first certificate.</p>
 <pre>docker logs "ts-$app" | tail -20
 tailscale status | grep "$app"
-curl -sI "https://$app.$(tailscale status --json | /usr/bin/python3 -c \
-  &#39;import json,sys; print(json.load(sys.stdin)["Self"]["DNSName"].rstrip(".").split(".", 1)[1])&#39;)/" | head -1</pre>
+curl -sI "https://$app.$tailnet.ts.net/" | head -1</pre>
         <p>A working run prints <code>HTTP/2 200</code> and a status line
         carrying exactly the chosen name, with no <code>-1</code> suffix.</p>
       </li>
 
       <li>
-        <p>Move the service&#39;s Host-header allowlist onto the node name,
-        deriving it from that name plus the tailnet suffix — the machine node&#39;s
-        <code>Self.DNSName</code> re-pins the retired name and answers 400 to
-        every phone request.</p>
+        <p>Move the service&#39;s own hostname setting onto the node name,
+        deriving it from that name plus the tailnet suffix, or the service
+        rejects requests arriving at the new origin.</p>
         <p>Where the setting lives differs per service, so the move is done when
         the derived value sits in the service&#39;s launch path rather than in a
         shell one-off the next deploy undoes.</p>
@@ -221,24 +301,34 @@ tailscale status | grep "$app"</pre>
     </ol>
 
     <h2 id="acceptance">Acceptance</h2>
-    <p>
-      Each service answers 200 at its own
-      <code>https://&lt;name&gt;.&lt;tailnet&gt;.ts.net</code>, the machine
-      node&#39;s <code>tailscale serve status</code> reports no configuration for
-      it, both names survive a container restart, and each app installs from the
-      phone on its own.
-    </p>
+    <div class="conclusion">
+      <span class="tag">conclusion</span>
+      <p><span class="badge">1</span> &middot; <strong>Its own name.</strong>
+      Each service answers <code>HTTP/2 200</code> at
+      <code>https://&lt;name&gt;.&lt;tailnet&gt;.ts.net</code>, and
+      <mark>the machine node reports no configuration for the retired port</mark>.</p>
+      <p><span class="badge">2</span> &middot; <strong>Its own identity.</strong>
+      Both names come back from a container restart <mark>with no
+      <code>-1</code> suffix</mark>.</p>
+      <p><span class="badge">3</span> &middot; <strong>Its own app.</strong>
+      <mark>Each service installs on the phone on its own</mark>, from its own
+      hostname.</p>
+    </div>
 
     <h2 id="recovery">Recovery</h2>
-    <p>The record does not mark which of these the walk itself hit, and a cell
-    reading &quot;not recorded&quot; is a gap in the record rather than an absent
-    failure.</p>
+    <div class="callout gap">
+      <span class="tag">gap</span>
+      The walk kept no per-step failure record, so a cell reading &quot;not
+      recorded&quot; below is a hole in the record rather than a failure that
+      did not happen.
+    </div>
     <table>
       <tr><th>Symptom</th><th>Cause</th><th>Way back</th></tr>
       <tr>
         <td>400 rather than 200, usually after a redeploy, node up and correctly
         named</td>
-        <td>The host allowlist fell back to the machine FQDN</td>
+        <td>The service&#39;s host allowlist fell back to the machine node&#39;s
+        own FQDN</td>
         <td>Fix the derivation in the launch script and redeploy; a hand-set
         value fails again next deploy</td>
       </tr>
@@ -268,7 +358,9 @@ tailscale status | grep "$app"</pre>
     <ul>
       <li><code>~/workspace/.claude/rules/services.md</code></li>
       <li>memory <code>setup-tailnet-services</code></li>
+      <li>memory <code>setup-colima</code></li>
       <li>knowledge: <code>~/workspace/notes/wiki/tailscale-in-containers.md</code></li>
+      <li>knowledge: <code>~/workspace/notes/wiki/tailscale.md</code></li>
     </ul>
   </footer>
 

@@ -21,12 +21,13 @@
   h3 { font-size: 1rem; margin: 2rem 0 .3rem; font-weight: 700; }
   p, li { margin: .6rem 0; }
   ul, ol { padding-left: 1.2rem; }
-  a { color: inherit; text-decoration-color: #aaa; }
+  a { color: #14539a; text-decoration-color: #9bb8d6; }
   strong { font-weight: 700; }
   code, pre, .provenance dd {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: .85em;
   }
+  code { color: #14539a; }
   pre { overflow-x: auto; background: #f4f4f4; padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
   table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
   th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
@@ -35,16 +36,47 @@
     table { display: block; overflow-x: auto; }
     th, td { min-width: 9rem; }
   }
+  .kicker {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .16em;
+    color: #555;
+    margin: 0 0 .5rem;
+  }
   .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
   .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
   .provenance dd { margin: 0; }
-  .callout { border: 1px solid #ccc; border-left-width: 4px; padding: .55rem .9rem; margin: 1.2rem 0; font-size: .88rem; line-height: 1.5; }
-  .callout .tag { font-variant: small-caps; letter-spacing: .06em; font-weight: 600; margin-right: .45rem; }
-  .callout.notice   { border-left-color: #556; }
-  .callout.gap      { border-left-color: #8a5a00; }
-  .callout.warning  { border-left-color: #a33; }
-  .callout.recovery { border-left-color: #2a6; }
-  .callout ul { margin: .3rem 0; }
+  /* Boxed conclusion: the answer of the section it opens, as numbered
+     statements; <mark> carries the load-bearing phrases, and the numerals
+     key the section's figure. */
+  .conclusion { border: 1px solid #111; padding: .85rem 1.1rem .95rem; margin: 1.1rem 0 1.6rem; }
+  .conclusion .tag {
+    display: block;
+    font-variant: small-caps;
+    letter-spacing: .09em;
+    font-weight: 600;
+    font-size: .78rem;
+    color: #555;
+    margin-bottom: .3rem;
+  }
+  .conclusion p { margin: .5rem 0 0; font-size: .95rem; }
+  .badge {
+    display: inline-block;
+    width: 1.2rem;
+    height: 1.2rem;
+    line-height: 1.1rem;
+    border: 1px solid #111;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #111;
+    font-size: .72rem;
+    font-weight: 700;
+    text-align: center;
+    margin-right: .4rem;
+  }
+  mark { background: #ffef9e; color: inherit; padding: 0 .12em; }
+  /* Red, dashed: what was cut from the taxonomy. */
+  .cut { color: #a33; border-bottom: 1px dashed #a33; }
   details { border: 1px solid #e4e4e4; padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
   details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
   details[open] summary { margin-bottom: .5rem; }
@@ -67,77 +99,91 @@
 <article>
 
   <header>
+    <p class="kicker">workspace · memory pools · memtypes</p>
     <h1>Memtypes</h1>
     <dl class="provenance">
       <dt>Doctype</dt>  <dd>explanation</dd>
-      <dt>Question</dt> <dd>what kinds of memory files exist, and what keeps the set MECE? (concept view)</dd>
-      <dt>Updated</dt>  <dd>2026-08-04</dd>
-      <dt>Commit</dt>   <dd>3786aa7</dd>
+      <dt>Question</dt> <dd>what kinds of memory file exist, and what keeps the set MECE? (concept view)</dd>
+      <dt>Updated</dt>  <dd>2026-08-05</dd>
+      <dt>Commit</dt>   <dd>b7e531b</dd>
     </dl>
   </header>
 
   <section>
 
-    <p>A memory file's kind — its <strong>memtype</strong> — is read from one
-    question, what would make this file wrong, and the five answers that
-    question admits are the whole set, so every file in the live pools carries
-    exactly one.</p>
+    <h2 id="answer">Answer</h2>
 
-    <div class="callout notice">
-      <span class="tag">Note</span>
-      The Commit field pins <code>~/workspace</code>, the tree this view is
-      written in; the schema it renders lives in another repository,
-      <code>~/.claude</code> at <code>8c78a4e</code>, and the pools it counts
-      are version-controlled nowhere — that repository's <code>.gitignore</code>
-      ignores <code>/*</code> and tracks zero files under
-      <code>projects/</code>.
+    <div class="conclusion">
+      <span class="tag">Conclusion</span>
+      <p><span class="badge">1</span><strong>Falsifier.</strong> A memory file's
+        kind is read from one question — <mark>what would make this file
+        wrong</mark> — so the taxonomy divides on a single axis and every file in
+        the live pools lands on exactly one branch of it.</p>
+      <p><span class="badge">2</span><strong>Episodic.</strong> Nothing falsifies a
+        record of what already happened, so <code>history-</code> is
+        <mark>append-only</mark> and never rewritten.</p>
+      <p><span class="badge">3</span><strong>Semantic.</strong>
+        <code>backlog</code> and <code>profile-</code> assert a state the world
+        can move, so both are <mark>updated in place</mark>.</p>
+      <p><span class="badge">4</span><strong>Procedural.</strong>
+        <code>setup-</code> and <code>feedback-</code> instruct how to act, so
+        both are updated in place and <mark>deleted when the tool is
+        gone</mark>.</p>
     </div>
 
     <figure id="fig-axis" class="pan">
       <svg viewBox="0 0 480 240" role="img" style="min-width:480px">
-        <title>One question, three lifecycle classes, and the five filename prefixes they admit</title>
+        <title>One question, the three lifecycle classes it splits into, and the five filename prefixes those classes admit</title>
         <defs>
           <marker id="arrow-memtypes" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
             <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
           </marker>
         </defs>
 
-        <rect x="160" y="10" width="160" height="46" fill="none" stroke="currentColor"/>
-        <text x="172" y="34" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Falsifier</text>
-        <text x="172" y="50" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">what makes it wrong</text>
+        <rect x="160" y="14" width="160" height="48" fill="none" stroke="currentColor"/>
+        <circle cx="184" cy="14" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="184" y="14" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">1</text>
+        <text x="176" y="48" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Falsifier</text>
 
-        <path d="M180,56 V100 H72 V158" fill="none" stroke="currentColor" marker-end="url(#arrow-memtypes)"/>
-        <text x="126" y="90" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">nothing</text>
+        <path d="M200,62 V96 H76 V168" fill="none" stroke="currentColor" marker-end="url(#arrow-memtypes)"/>
+        <text x="138" y="84" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">nothing</text>
 
-        <path d="M240,56 V158" fill="none" stroke="currentColor" marker-end="url(#arrow-memtypes)"/>
-        <text x="252" y="120" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">the world</text>
-        <text x="252" y="134" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">moves</text>
+        <path d="M240,62 V168" fill="none" stroke="currentColor" marker-end="url(#arrow-memtypes)"/>
+        <text x="232" y="126" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">the world</text>
+        <text x="232" y="139" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">moves</text>
 
-        <path d="M300,56 V100 H408 V158" fill="none" stroke="currentColor" marker-end="url(#arrow-memtypes)"/>
-        <text x="360" y="78" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">the tool</text>
-        <text x="360" y="90" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">changes</text>
+        <path d="M280,62 V116 H404 V168" fill="none" stroke="currentColor" marker-end="url(#arrow-memtypes)"/>
+        <text x="350" y="92" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">the tool</text>
+        <text x="350" y="104" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">changes</text>
 
-        <rect x="10" y="160" width="124" height="56" fill="none" stroke="currentColor"/>
-        <text x="22" y="186" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Episodic</text>
-        <text x="22" y="204" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">history-</text>
+        <rect x="8" y="170" width="136" height="58" fill="none" stroke="currentColor"/>
+        <circle cx="32" cy="170" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="32" y="170" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">2</text>
+        <text x="20" y="200" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Episodic</text>
+        <text x="20" y="216" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">history-</text>
 
-        <rect x="178" y="160" width="124" height="56" fill="none" stroke="currentColor"/>
-        <text x="190" y="186" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Semantic</text>
-        <text x="190" y="204" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">backlog, profile-</text>
+        <rect x="172" y="170" width="136" height="58" fill="none" stroke="currentColor"/>
+        <circle cx="196" cy="170" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="196" y="170" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">3</text>
+        <text x="184" y="200" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Semantic</text>
+        <text x="184" y="216" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">backlog, profile-</text>
 
-        <rect x="346" y="160" width="124" height="56" fill="none" stroke="currentColor"/>
-        <text x="358" y="186" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Procedural</text>
-        <text x="358" y="204" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">setup-, feedback-</text>
+        <rect x="336" y="170" width="136" height="58" fill="none" stroke="currentColor"/>
+        <circle cx="360" cy="170" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="360" y="170" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">4</text>
+        <text x="348" y="200" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Procedural</text>
+        <text x="348" y="216" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">setup-, feedback-</text>
       </svg>
       <figcaption>
         Static structure, the memtype axis declared in
-        <code>~/.claude/CLAUDE.md</code> &sect;Filing at <code>8c78a4e</code>;
-        480 viewBox units, so the figure pans instead of shrinking. Key: top
-        box — the one question a file's kind is read from; lower box — one
+        <code>~/.claude/CLAUDE.md</code> &sect;Filing; 480 viewBox units, so the
+        figure pans instead of shrinking. Key: numbered badge — the statement of
+        the same number in <a href="#answer">the answer</a>; top box — the one
+        question a file's kind is read from; lower box — one
         <code>metadata.type</code> class, under it the filename prefixes that
         class admits; arrow — one answer to the question, labelled with what
-        falsifies a file in that class. No element is dashed: every part exists
-        at the pinned commits.
+        falsifies a file on that branch. Nothing is dashed: every part exists at
+        the pinned commits.
       </figcaption>
     </figure>
 
@@ -146,43 +192,59 @@
       <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
       <tbody>
         <tr><td>Falsifier</td><td>routing question</td><td>the single axis the taxonomy divides on: what would make this file wrong</td></tr>
-        <tr><td>Episodic</td><td><code>metadata.type</code> class</td><td>append-only — a file of this class is never rewritten, only extended</td></tr>
-        <tr><td>Semantic</td><td><code>metadata.type</code> class</td><td>updated in place when what the file states stops being true</td></tr>
-        <tr><td>Procedural</td><td><code>metadata.type</code> class</td><td>updated in place, and deleted outright when the tool or practice it describes is gone</td></tr>
-        <tr><td>nothing</td><td>answer edge</td><td>no later event can falsify the file, because it records what already happened</td></tr>
-        <tr><td>the world moves</td><td>answer edge</td><td>the state the file asserts — live work, an owner preference — has changed</td></tr>
-        <tr><td>the tool changes</td><td>answer edge</td><td>the tool, environment, or practice the file instructs about has changed</td></tr>
+        <tr><td>Episodic</td><td><code>metadata.type</code> value</td><td>the class of files that record what happened</td></tr>
+        <tr><td>Semantic</td><td><code>metadata.type</code> value</td><td>the class of files that state what is true</td></tr>
+        <tr><td>Procedural</td><td><code>metadata.type</code> value</td><td>the class of files that state how to act</td></tr>
+        <tr><td>nothing</td><td>answer edge</td><td>the branch taken when no later event can falsify the file</td></tr>
+        <tr><td>the world moves</td><td>answer edge</td><td>the branch taken when the state the file asserts — live work, an owner preference — can change</td></tr>
+        <tr><td>the tool changes</td><td>answer edge</td><td>the branch taken when the tool, environment, or practice the file instructs about can change</td></tr>
       </tbody>
     </table>
 
     <h2 id="discriminators">Discriminators</h2>
-    <p>The falsifier separates the three classes of
-    <a href="#fig-axis">the memtype axis</a>, and inside each class that holds a
-    pair it separates again: <code>backlog</code> from <code>profile-</code> by
-    whether the file is about work or about the owner, and <code>setup-</code>
-    from <code>feedback-</code> by what losing the file costs.</p>
+
+    <div class="conclusion">
+      <span class="tag">Conclusion</span>
+      <p><span class="badge">1</span><strong>Work or owner.</strong> Semantic
+        splits on what the file is about — <code>backlog</code> holds the pool's
+        live work and <code>profile-</code> holds who the owner is — so
+        <mark>closing the work deletes an item</mark> while a changed preference
+        only rewrites a line.</p>
+      <p><span class="badge">2</span><strong>Cost of loss.</strong> Procedural
+        splits on what losing the file costs: a <code>setup-</code> fact is
+        <mark>re-derivable by probing the tool</mark>, while a
+        <code>feedback-</code> rule was <mark>bought with an observed
+        failure</mark> and losing it repeats that failure.</p>
+    </div>
 
     <table>
-      <thead><tr><th>Memtype</th><th>Holds</th><th>Wrong when</th></tr></thead>
+      <thead><tr><th>Memtype</th><th>Holds</th><th>Lifecycle</th></tr></thead>
       <tbody>
-        <tr><td><code>history-</code></td><td>what version control cannot see: changes to unversioned things, and rejected options with their kill reasons</td><td>never — nothing falsifies it, so it only grows</td></tr>
-        <tr><td><code>backlog</code></td><td>the pool's live work, one file per pool</td><td>the work closes; done is deletion, and no done marker exists</td></tr>
-        <tr><td><code>profile-</code></td><td>who the owner is: a standing preference that outlives any task</td><td>the owner's preference changes</td></tr>
-        <tr><td><code>setup-</code></td><td>one tool's or environment's own facts</td><td>the tool changes; the fact is re-derivable, so losing it costs one probe</td></tr>
-        <tr><td><code>feedback-</code></td><td>a rule bought with an observed failure</td><td>the practice that bought it is gone; the rule is not re-derivable, so losing it repeats the failure</td></tr>
+        <tr><td><code>history-</code></td><td>what version control cannot see: changes to unversioned things, and rejected options with their kill reasons</td><td>extended, never rewritten</td></tr>
+        <tr><td><code>backlog</code></td><td>the pool's live work, one file per pool</td><td>an item is deleted when it closes, and no done marker exists</td></tr>
+        <tr><td><code>profile-</code></td><td>who the owner is: a standing preference that outlives any task</td><td>rewritten when the preference changes</td></tr>
+        <tr><td><code>setup-</code></td><td>one tool's or environment's own facts</td><td>deleted when the tool or fact is gone</td></tr>
+        <tr><td><code>feedback-</code></td><td>a rule bought with an observed failure</td><td>deleted when the practice is gone</td></tr>
       </tbody>
     </table>
 
-    <h2 id="pool-independence">Pool independence</h2>
-    <p>A memtype fixes a file's lifecycle and never its pool, which is chosen
-    by scope instead — global for a machine-wide fact, workspace for what
-    coordinates several projects, a project pool for what only that project
-    touches. <code>setup-</code> is the case that shows the two axes are
-    independent, carrying thirteen machine-wide facts in the global pool and
-    one file each in the workspace, camera, and notes pools.</p>
+    <h2 id="independence">Independence</h2>
+
+    <div class="conclusion">
+      <span class="tag">Conclusion</span>
+      <p><span class="badge">1</span><strong>Two axes.</strong> A memtype fixes a
+        file's <mark>lifecycle and never its pool</mark>, which the Filing routes
+        pick by scope instead — global for a machine-wide fact, workspace for
+        what coordinates several projects, a project pool for what only that
+        project touches.</p>
+      <p><span class="badge">2</span><strong>The crossing.</strong> One memtype
+        settles nothing about location: <code>setup-</code> alone carries
+        <mark>16 of the 25 files</mark> and spans <mark>four of the six
+        pools</mark>.</p>
+    </div>
 
     <details>
-      <summary>All 25 files across six pools carry one of the five prefixes, and each file's <code>metadata.type</code> matches its prefix's row (census, walked 2026-08-04)</summary>
+      <summary>All 25 files across six pools carry one of the five prefixes, and every file's <code>metadata.type</code> matches its prefix's row (census, walked 2026-08-05)</summary>
       <table>
         <thead><tr><th>Pool</th><th><code>history-</code></th><th><code>backlog</code></th><th><code>profile-</code></th><th><code>setup-</code></th><th><code>feedback-</code></th></tr></thead>
         <tbody>
@@ -195,36 +257,47 @@
           <tr><td><strong>total</strong></td><td>2</td><td>4</td><td>1</td><td>16</td><td>2</td></tr>
         </tbody>
       </table>
-      <p>Each pool's <code>MEMORY.md</code> index is excluded: it is the
-      catalogue of the pool, not a member of it, and carries no memtype.</p>
+      <p>Each pool's <code>MEMORY.md</code> index is excluded from the count: it
+      is the catalogue of the pool, not a member of it, and carries no
+      memtype.</p>
     </details>
 
     <h2 id="exclusions">Exclusions</h2>
-    <p>Three candidates are deliberately not memtypes, each because it named no
-    falsifier of its own and so cut across the axis rather than along it.</p>
+
+    <div class="conclusion">
+      <span class="tag">Conclusion</span>
+      <p><span class="badge">1</span><strong>Off the axis.</strong> Three
+        candidates are deliberately not memtypes, each because it
+        <mark>named no falsifier of its own</mark> and so cut across the axis
+        rather than along it.</p>
+      <p><span class="badge">2</span><strong>Nothing lost.</strong> The
+        2026-08-04 audit dropped two prefixes and touched three files, and
+        <mark>no file lost content</mark> — one rename, one link repoint, one
+        move between pools.</p>
+    </div>
 
     <table>
       <thead><tr><th>Candidate</th><th>Why not</th><th>Where its content goes</th></tr></thead>
       <tbody>
-        <tr><td><code>project-</code></td><td>no file ever used it, and what it would hold falls on two sides of the falsifier</td><td>live work to <code>backlog</code>, constraints to the repository's own <code>docs/</code></td></tr>
-        <tr><td><code>reference-</code></td><td>shared one lifecycle with <code>setup-</code>, and its only file was a tool-behavior fact</td><td><code>setup-</code>, in whichever pool the tool's scope names</td></tr>
-        <tr><td>decision</td><td>a decision is an event or a rule, and neither is a lifecycle of its own</td><td>the choice to <code>history-</code> when its evidence would otherwise vanish; the chosen rule to where rules of its kind live</td></tr>
+        <tr><td><code class="cut">project-</code></td><td>no file ever used it, and what it would hold falls on two sides of the falsifier</td><td>live work to <code>backlog</code>, constraints to the repository's own <code>docs/</code></td></tr>
+        <tr><td><code class="cut">reference-</code></td><td>shared one lifecycle with <code>setup-</code>, and its only file was a tool-behavior fact</td><td><code>setup-</code>, in whichever pool the tool's scope names</td></tr>
+        <tr><td><span class="cut">decision</span></td><td>a decision is an event or a rule, and neither is a lifecycle of its own</td><td>the choice to <code>history-</code> when its evidence would otherwise vanish; the chosen rule to where rules of its kind live</td></tr>
       </tbody>
     </table>
 
     <details>
-      <summary>The 2026-08-04 audit removed two prefixes and touched three files, none of which lost content (dotclaude <code>8c78a4e</code>)</summary>
+      <summary>The three touched files, and what each move preserved (audit entry, workspace <code>history-workspace-refactor</code>, 2026-08-04)</summary>
       <ul>
-        <li><code>project-</code> — dropped from the table; no file existed to
-          move.</li>
         <li><code>reference-chirpy-post-url</code> — renamed
           <code>setup-chirpy-post-url</code> in the notes pool.</li>
         <li>the stale link <code>[[reference-subagent-inheritance]]</code> —
           repointed to <code>[[setup-claude-subagents]]</code>.</li>
-        <li><code>profile-model-architectures</code> — moved from the notes
-          pool to the workspace pool, since an owner preference about
-          efficient vision architectures serves camera's on-device work as
-          much as notes' reports.</li>
+        <li><code>profile-model-architectures</code> — moved from the notes pool
+          to the workspace pool, since an owner preference about efficient vision
+          architectures serves camera's on-device work as much as notes'
+          reports.</li>
+        <li><code class="cut">project-</code> — dropped from the table with no
+          file to move.</li>
       </ul>
     </details>
 
@@ -232,20 +305,26 @@
     <p>The figure and tables claim the memtype set, its axis, and its
     boundaries, and nothing else. Not shown, deliberately:</p>
     <ul>
+      <li><strong>The pin's reach</strong> — the Commit field pins
+        <code>~/workspace</code>, the tree this view lives in; the schema it
+        renders is a second repository, <code>~/.claude</code> at
+        <code>1fe7e9d</code>, and the pools it counts are version-controlled
+        nowhere, that repository's <code>.gitignore</code> ignoring
+        <code>/*</code> and re-admitting no path under
+        <code>projects/</code>.</li>
       <li><strong>File contents</strong> — the tables name what each memtype
         holds, never what any file says.</li>
-      <li><strong>Pool routes</strong> — which pool a fact belongs to is
-        decided by scope, and the sibling view
+      <li><strong>Pool routes</strong> — which pool a fact belongs to is decided
+        by scope, and the sibling view
         <a href="agent-config-scopes.html"><code>agent-config-scopes.html</code></a>
         owns that mapping.</li>
-      <li><strong>Item grammar</strong> — the marker, tag, and date form inside
-        a <code>backlog.md</code> belong to the pool contract, not to the
-        memtype that admits the file.</li>
-      <li><strong>Enforcement</strong> — no checker named in "Filing" pairs a
-        filename's prefix with its <code>metadata.type</code>; the one hook it
-        names, <code>check-backlog-format.py</code>, compiles the pool
-        contract's item grammar only. The census above is a walk, not a
-        guarantee.</li>
+      <li><strong>Item grammar</strong> — the marker, tag, and date form inside a
+        <code>backlog.md</code> belongs to the pool contract, not to the memtype
+        that admits the file.</li>
+      <li><strong>Enforcement</strong> — no checker pairs a filename's prefix
+        with its <code>metadata.type</code>; the one hook installed,
+        <code>check-backlog-format.py</code>, compiles the pool contract's item
+        grammar only. The census above is a walk, not a guarantee.</li>
     </ul>
 
   </section>
@@ -253,18 +332,21 @@
   <footer class="sources">
     <h2 id="sources">Sources</h2>
     <ul>
-      <li><code>~/.claude/CLAUDE.md</code> &sect;Filing at dotclaude
-        <code>8c78a4e</code> — the memtype definition, the type table, the
-        discriminator paragraph, and the pool contract</li>
-      <li><code>history-workspace-refactor</code>, workspace pool — the
-        2026-08-04 "memtype audit (MECE pass)" entry: what was removed, merged,
-        and moved, with reasons</li>
-      <li>the live pools under <code>~/.claude/projects/*/memory/</code>,
-        walked 2026-08-04 for the census and the prefix-to-type check</li>
-      <li><code>~/.claude/hooks/check-backlog-format.py</code> — the one hook
-        "Filing" names, and what it validates</li>
-      <li><code>docs/agent-config-scopes.html</code> — the scope routes this
-        view leaves to it</li>
+      <li><code>~/.claude/CLAUDE.md</code> &sect;Filing, lines 129–137, at
+        dotclaude <code>1fe7e9d</code> — the memtype definition, the type table,
+        and the discriminator paragraph</li>
+      <li><code>~/.claude/CLAUDE.md</code> &sect;"The pool contract", lines
+        149–204 — the <code>frontmatter.type</code> key the census checks</li>
+      <li><code>history-workspace-refactor</code>, workspace pool, lines 106–124
+        — the 2026-08-04 "memtype audit (MECE pass)" entry: what was removed,
+        merged, and moved, with reasons</li>
+      <li>the live pools under <code>~/.claude/projects/*/memory/</code>, walked
+        2026-08-05 for the census and the prefix-to-type check</li>
+      <li><code>~/.claude/hooks/check-backlog-format.py</code> and
+        <code>~/.claude/.gitignore</code> — the one hook installed, and what the
+        dotclaude repository tracks</li>
+      <li><code>docs/agent-config-scopes.html</code> — the scope routes this view
+        leaves to it</li>
     </ul>
   </footer>
 

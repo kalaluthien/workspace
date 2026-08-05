@@ -21,13 +21,15 @@
   h3 { font-size: 1rem; margin: 2rem 0 .3rem; font-weight: 700; }
   p, li { margin: .6rem 0; }
   ul, ol { padding-left: 1.2rem; }
-  a { color: inherit; text-decoration-color: #aaa; }
+  a { color: #1a4f8a; text-decoration-color: #9bb6d1; }
   strong { font-weight: 700; }
   code, pre, .provenance dd {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: .85em;
   }
+  code { color: #1a4f8a; }
   pre { overflow-x: auto; background: #f4f4f4; padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
+  pre, pre code { color: #111; }
   table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
   th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
   th { font-weight: 700; }
@@ -35,9 +37,21 @@
     table { display: block; overflow-x: auto; }
     th, td { min-width: 9rem; }
   }
+  .kicker { font-variant: small-caps; letter-spacing: .16em; font-size: .75rem; font-weight: 600; color: #555; margin: 0 0 .4rem; }
   .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
   .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
   .provenance dd { margin: 0; }
+  .conclusion { border: 1px solid #111; padding: .85rem 1rem .95rem; margin: 1.3rem 0 1.6rem; }
+  .conclusion .label { display: block; font-variant: small-caps; letter-spacing: .12em; font-size: .72rem; font-weight: 700; margin-bottom: .45rem; }
+  .conclusion ol { list-style: none; margin: 0; padding: 0; }
+  .conclusion li { margin: .5rem 0; }
+  .badge {
+    display: inline-block; width: 1.15rem; height: 1.15rem; line-height: 1.05rem;
+    border: 1px solid #111; border-radius: 50%; background: #ffffff; color: #111;
+    font-size: .7rem; font-weight: 700; text-align: center; margin-right: .35rem;
+    vertical-align: .04em;
+  }
+  mark { background: #fbeeaa; color: inherit; padding: 0 .12em; }
   .callout { border: 1px solid #ccc; border-left-width: 4px; padding: .55rem .9rem; margin: 1.2rem 0; font-size: .88rem; line-height: 1.5; }
   .callout .tag { font-variant: small-caps; letter-spacing: .06em; font-weight: 600; margin-right: .45rem; }
   .callout.notice   { border-left-color: #556; }
@@ -67,20 +81,40 @@
 <article>
 
   <header>
+    <p class="kicker">workspace &middot; .claude &middot; configuration scopes</p>
     <h1>Configuration scopes</h1>
     <dl class="provenance">
       <dt>Doctype</dt>  <dd>explanation</dd>
       <dt>Question</dt> <dd>where does each kind of Claude configuration — instruction, rule, skill, agent, memory — live? (concept view)</dd>
       <dt>Updated</dt>  <dd>2026-08-04</dd>
-      <dt>Commit</dt>   <dd>b969155</dd>
+      <dt>Commit</dt>   <dd>b7e531b</dd>
     </dl>
   </header>
 
   <section>
 
-    <p>Each configuration kind files to the scope whose reach matches how far
-    its claim holds, and the router that assigns it always sits one scope above
-    the destinations it chooses between.</p>
+    <h2 id="answer">Answer</h2>
+
+    <div class="conclusion">
+      <span class="label">Conclusion</span>
+      <ol>
+        <li><span class="badge">1</span> <strong>Global.</strong> What holds
+          <mark>on any repository</mark> — the principles, the six filing routes,
+          the skill-authoring rule, the one agent definition — lives in
+          <code>~/.claude/</code> and reaches every session on the machine.</li>
+        <li><span class="badge">2</span> <strong>Workspace.</strong> What
+          <mark>coordinates the entries</mark> — the entry table, the services
+          rule, the output style, the <code>delegating</code> skill — lives in
+          <code>~/workspace/.claude/</code>.</li>
+        <li><span class="badge">3</span> <strong>Project.</strong> How to work
+          inside <mark>one entry</mark> lives in that entry's own
+          <code>.claude/</code>, and nothing there reaches a sibling.</li>
+        <li><span class="badge">4</span> <strong>The rule behind it.</strong> A
+          kind files to the scope whose reach matches how far its claim holds,
+          and the router that assigns it <mark>never sits below</mark> a
+          destination it chooses between.</li>
+      </ol>
+    </div>
 
     <figure id="fig-scopes">
       <svg viewBox="0 0 340 310" role="img">
@@ -92,32 +126,39 @@
         </defs>
 
         <rect x="20" y="14" width="280" height="58" fill="none" stroke="currentColor"/>
-        <text x="34" y="38" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Global &#8212; ~/.claude/</text>
-        <text x="34" y="57" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">any repository</text>
+        <circle cx="54" cy="14" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="54" y="14" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">1</text>
+        <text x="34" y="42" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Global &#8212; ~/.claude/</text>
+        <text x="34" y="60" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">any repository</text>
 
-        <line x1="170" y1="74" x2="170" y2="124" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
-        <text x="184" y="93" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">binds:</text>
-        <text x="184" y="107" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">principles, routes</text>
+        <line x1="170" y1="76" x2="170" y2="122" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <text x="184" y="92" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">binds:</text>
+        <text x="184" y="106" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">principles, routes</text>
 
         <rect x="20" y="126" width="280" height="58" fill="none" stroke="currentColor"/>
-        <text x="34" y="150" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Workspace &#8212; ~/workspace/.claude/</text>
-        <text x="34" y="169" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">every entry</text>
+        <circle cx="54" cy="126" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="54" y="126" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">2</text>
+        <text x="34" y="154" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Workspace &#8212; ~/workspace/.claude/</text>
+        <text x="34" y="172" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">every entry</text>
 
-        <line x1="170" y1="186" x2="170" y2="236" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
-        <text x="184" y="205" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">assigns:</text>
-        <text x="184" y="219" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">the entry table</text>
+        <line x1="170" y1="188" x2="170" y2="234" stroke="currentColor" marker-end="url(#arrow-scopes)"/>
+        <text x="184" y="204" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">assigns:</text>
+        <text x="184" y="218" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">the entry table</text>
 
         <rect x="20" y="238" width="280" height="58" fill="none" stroke="currentColor"/>
-        <text x="34" y="262" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Project &#8212; &lt;entry&gt;/.claude/</text>
-        <text x="34" y="281" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">one entry</text>
+        <circle cx="54" cy="238" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="54" y="238" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">3</text>
+        <text x="34" y="266" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Project &#8212; &lt;entry&gt;/.claude/</text>
+        <text x="34" y="284" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">one entry</text>
       </svg>
       <figcaption>
-        Static structure, the three configuration scopes at commit
-        <code>b969155</code>. Key: solid box — one scope's
-        <code>.claude/</code> directory, under it the reach its claims are
-        meant to hold over; arrow — one governing channel, labelled with its
-        intent, pointing from the governing scope to the governed one. No
-        element is dashed: every part drawn here exists at the pinned commit.
+        Static structure, the three configuration scopes at 340 viewBox units.
+        Key: solid box — one scope's <code>.claude/</code> directory, under it
+        the reach its claims are meant to hold over; circled numeral — the
+        conclusion statement above and the elements row below; arrow — one
+        governing channel, labelled with its intent, pointing from the governing
+        scope to the governed one. No element is dashed: every part drawn here
+        exists at the pinned commits.
       </figcaption>
     </figure>
 
@@ -125,35 +166,43 @@
     <table>
       <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>Global — ~/.claude/</td><td>configuration directory</td><td>the outermost scope, whose claims hold in any repository on the machine</td></tr>
-        <tr><td>Workspace — ~/workspace/.claude/</td><td>configuration directory</td><td>the layout, the entry routing table, and what coordinates the entries</td></tr>
-        <tr><td>Project — &lt;entry&gt;/.claude/</td><td>configuration directory</td><td>one per project entry: how to work inside that entry, and the instances only it uses</td></tr>
+        <tr><td><span class="badge">1</span> Global — <code>~/.claude/</code></td><td>configuration directory</td><td>the outermost scope, whose claims hold in any repository on the machine</td></tr>
+        <tr><td><span class="badge">2</span> Workspace — <code>~/workspace/.claude/</code></td><td>configuration directory</td><td>the layout, the entry routing table, and what coordinates the entries</td></tr>
+        <tr><td><span class="badge">3</span> Project — <code>&lt;entry&gt;/.claude/</code></td><td>configuration directory</td><td>one per project entry: how to work inside that entry, and the instances only it uses</td></tr>
         <tr><td>binds: principles, routes</td><td>governing edge</td><td>the global instruction file's principles and "Filing" routes hold inside the workspace scope unchanged</td></tr>
         <tr><td>assigns: the entry table</td><td>governing edge</td><td>the workspace CLAUDE.md names each project entry and when a request routes to it</td></tr>
       </tbody>
     </table>
 
     <h2 id="placement">Placement</h2>
-    <p>No scope holds every kind at the pinned commit: the global scope carries
-    no skill and no output style, the workspace scope carries no agent since
-    <code>document-writer</code> moved up to the user level
-    (<code>b6bff78</code>), and only <code>notes/</code> among the five entries
-    carries a skill or an agent.</p>
 
-    <p><code>kalaluthien.github.io/</code> has no <code>.claude/</code>
-    directory at all, and the workspace entry table sends a reader there to
-    <code>_config.yml</code> instead, so the missing directory is routing
-    rather than an omission.</p>
+    <div class="conclusion">
+      <span class="label">Conclusion</span>
+      <ol>
+        <li><span class="badge">1</span> <strong>No scope holds every kind.</strong>
+          <mark>Global carries no skill and no output style</mark>, workspace
+          carries no agent, and only <code>notes/</code> among the five entries
+          carries a skill or an agent.</li>
+        <li><span class="badge">2</span> <strong>One entry has no directory.</strong>
+          <code>kalaluthien.github.io/</code> has no <code>.claude/</code> at
+          all, and the entry table sends its reader to <code>_config.yml</code>
+          instead, so the absence is <mark>routing, not omission</mark>.</li>
+        <li><span class="badge">3</span> <strong>One kind has no format.</strong>
+          Five kinds cite a written definition; <mark>the agent kind cites
+          none</mark>, and <code>document-writer.md</code> is its only worked
+          example.</li>
+      </ol>
+    </div>
 
     <table>
       <thead><tr><th>kind</th><th>global</th><th>workspace</th><th>project</th><th>format defined in</th></tr></thead>
       <tbody>
         <tr><td>instruction</td><td><code>CLAUDE.md</code> + <code>RTK.md</code></td><td><code>CLAUDE.md</code></td><td>4 of 5 entries</td><td>"Claude Code" item 1</td></tr>
-        <tr><td>rule</td><td><code>skill-authoring.md</code></td><td><code>services.md</code></td><td>none</td><td><code>setup-claude-rules</code>, global pool</td></tr>
+        <tr><td>rule</td><td><code>skill-authoring.md</code></td><td><code>services.md</code></td><td><code>camera/</code>: <code>engineering.md</code></td><td><code>setup-claude-rules</code>, global pool</td></tr>
         <tr><td>skill</td><td>none</td><td><code>delegating/</code></td><td><code>notes/</code>: 6</td><td><code>rules/skill-authoring.md</code>; naming, "Claude Code" item 2</td></tr>
-        <tr><td>agent</td><td><code>document-writer.md</code></td><td>none</td><td><code>notes/</code>: 3</td><td>none — by example only</td></tr>
+        <tr><td>agent</td><td><code>document-writer.md</code> + its reference directory</td><td>none</td><td><code>notes/</code>: 3</td><td>none — by example only</td></tr>
         <tr><td>output style</td><td>none</td><td><code>simplified-technical.md</code></td><td>none</td><td>none</td></tr>
-        <tr><td>memory pool</td><td>13 <code>setup-*</code></td><td>3 files</td><td>4 of 5 entries</td><td>"Filing" table + pool contract</td></tr>
+        <tr><td>memory pool</td><td>13 <code>setup-*</code></td><td>4 files</td><td>4 of 5 entries</td><td>"Filing" table + pool contract</td></tr>
       </tbody>
     </table>
 
@@ -162,68 +211,95 @@
       The agent row has no definition to cite, so an author writing a new agent
       reverse-engineers the frontmatter from an existing file and nothing states
       which keys are required. The proposal
-      <code>agent-document-writing.html</code> would move the document system's
-      rules into the <code>document-writer</code> definition, but its Status
-      reads Open, so nothing records whether the agent format stays by example
-      or is written down beside the skill rule. The owner decides.
+      <code>agent-document-writing.html</code> was accepted on 2026-08-04 and
+      moved the document system's rules into the <code>document-writer</code>
+      definition, but it recorded no agent authoring format, and the only
+      harness fact written down is that <code>~/.claude/agents/</code> is
+      scanned recursively and loads <code>.md</code> files with agent
+      frontmatter only (<code>setup-claude-subagents</code>, probed 2026-08-04).
+      The owner decides whether the format stays by example.
     </div>
 
     <details>
-      <summary>The walk at <code>b969155</code>: two absent directories at the global scope, one at the workspace scope, and a single entry carrying skills or agents (evidence)</summary>
+      <summary>The walk at <code>b7e531b</code>: two absent directories at the global scope, one at the workspace scope, and a single entry carrying skills or agents (evidence)</summary>
 <pre>== ~/.claude               == ~/workspace/.claude
 rules   skill-authoring.md  rules   services.md
 skills  (absent)            skills  delegating
 agents  document-writer.md  agents  (absent)
+        document-writer/
 styles  (absent)            styles  simplified-technical.md
 
 == entries
 notes/.claude/                       agents CLAUDE.md skills
-camera/.claude/                      CLAUDE.md
+camera/.claude/                      CLAUDE.md rules
 mabinogi-mobile-automation/.claude/  CLAUDE.md
 board/.claude/                       CLAUDE.md
 kalaluthien.github.io/.claude/       (no such directory)
 
 == memory pools, files excluding each MEMORY.md
 -Users-hyungmokim--claude                              13
--Users-hyungmokim-workspace                             3
--Users-hyungmokim-workspace-notes                       4
+-Users-hyungmokim-workspace                             4
+-Users-hyungmokim-workspace-notes                       3
 -Users-hyungmokim-workspace-camera                      3
 -Users-hyungmokim-workspace-board                       1
 -Users-hyungmokim-workspace-mabinogi-mobile-automation  1</pre>
-      <p><code>styles</code> abbreviates <code>output-styles</code>; settings
-        files, lock files, and <code>camera/.claude/worktrees/</code> are
-        filtered from the entry listing. A pool path under
-        <code>~/.claude/projects/</code> encodes the working directory with
-        <code>/</code> replaced by <code>-</code>, so list the parent and match
-        by suffix rather than typing the encoding by hand.</p>
+      <p><code>styles</code> abbreviates <code>output-styles</code>;
+        <code>document-writer/</code> is the agent's reference directory of
+        templates and components, not a second agent. Settings files, lock
+        files, and empty worktree directories are filtered from the entry
+        listing. A pool path under <code>~/.claude/projects/</code> encodes the
+        working directory with <code>/</code> replaced by <code>-</code>, so
+        list the parent and match by suffix rather than typing the encoding by
+        hand.</p>
     </details>
 
     <h2 id="reach">Reach</h2>
-    <p>A session composes the scopes rather than choosing between them, and the
-    working directory selects exactly half of what it loads.</p>
+
+    <div class="conclusion">
+      <span class="label">Conclusion</span>
+      <ol>
+        <li><span class="badge">1</span> <strong>Composition.</strong> A session
+          <mark>composes the three scopes</mark> rather than choosing between
+          them, and the working directory selects exactly half of what it
+          loads.</li>
+        <li><span class="badge">2</span> <strong>Dormancy.</strong> A rule from
+          any scope waits until the session <mark>reads a file its
+          <code>paths</code> key matches</mark> — never when it writes one — so
+          a rule is the only kind whose arrival depends on what the session
+          opens.</li>
+        <li><span class="badge">3</span> <strong>Snapshot.</strong> Subagents
+          inherit the whole composition, <mark>snapshotted at session
+          start</mark>; skills hot-reload mid-session, a new agent definition
+          registers only on restart.</li>
+      </ol>
+    </div>
 
     <table>
       <thead><tr><th>source</th><th>selected by</th></tr></thead>
       <tbody>
-        <tr><td><code>~/.claude/</code> — the two instruction files and <code>rules/</code></td><td>nothing; every session on the machine</td></tr>
+        <tr><td><code>~/.claude/</code> — <code>CLAUDE.md</code> with its <code>@RTK.md</code> import, and <code>rules/</code></td><td>nothing; every session on the machine</td></tr>
         <tr><td><code>~/workspace/.claude/</code></td><td>the workspace being an ancestor of the working directory</td></tr>
         <tr><td><code>&lt;entry&gt;/.claude/</code></td><td>the entry being the working directory</td></tr>
         <tr><td>one memory pool, its <code>MEMORY.md</code> index first</td><td>the working directory, encoded as the pool's directory name</td></tr>
       </tbody>
     </table>
 
-    <p>A rule from any scope stays dormant until the session reads a file its
-    <code>paths</code> key matches, which makes a rule the only kind whose
-    arrival depends on what the session opens. Subagents inherit the whole
-    composition, snapshotted at session start (<code>setup-claude-subagents</code>,
-    global pool, verified 2026-07-16).</p>
-
     <h2 id="routing">Routing</h2>
-    <p>Every scope declares its own predicate in the opening lines of its
-    CLAUDE.md and the scope above assigns it, so no file decides its own home.
-    The router for a kind therefore sits one scope above the destinations it
-    chooses between, which lets a reader who knows what a thing <em>is</em> find
-    where it goes without opening any of the candidates.</p>
+
+    <div class="conclusion">
+      <span class="label">Conclusion</span>
+      <ol>
+        <li><span class="badge">1</span> <strong>No self-placement.</strong>
+          Every scope declares its predicate in the opening lines of its
+          CLAUDE.md and a router elsewhere assigns it, so <mark>no file decides
+          its own home</mark>.</li>
+        <li><span class="badge">2</span> <strong>Router position.</strong> A
+          router sits at the <mark>outermost scope of its candidate set</mark>
+          and never below one of them — "Filing" sits at the global scope and
+          routes into all three — which lets a reader who knows what a thing
+          <em>is</em> find where it goes without opening any candidate.</li>
+      </ol>
+    </div>
 
     <table>
       <thead><tr><th>Router</th><th>Lives in</th><th>Routes</th></tr></thead>
@@ -258,17 +334,21 @@ kalaluthien.github.io/.claude/       (no such directory)
     <p>The figure and tables claim placement, reach, and routing, and nothing
     else. Not shown, deliberately:</p>
     <ul>
+      <li><strong>Two trees</strong> — the Commit field pins
+        <code>~/workspace</code>; the configuration this view describes lives in
+        a second repository, <code>~/.claude</code> at <code>1fe7e9d</code>, and
+        the memory pools under it are version-controlled nowhere.</li>
       <li><strong>File contents</strong> — the tables name files and the kinds
         they hold, never what a file says.</li>
-      <li><strong>Settings and hooks</strong> — <code>settings.json</code> at
-        both upper scopes and in two entries, and the one authored hook
-        <code>check-backlog-format.py</code>, are harness machinery over the
-        kinds rather than a kind of their own.</li>
+      <li><strong>Settings, hooks, and plugins</strong> —
+        <code>settings.json</code> at both upper scopes and in two entries, the
+        one authored hook <code>check-backlog-format.py</code>, and the skills
+        supplied by <code>~/.claude/plugins/</code> are harness machinery over
+        the kinds rather than authored configuration of a kind.</li>
       <li><strong>Non-pool directories</strong> —
-        <code>~/.claude/projects/</code> holds 12 directories and only 6 carry
-        a <code>memory/</code> pool, and
-        <code>camera/.claude/worktrees/</code> holds one live git worktree.
-        Neither is counted anywhere here.</li>
+        <code>~/.claude/projects/</code> holds 14 directories and only 6 carry a
+        <code>memory/</code> pool; <code>camera/.claude/worktrees/</code> and
+        <code>~/workspace/.claude-worktrees/</code> are both empty here.</li>
       <li><strong>Load mechanics</strong> — the reach table names what selects
         each source, not the order, the token budget, or what happens when two
         scopes disagree.</li>
@@ -288,14 +368,17 @@ kalaluthien.github.io/.claude/       (no such directory)
       <li>the live tree under <code>~/.claude/</code> and
         <code>~/workspace/</code>, walked in the evidence listing above</li>
       <li><code>setup-claude-rules</code> and <code>setup-claude-subagents</code>,
-        global pool — the <code>paths</code> key and the subagent inheritance
-        snapshot, verified 2026-07-16</li>
-      <li><code>docs/README.md</code> &sect;Writing pipeline — the
-        <code>document-writer</code> definition at the user level</li>
-      <li>commit <code>b6bff78</code> — the move of
-        <code>document-writer.md</code> out of the workspace scope</li>
-      <li><code>docs/agent-document-writing.html</code> — the open proposal
-        cited in the agent-format gap</li>
+        global pool — the <code>paths</code> key, the read-not-write firing, the
+        subagent snapshot (2026-07-16), and the recursive agent scan
+        (2026-08-04)</li>
+      <li><code>~/.claude/rules/skill-authoring.md</code> and
+        <code>~/workspace/.claude/rules/services.md</code> — the skill format and
+        the services-plane rule</li>
+      <li><code>docs/README.md</code> — the document system defined in the
+        <code>document-writer</code> agent's own files (owner decision,
+        2026-08-04)</li>
+      <li><code>docs/agent-document-writing.html</code> — the proposal cited in
+        the agent-format gap, Accepted 2026-08-04</li>
     </ul>
   </footer>
 
