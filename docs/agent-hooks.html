@@ -82,7 +82,7 @@
       <dt>Doctype</dt>  <dd>explanation</dd>
       <dt>Question</dt> <dd>what hooks run around a working session, which layer owns each, and what does each guard? (runtime view)</dd>
       <dt>Updated</dt>  <dd>2026-08-06</dd>
-      <dt>Commit</dt>   <dd>9459de7</dd>
+      <dt>Commit</dt>   <dd>c1f8670</dd>
     </dl>
   </header>
 
@@ -106,12 +106,13 @@
         <li><span class="n">3</span><strong>Git layer.</strong> A
           <code>git commit</code> inside that Bash call leaves the harness
           entirely: all six repositories run <mark>the same
-          <code>no-main-commits</code> guard</mark>, and board alone also
-          deploys on a version tag.</li>
+          <code>no-main-commits</code> guard</mark>, five then chain their own
+          hook, and three of those <mark>check the workspace docs
+          contract</mark>.</li>
         <li><span class="n">4</span><strong>Turn end.</strong>
-          <code>Stop</code> <mark>blocks the first stop of each turn</mark>
-          with the Filing reminder and lets the second through, so every turn
-          gets exactly one pass over its own takeaways.</li>
+          <code>Stop</code> <mark>blocks one stop per working turn</mark> with
+          the Filing reminder — a turn that only answered in text is let
+          straight through.</li>
       </ol>
     </div>
 
@@ -140,13 +141,13 @@
         <text x="34" y="150" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">PreToolUse, PostToolUse</text>
 
         <path d="M190,148 H275 V186" fill="none" stroke="currentColor" marker-end="url(#arrow-session)"/>
-        <text x="250" y="140" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">commit, tag</text>
+        <text x="250" y="140" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">commit</text>
 
         <rect x="200" y="188" width="150" height="56" fill="none" stroke="currentColor"/>
         <circle cx="224" cy="188" r="11" fill="#ffffff" stroke="currentColor"/>
         <text x="224" y="188" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">3</text>
         <text x="214" y="216" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Git layer</text>
-        <text x="214" y="232" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">pre-commit, tag</text>
+        <text x="214" y="232" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">pre-commit chain</text>
 
         <line x1="105" y1="162" x2="105" y2="256" stroke="currentColor" marker-end="url(#arrow-session)"/>
         <text x="115" y="205" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">turn ends</text>
@@ -175,10 +176,10 @@
       <tbody>
         <tr><td>1 &middot; Prompt in</td><td>session moment</td><td>the prompt is submitted; the hook carries no matcher, so its one line of output joins every prompt's context</td></tr>
         <tr><td>2 &middot; Tool call</td><td>session moment</td><td>a tool runs; one hook wraps <code>Bash</code> before the call, another follows <code>Write</code> and <code>Edit</code></td></tr>
-        <tr><td>3 &middot; Git layer</td><td>repository boundary</td><td>the hooks installed inside one clone's <code>.git/</code>, reached only when a command actually invokes git</td></tr>
+        <tr><td>3 &middot; Git layer</td><td>repository boundary</td><td>the hooks git finds for one clone, reached only when a command actually invokes git</td></tr>
         <tr><td>4 &middot; Turn end</td><td>session moment</td><td>the model tries to end the turn; the hook decides whether it may</td></tr>
         <tr><td>session runs</td><td>sequence edge</td><td>the turn proceeds from the prompt into its tool calls</td></tr>
-        <tr><td>commit, tag</td><td>crossing edge</td><td>a Bash command that calls git hands control to that repository's own hooks</td></tr>
+        <tr><td>commit</td><td>crossing edge</td><td>a Bash command that commits hands control to that repository's own hook chain</td></tr>
         <tr><td>turn ends</td><td>sequence edge</td><td>tool calls are exhausted and the model attempts to stop</td></tr>
       </tbody>
     </table>
@@ -204,10 +205,10 @@
     <table>
       <thead><tr><th></th><th>Harness layer</th><th>Git layer</th></tr></thead>
       <tbody>
-        <tr><td>Configured in</td><td><code>~/.claude/settings.json</code>, <code>hooks</code> section — no project settings file defines any</td><td>an executable under each clone's <code>.git/hooks/</code>, or the <code>core.hooksPath</code> directory it names</td></tr>
-        <tr><td>Fires on</td><td>prompt submit, tool call, turn end</td><td>the commit about to be made, and a ref transaction</td></tr>
-        <tr><td>Sees</td><td>the session: prompt text, tool payload on stdin, <code>stop_hook_active</code></td><td>the repository: current branch, staged index, old and new ref values</td></tr>
-        <tr><td>Tracked</td><td>yes — <code>~/.claude</code> tracks <code>settings.json</code>, <code>hooks/</code>, and <code>git-hooks/</code></td><td>the guard and each repository's own hook are; nothing inside a clone's <code>.git/</code> is, so the wiring is installed per clone</td></tr>
+        <tr><td>Configured in</td><td><code>~/.claude/settings.json</code>, <code>hooks</code> section — no project settings file defines any</td><td>an executable under each clone's <code>.git/hooks/</code>, or the <code>core.hooksPath</code> directory it names instead</td></tr>
+        <tr><td>Fires on</td><td>prompt submit, tool call, turn end</td><td>the commit about to be made</td></tr>
+        <tr><td>Sees</td><td>the session: prompt text, tool payload on stdin, the transcript</td><td>the repository: current branch, staged index, working tree</td></tr>
+        <tr><td>Tracked</td><td>yes — <code>~/.claude</code> tracks <code>settings.json</code>, <code>hooks/</code>, and <code>git-hooks/</code></td><td>the guard and each repository's own hook are; the entry point under <code>.git/</code> and the config value are not, so the wiring is installed per clone</td></tr>
         <tr><td>Override</td><td>none</td><td><code>git commit --no-verify</code>, named in the guard's own message</td></tr>
       </tbody>
     </table>
@@ -223,10 +224,12 @@
           Filing pass; <code>PreToolUse</code> and
           <code>UserPromptSubmit</code> shape cost and register and
           <mark>refuse nothing</mark>.</li>
-        <li><span class="n">2</span><strong><code>Stop</code> is one-shot by
-          construction.</strong> The <code>jq</code> filter emits its block
-          only while <mark><code>stop_hook_active</code> is false</mark>, so
-          the reminder can never loop a turn.</li>
+        <li><span class="n">2</span><strong><code>Stop</code> asks twice
+          over.</strong> It returns silently when
+          <mark><code>stop_hook_active</code></mark> is set, so it can never
+          loop a turn, and again when the finished turn
+          <mark>made no tool call</mark> — a text-only answer has nothing to
+          file.</li>
       </ol>
     </div>
 
@@ -236,7 +239,7 @@
         <tr><td><code>UserPromptSubmit</code></td><td>every prompt</td><td><code>echo</code> of one reminder line</td><td>the reply's register — plain, everyday language over jargon</td></tr>
         <tr><td><code>PreToolUse</code></td><td><code>Bash</code></td><td><code>rtk hook claude</code></td><td>the token budget: the command is rewritten to its rtk proxy, which trims the output</td></tr>
         <tr><td><code>PostToolUse</code></td><td><code>Write|Edit</code></td><td><code>check-backlog-format.py</code></td><td>the backlog item grammar in any pool's <code>backlog.md</code>; the offending line comes back on stderr, and an unreadable contract is a refusal, never a pass</td></tr>
-        <tr><td><code>Stop</code></td><td>every turn</td><td><code>jq</code> filter on the hook payload</td><td>the durable takeaway: the first stop is blocked with the Filing reminder, the second passes</td></tr>
+        <tr><td><code>Stop</code></td><td>every turn</td><td><code>stop-takeaway-check.py</code></td><td>the durable takeaway: it walks the transcript back to the last real user prompt and blocks that stop with the Filing reminder only if a tool call happened in between</td></tr>
       </tbody>
     </table>
 
@@ -251,28 +254,35 @@
           commit on <code>main</code> or <code>master</code></mark>, passes a
           detached HEAD untouched, and prints the branch-or-worktree
           recipe.</li>
-        <li><span class="n">2</span><strong>Three chain, three do not.</strong>
-          Where a repository already owns a pre-commit hook,
-          <code>core.hooksPath</code> points at <code>.git/local-hooks</code>,
-          whose two-line hook <mark>runs the guard first and the repository's
-          own hook second</mark> — any other value silently drops the
-          guard.</li>
-        <li><span class="n">3</span><strong>board also watches refs.</strong>
-          <code>reference-transaction</code> is the only hook that <mark>sees a
-          tag come into existence</mark>, and it starts one detached deploy per
-          newly created <code>vMAJOR.MINOR.PATCH</code> tag.</li>
+        <li><span class="n">2</span><strong>Five chain, one does not.</strong>
+          Where a repository owns a pre-commit hook,
+          <code>core.hooksPath</code> names <code>.git/local-hooks</code>,
+          whose entry hook <mark>runs the guard first and the repository's own
+          hook second</mark>; only <code>kalaluthien.github.io</code> still
+          runs the guard alone.</li>
+        <li><span class="n">3</span><strong>The docs contract now has
+          callers.</strong> <code>~/workspace/scripts/check-docs</code> is run
+          by <mark>workspace, board, and camera</mark> on any commit that
+          stages <code>docs/</code>; the other three ship no view it could
+          check.</li>
+        <li><span class="n">4</span><strong>One hook outside the chain.</strong>
+          board also runs a <code>reference-transaction</code> hook, which
+          <mark>starts one deploy per new version tag</mark>; it is installed in
+          that same <code>core.hooksPath</code> directory, because the setting
+          <mark>replaces <code>.git/hooks</code> rather than adding to
+          it</mark>.</li>
       </ol>
     </div>
 
     <table>
-      <thead><tr><th>Repository</th><th><code>core.hooksPath</code></th><th>Chained after the guard</th><th>What that hook adds</th></tr></thead>
+      <thead><tr><th>Repository</th><th><code>core.hooksPath</code></th><th>Chained after the guard</th><th>Runs <code>check-docs</code></th><th>What that hook adds</th></tr></thead>
       <tbody>
-        <tr><td><code>workspace</code></td><td>unset</td><td>—</td><td>—</td></tr>
-        <tr><td><code>board</code></td><td>unset</td><td>—</td><td>— (but see <code>reference-transaction</code> below)</td></tr>
-        <tr><td><code>kalaluthien.github.io</code></td><td>unset</td><td>—</td><td>—</td></tr>
-        <tr><td><code>notes</code></td><td><code>.git/local-hooks</code></td><td><code>.githooks/pre-commit</code></td><td>the front-matter schema of staged blog, journal, and wiki notes</td></tr>
-        <tr><td><code>camera</code></td><td><code>.git/local-hooks</code></td><td><code>hooks/pre-commit</code></td><td>camera-roll bytes and metadata, the mechanical <code>docs/</code> conventions, Kotlin block comments, and release-commit invariants</td></tr>
-        <tr><td><code>mabinogi-mobile-automation</code></td><td><code>.git/local-hooks</code></td><td><code>.git/hooks/pre-commit</code></td><td>the pre-commit framework, running one local hook: the shell completion stays in sync with the script</td></tr>
+        <tr><td><code>workspace</code></td><td><code>.git/local-hooks</code></td><td><code>hooks/pre-commit</code></td><td>yes</td><td>nothing else — the hook exists to run the docs-contract checker</td></tr>
+        <tr><td><code>board</code></td><td><code>.git/local-hooks</code></td><td><code>hooks/pre-commit</code></td><td>yes</td><td>a credential-shape scan of the staged diff — API keys, tokens, private-key headers</td></tr>
+        <tr><td><code>camera</code></td><td><code>.git/local-hooks</code></td><td><code>hooks/pre-commit</code></td><td>yes, after its own <code>script/check-docs.py</code></td><td>camera-roll bytes and metadata, Kotlin block comments, and release-commit invariants</td></tr>
+        <tr><td><code>notes</code></td><td><code>.git/local-hooks</code></td><td><code>.githooks/pre-commit</code></td><td>no — no <code>docs/</code> directory</td><td>the front-matter schema of staged blog, journal, and wiki notes</td></tr>
+        <tr><td><code>mabinogi-mobile-automation</code></td><td><code>.git/local-hooks</code></td><td><code>.git/hooks/pre-commit</code></td><td>no — its <code>docs/</code> holds only <code>images/</code></td><td>the pre-commit framework, running one local hook: the shell completion stays in sync with the script</td></tr>
+        <tr><td><code>kalaluthien.github.io</code></td><td>unset</td><td>—</td><td>no — no <code>docs/</code> directory</td><td>—</td></tr>
       </tbody>
     </table>
 
@@ -314,41 +324,56 @@
         <text x="34" y="216" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">per repository</text>
       </svg>
       <figcaption>
-        Keyed stage figure, the chained pre-commit path in <code>notes</code>,
-        <code>camera</code>, and <code>mabinogi-mobile-automation</code>; 340
-        viewBox units, so it does not pan. Key: circled numeral — one stage,
-        keyed to the legend; solid arrow — control passing on, labelled with
-        the condition; bare text outside any box — an exit. The three
-        repositories with no <code>core.hooksPath</code> run stage 2 alone.
+        Keyed stage figure, the chained pre-commit path in the five repositories
+        that set <code>core.hooksPath</code>; 340 viewBox units, so it does not
+        pan. Key: circled numeral — one stage, keyed to the legend; solid arrow
+        — control passing on, labelled with the condition; bare text outside any
+        box — an exit. <code>kalaluthien.github.io</code>, which sets no
+        <code>core.hooksPath</code>, runs stage 2 alone.
       </figcaption>
     </figure>
 
     <ol class="legend">
-      <li><strong>Entry</strong> — installed hook. The two-line
+      <li><strong>Entry</strong> — installed hook. The short
         <code>pre-commit</code> git actually executes, reached because
         <code>core.hooksPath</code> names its directory.</li>
       <li><strong>Shared guard</strong> — machine-wide check.
         <code>no-main-commits</code>, run first so no chained hook can be
         ordered ahead of it; a non-zero exit here ends the commit.</li>
       <li><strong>Repo hook</strong> — repository check. The hook that
-        repository would have run anyway, <code>exec</code>'d last, so its
-        exit status is the commit's.</li>
+        repository would have run anyway, <code>exec</code>'d last, so its exit
+        status is the commit's. In workspace and board the entry hook tests it
+        for existence first, so a branch predating the file still commits;
+        the other three <code>exec</code> it unconditionally.</li>
     </ol>
 
-    <p>The one hook outside this shape is board's
-      <code>reference-transaction</code>: git has no post-tag hook, so it reads
-      the committed transaction and starts one detached
-      <code>scripts/deploy-tag</code> per new version tag, logging to
-      <code>~/.local/state/board/release.log</code>. A moved tag, a deleted
-      tag, and every branch update are ignored.</p>
+    <div class="callout warning">
+      <span class="tag">Warning</span> <code>core.hooksPath</code> replaces
+      <code>.git/hooks</code>; it does not add to it, so setting it silently
+      retires every hook still living there — a hooks directory git no longer
+      reads is not an error, it is no hook at all. The trap this leaves behind
+      is textual: an install line or a precondition that names
+      <code>.git/hooks</code> reports a hook git will never call, so the check
+      that should catch the absence is the thing asserting it is fine. Resolve
+      <code>git config core.hooksPath</code> first and fall back to
+      <code>.git/hooks</code> only when it is unset — which is what
+      <code>board/hooks/reference-transaction</code>'s install line and
+      <code>board/scripts/release-patch</code>'s precondition now both do, at
+      board <code>044804c</code>.
+    </div>
 
     <details>
-      <summary>Creation is the pair of ref values, not the old one alone — testing <code>old</code> by itself would redeploy on every <code>git tag -d</code></summary>
-      <p>git reports a tag move as <code>old=&lt;oid&gt; new=&lt;oid&gt;</code>,
-        but a deletion as all zeros on <em>both</em> sides rather than the zero
-        new value the name suggests (measured against git 2.51, 2026-08-04),
-        so the hook requires both halves:</p>
-<pre>[[ $old =~ ^0+$ &amp;&amp; ! $new =~ ^0+$ ]] || continue</pre>
+      <summary><code>core.hooksPath</code> must be absolute, or every hook silently stops running inside a linked worktree</summary>
+      <p>Git resolves a relative <code>core.hooksPath</code> against the working
+        directory. A linked worktree's own <code>.git</code> is a file, not a
+        directory, so <code>.git/local-hooks</code> resolves to a path that does
+        not exist there — and a missing hooks directory is not an error, it is
+        no hook at all. Probed on git 2.54.0, 2026-08-06: with a relative value
+        the entry hook fired in the main checkout and not in a
+        <code>git worktree add</code> checkout of the same repository; setting
+        the absolute value in the worktree restored it. All five configured
+        repositories now hold the absolute form:</p>
+<pre>git config core.hooksPath "$PWD/.git/local-hooks"</pre>
     </details>
 
     <h2 id="omissions">Omissions</h2>
@@ -356,21 +381,29 @@
       and what each refuses; nothing else. Not shown, deliberately:</p>
     <ul>
       <li><strong>The pin's reach</strong> — the Commit field pins
-        <code>~/workspace</code>, which holds no hook source: the harness
-        hooks and the shared guard are tracked in <code>~/.claude</code> at
-        <code>a1eda25</code>, and the per-repository wiring under
-        <code>.git/</code> is version-controlled nowhere.</li>
+        <code>~/workspace</code>, which holds the shared checker and its own
+        <code>hooks/</code> but no other repository's: the harness hooks and the
+        shared guard are tracked in <code>~/.claude</code> at
+        <code>13d1aa5</code>, the chained hooks in their own repositories at
+        board <code>f3d4224</code> and camera <code>d8741ec</code>, and the
+        entry hook under <code>.git/local-hooks/</code> is version-controlled
+        nowhere.</li>
       <li><strong>Inside the chained hooks</strong> — the last column of the
         repository table names what each adds in one line; the checks
         themselves belong to those repositories' own documents.</li>
+      <li><strong>What <code>check-docs</code> checks</strong> — the six rules
+        it applies and the contract block it parses are stated where the
+        contract lives, <code>docs/README.md</code>; this view claims only who
+        calls it and when.</li>
       <li><strong>The rtk rewrite</strong> — which commands rtk proxies, and by
         how much it trims them, is the tool's own fact
         (<code>~/.claude/RTK.md</code>), not this view's.</li>
       <li><strong>Other hook kinds</strong> — the walk covered
         <code>.git/hooks/</code> and <code>.git/local-hooks/</code> in the six
-        repositories on 2026-08-04, samples excluded; no other hook file was
-        installed. Server-side hooks and CI checks are a different layer
-        again.</li>
+        repositories on 2026-08-06, samples excluded; the only hook file found
+        outside the pre-commit chain was board's
+        <code>reference-transaction</code>. Server-side hooks and CI checks are
+        a different layer again.</li>
       <li><strong>Ordering across layers</strong> — the figure shows that a
         Bash call crosses into git, not how a harness hook and a git hook would
         interleave if both had something to say.</li>
@@ -381,23 +414,38 @@
   <footer class="sources">
     <h2 id="sources">Sources</h2>
     <ul>
-      <li><code>~/.claude/settings.json</code> at dotclaude <code>a1eda25</code>
+      <li><code>~/.claude/settings.json</code> at dotclaude <code>13d1aa5</code>
         — the <code>hooks</code> section: the four events, their matchers, and
         the exact commands</li>
+      <li><code>~/.claude/hooks/stop-takeaway-check.py</code> — the
+        <code>stop_hook_active</code> return, the transcript walk, and the
+        tool-call condition on the block</li>
       <li><code>~/.claude/hooks/check-backlog-format.py</code> — its header:
         the two entry points, the exit-2 behavior, and the refusal on an
         unreadable contract</li>
       <li><code>~/.claude/git-hooks/no-main-commits</code> — the shared guard:
         the protected branch names, the detached-HEAD pass, and the
         <code>--no-verify</code> override</li>
-      <li>the installed hooks and <code>core.hooksPath</code> values of the six
-        repositories under <code>~/workspace</code>, walked 2026-08-04</li>
-      <li><code>notes/.githooks/pre-commit</code>,
-        <code>camera/hooks/pre-commit</code>, and
+      <li>the <code>core.hooksPath</code> values and installed hook files of the
+        six repositories under <code>~/workspace</code>, walked 2026-08-06</li>
+      <li><code>hooks/pre-commit</code> in workspace, board
+        (<code>f3d4224</code>), and camera (<code>d8741ec</code>);
+        <code>notes/.githooks/pre-commit</code> and
         <code>mabinogi-mobile-automation/.pre-commit-config.yaml</code> — what
         each chained hook checks</li>
-      <li><code>board/.git/hooks/reference-transaction</code> — the tag-deploy
-        hook and its measured ref-value note</li>
+      <li><code>~/workspace/scripts/check-docs</code> — its docstring: the
+        contract it parses and the rules it applies</li>
+      <li><code>board/hooks/reference-transaction</code> and
+        <code>board/scripts/release-patch</code> at board <code>044804c</code> —
+        the tag-deploy hook, its install line, and the precondition that reads
+        it, both resolving <code>core.hooksPath</code> before falling back</li>
+      <li>three live probes on git 2.54.0, 2026-08-06 — a scratch repository
+        configured as these are, showing that <code>core.hooksPath</code>
+        hides <code>.git/hooks/reference-transaction</code> and that a relative
+        value runs no hook in a linked worktree; and
+        <code>GIT_TRACE=1 git update-ref</code> in board, which runs
+        <code>.git/local-hooks/reference-transaction</code> for each transaction
+        phase</li>
       <li><code>~/.claude/RTK.md</code> — that the <code>Bash</code> PreToolUse
         hook rewrites commands to their rtk proxy</li>
     </ul>
