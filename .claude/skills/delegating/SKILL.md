@@ -128,6 +128,28 @@ bookkeeping:
    owner. A session that ends with the marker still `[/]` leaves a
    card that reads as running forever.
 
+With no item after the pool file, the mission is the whole page: every item
+whose marker is `[ ]` and which carries no tag waiting on the owner — the
+same rows the board draws Start live on — in the order the file lists them,
+which is the user's own priority. Claim them in one edit before anything
+else, for the reason a single claim is made: until the markers move the
+board shows a promise the corpus denies, and the rows are already held
+against a second tap.
+
+Then run them as separate missions, and close each item as its own mission
+ships — not the batch at the end. Fan out only where the missions' changes
+cannot meet; they land in one repository, so each takes its own worktree and
+anything touching the same files runs in sequence. Keep at most three
+running, so one `Monitor` watch covers them and a tab keeps a free pane.
+Re-read the backlog file immediately before every close: filings and other
+tickets edit it while you work, and a rewrite from the copy you read at
+claim time drops their rows.
+
+End the batch with no row still `[/]`. A mission you will not finish is
+retagged `#need-you`, which hands that row back and is a correct outcome;
+a row left working reads as a session that is still running, and the
+board waits on it for ever.
+
 When the orchestrator collects a board-dispatched session, it checks the
 item's marker before reporting: a delegate can ship the work, print its
 sentinel, and still leave the row `[/]`. Close the item yourself then — the
