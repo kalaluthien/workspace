@@ -124,8 +124,8 @@ bookkeeping:
    marker moves the board shows a promise the corpus denies.
 2. Close the item on completion, per the Filing rules in `~/.claude/CLAUDE.md`:
    delete the row when the work shipped, after lifting any owed remainder into
-   its own `#need-you` item; retag `#need-you` or `#blocked` when the work now
-   waits on someone. A session that ends with the marker still `[/]` leaves a
+   its own `#need-you` item; retag `#need-you` when the work now waits on the
+   owner. A session that ends with the marker still `[/]` leaves a
    card that reads as running forever.
 
 When the orchestrator collects a board-dispatched session, it checks the
