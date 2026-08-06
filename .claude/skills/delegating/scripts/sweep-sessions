@@ -11,6 +11,14 @@
 # One exclusion is structural, not an option: the calling pane
 # ($HERDR_PANE_ID) is skipped so a sweep cannot close itself.
 #
+# A session or shell in the container root itself (repo label "workspace") is
+# reported like any other but never closed by a bare sweep: those are the
+# orchestrators and the workspace-level work, and a clean-up asked about the
+# entries must not retire the session that asked. --include-workspace restores
+# close reach over them, and so does naming the root as <repo>, since both say
+# the caller means that target. The protection covers both passes, so the
+# session pass and --shells agree about the root.
+#
 # --shells adds the panes holding no session at all: a bare shell left behind
 # after its work, anywhere under the workspace root including the container
 # root. A shell is idle when its foreground process group is the shell itself,
@@ -22,35 +30,45 @@
 # A tab needs no handling: herdr retires one when its last pane closes, and a
 # workspace when its last tab does.
 #
-# Usage: sweep-sessions [<repo>] [--close] [--shells] [--lines N]
+# Usage: sweep-sessions [<repo>] [--close] [--include-workspace]
+#                       [--shells] [--lines N]
 # Output: one JSON object per session, one per line ->
 #         {repo, name, pane, verdict, closed}
 # Verdicts: empty | done | pending, for a quiet pane, plus the herdr status
 #           (working | blocked | unknown) for a pane not worth reading, plus
 #           shell and shell-busy under --shells.
-#           --close acts on empty, done, and shell. A pending session is
-#           waiting on an answer or finished without a sentinel, so its fate is
-#           a judgement this script does not make.
+#           --close acts on empty, done, and shell, except in the container
+#           root, whose rows report closed:false unless the caller named it.
+#           A pending session is waiting on an answer or finished without a
+#           sentinel, so its fate is a judgement this script does not make.
 source "$(dirname "$0")/_lib.sh"
 require_herdr
 
-repo_arg= close=false shells=false
+repo_arg= close=false shells=false include_workspace=false
 while [ $# -gt 0 ]; do
   case $1 in
-    --close)  close=true; shift ;;
-    --shells) shells=true; shift ;;
-    --lines)  SESSION_READ_LINES=${2:?}; shift 2 ;;
-    -*)       die "unknown option: $1" ;;
-    *)        repo_arg=$1; shift ;;
+    --close)              close=true; shift ;;
+    --include-workspace)  include_workspace=true; shift ;;
+    --shells)             shells=true; shift ;;
+    --lines)              SESSION_READ_LINES=${2:?}; shift 2 ;;
+    -*)                   die "unknown option: $1" ;;
+    *)                    repo_arg=$1; shift ;;
   esac
 done
+
+# The container root's rows are read-only unless the caller reached for them,
+# by the flag or by naming a target at all — a named <repo> is already an
+# explicit choice of what to sweep.
+protect_root=true
+if $include_workspace || [ -n "$repo_arg" ]; then protect_root=false; fi
 
 # Match by prefix for an entry, whose sessions may sit in a subdirectory or a
 # worktree, but exactly for the container root, which is every entry's prefix
 # and would otherwise claim all of them a second time under its own label.
 sweep() {
-  local path=$1 label rows exact=false
+  local path=$1 label rows exact=false protect=false
   [ "$path" = "$WORKSPACE_ROOT" ] && exact=true
+  if $exact && $protect_root; then protect=true; fi
   label=$(basename "$path")
   rows=$(herdr agent list | jq -c --arg path "$path" --argjson exact "$exact" '
     .result.agents[]
@@ -69,7 +87,7 @@ sweep() {
     v=$(session_verdict "$pane" "$name" "$status")
 
     closed=false
-    if $close && { [ "$v" = empty ] || [ "$v" = done ]; }; then
+    if $close && ! $protect && { [ "$v" = empty ] || [ "$v" = done ]; }; then
       herdr pane close "$pane" >/dev/null
       closed=true
     fi
@@ -84,7 +102,7 @@ sweep() {
 # in, and the container root labels as itself, so a stray shell is reported
 # where it lives rather than filed under the nearest repository.
 sweep_shells() {
-  local root=$1 rows row pane cwd label v closed
+  local root=$1 rows row pane cwd label v closed protect
   rows=$(herdr pane list | jq -c --arg root "$root" '
     .result.panes[]
     | select(.agent == null)
@@ -100,12 +118,16 @@ sweep_shells() {
 
     label=${cwd#"$WORKSPACE_ROOT"/}
     label=${label%%/*}
-    [ "$cwd" = "$WORKSPACE_ROOT" ] && label=$(basename "$WORKSPACE_ROOT")
+    protect=false
+    if [ "$cwd" = "$WORKSPACE_ROOT" ]; then
+      label=$(basename "$WORKSPACE_ROOT")
+      protect=$protect_root
+    fi
 
     v=$(shell_verdict "$pane")
 
     closed=false
-    if $close && [ "$v" = shell ]; then
+    if $close && ! $protect && [ "$v" = shell ]; then
       herdr pane close "$pane" >/dev/null
       closed=true
     fi

@@ -103,7 +103,10 @@ it does not do the delegated work itself. All scripts live in
    status of a pane too busy to read. Adding `--close` retires the empty and
    done ones and nothing else, because a `pending` session is either waiting
    on an answer or finished without a sentinel and the screen cannot tell
-   which. Report the pending ones and let the user decide. Run it dry first
+   which. Sessions in the container root itself (repo `workspace`) are reported
+   but never closed by a bare sweep — `--include-workspace`, or naming the root
+   as the sweep's target, is the explicit user request that reaches them.
+   Report the pending ones and let the user decide. Run it dry first
    when the sweep covers sessions whose output has not been collected yet —
    closing a `done` session discards the report behind it.
    `--shells` widens the same sweep to panes holding no session at all. A bare
