@@ -78,6 +78,10 @@ it does not do the delegated work itself. All scripts live in
    foreground wait burns the turn holding a `sleep`, and a timeout ends it
    with nothing delivered. `scripts/await-session` remains for a deliberate
    blocking wait that also prints the pane tail.
+   While a watch stands, spend no turns checking the sessions it covers — no
+   `read-session`, `check-sessions`, or `sweep-sessions` between events. Each
+   check turn re-reads the orchestrator's whole context to learn what the
+   watch will deliver anyway; read a session once, when its line arrives.
    A `pending` or `blocked` session gets `scripts/read-session` and one
    re-request before escalating to the user. `blocked` also covers a session
    usage limit; the message names a reset time that can already be past when
