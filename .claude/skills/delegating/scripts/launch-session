@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Launch a named claude session for one repository, reusing the repository's
-# herdr workspace and the first tab with capacity (a tab never exceeds 4
-# panes; a full workspace gets a new tab). Blocks until the session is idle.
+# herdr workspace and giving the session a tab of its own — a tab holds one
+# session, so a pane is never split. Blocks until the session is idle.
 #
 # The name says what the session is for — <role>-<task>, for example
 # survey-tflite-detectors or build-preview-crash. Every session launches as
@@ -43,33 +43,20 @@ role=$(role_of "$name")
 
 # herdr 0.8.0: `agent start` no longer creates its pane — it claims an
 # existing shell pane (--kind --pane) and appends AGENT_ARGs to the kind's
-# canonical executable. Creating a workspace or a tab yields a root pane;
-# only a reused tab needs a split.
+# canonical executable. Creating a workspace or a tab yields that shell as
+# `.result.root_pane`, so a session's pane always arrives with its own tab:
+# a full-height pane keeps a session readable, and herdr retires the tab with
+# the pane when the session is swept.
 ws=$(workspace_id_for_label "$label") pane= tab=
 if [ -z "$ws" ]; then
   created=$(herdr workspace create --cwd "$path" --label "$label" --no-focus)
   ws=$(printf '%s' "$created" | jq -r '.result.workspace.workspace_id // empty')
   [ -n "$ws" ] || die "could not create a workspace for $label"
-  tab=$(printf '%s' "$created" | jq -r '.result.tab.tab_id // empty')
-  pane=$(printf '%s' "$created" | jq -r '.result.root_pane.pane_id // empty')
+else
+  created=$(herdr tab create --workspace "$ws" --cwd "$path" --no-focus)
 fi
-
-if [ -z "$pane" ]; then
-  tab=$(herdr tab list --workspace "$ws" |
-    jq -r 'first(.result.tabs[] | select(.pane_count < 4) | .tab_id) // empty')
-  if [ -n "$tab" ]; then
-    base=$(herdr pane list |
-      jq -r --arg t "$tab" \
-        'first(.result.panes[] | select(.tab_id == $t) | .pane_id) // empty')
-    [ -n "$base" ] || die "no pane found in tab $tab"
-    pane=$(herdr pane split --pane "$base" --direction down \
-      --cwd "$path" --no-focus | jq -r '.result.pane.pane_id // empty')
-  else
-    created=$(herdr tab create --workspace "$ws" --cwd "$path" --no-focus)
-    tab=$(printf '%s' "$created" | jq -r '.result.tab.tab_id // empty')
-    pane=$(printf '%s' "$created" | jq -r '.result.root_pane.pane_id // empty')
-  fi
-fi
+tab=$(printf '%s' "$created" | jq -r '.result.tab.tab_id // empty')
+pane=$(printf '%s' "$created" | jq -r '.result.root_pane.pane_id // empty')
 [ -n "$pane" ] || die "could not obtain a shell pane in $ws"
 
 # A fresh pane's shell takes a moment to reach its prompt, and agent start

@@ -37,13 +37,13 @@ it does not do the delegated work itself. All scripts live in
    search, classify, or summarize.
 
 3. `scripts/check-sessions <repo>` — live sessions with name, role, status,
-   verdict, and tab capacity. Reuse a session of the role the new task needs
-   whose verdict is `empty` or `done`; the verdict decides, not the status,
-   because a session that pauses mid-turn reports idle and claiming it would
-   clear work still running. Otherwise
-   `scripts/launch-session <repo> <role>-<task>` (capacity: a tab never exceeds
-   4 panes; pick `--effort` from the task's breadth per step 2; `--model` is an
-   escape hatch for one session).
+   and verdict. Reuse a session of the role the new task needs whose verdict
+   is `empty` or `done`; the verdict decides, not the status, because a
+   session that pauses mid-turn reports idle and claiming it would clear work
+   still running. Otherwise `scripts/launch-session <repo> <role>-<task>`
+   (every session gets a tab of its own, so a launch never splits a pane and
+   never runs out of room; pick `--effort` from the task's breadth per step 2;
+   `--model` is an escape hatch for one session).
    Claim a reused session here, before sending:
    `scripts/clean-session <name> --rename <role>-<task>` resets it to a
    known-empty context and renames the pane for the new task, because a session
@@ -152,7 +152,7 @@ Then run them as separate missions, and close each item as its own mission
 ships — not the batch at the end. Fan out only where the missions' changes
 cannot meet; they land in one repository, so each takes its own worktree and
 anything touching the same files runs in sequence. Keep at most three
-running, so one `Monitor` watch covers them and a tab keeps a free pane.
+running, so one `Monitor` watch covers them.
 Re-read the backlog file immediately before every close: filings and other
 tickets edit it while you work, and a rewrite from the copy you read at
 claim time drops their rows.

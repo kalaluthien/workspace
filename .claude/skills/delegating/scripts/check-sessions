@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # Report the delegable sessions for one repository (or all of ~/workspace):
-# every agent pane with its name, role, status and verdict, plus each tab's
-# remaining pane capacity. The orchestrator reads this to decide reuse (a free
-# verdict, and a role whose model suits the new task) versus launch (a tab with
-# capacity, or a new tab). A session is free to claim when its verdict is
+# every agent pane with its name, role, status and verdict. The orchestrator
+# reads this to decide reuse (a free verdict, and a role whose model suits the
+# new task) versus launch. A session is free to claim when its verdict is
 # empty or done; see session_verdict in _lib.sh for why status is not enough.
+# Tabs are not reported: launch-session gives every session a tab of its own,
+# so no tab has capacity to weigh.
 #
 # Usage: check-sessions [<repo>]
-# Output: one JSON object -> {repo, workspace_id, agents: [...], tabs: [...]}
+# Output: one JSON object -> {repo, workspace_id, agents: [...]}
 # per repository, one per line.
 source "$(dirname "$0")/_lib.sh"
 require_herdr
@@ -16,7 +17,7 @@ scan() {
   local path=$1 label ws
   label=$(basename "$path")
   ws=$(workspace_id_for_label "$label")
-  local agents='[]' tabs='[]'
+  local agents='[]'
   if [ -n "$ws" ]; then
     agents=$(herdr agent list | jq -c --arg path "$path" '
       [.result.agents[]
@@ -40,13 +41,10 @@ scan() {
         jq -c --argjson a "$row" --arg v "$v" '. + [$a + {verdict: $v}]')
     done <<< "$(printf '%s' "$agents" | jq -c '.[]')"
     agents=$merged
-    tabs=$(herdr tab list --workspace "$ws" |
-      jq -c '[.result.tabs[] | {tab: .tab_id, panes: .pane_count, free: (4 - .pane_count)}]')
   fi
-  jq -nc --arg repo "$label" --arg ws "$ws" \
-    --argjson agents "$agents" --argjson tabs "$tabs" \
+  jq -nc --arg repo "$label" --arg ws "$ws" --argjson agents "$agents" \
     '{repo: $repo, workspace_id: (if $ws == "" then null else $ws end),
-      agents: $agents, tabs: $tabs}'
+      agents: $agents}'
 }
 
 if [ $# -ge 1 ]; then
