@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+# The docs contract, checked on any commit that stages docs/.
+#
+# scripts/check-docs parses the fenced `json contract=docs` block out of
+# docs/README.md and checks this repository's docs/ against it: every view
+# catalogued, every catalogued view present, the provenance block, the
+# doctype, its chapter, and the Updated date.
+#
+# It reads the working tree, not the index, so an unstaged problem under
+# docs/ blocks the commit too. That is the wrong half of the trade only when
+# docs/ is dirty for another reason; the checker owns whole-directory rules
+# (a chapter listing a file that is not there) that the index cannot answer.
+#
+# Git hooks do not clone. Wire this directory up once per machine:
+#   git config core.hooksPath .git/local-hooks
+# whose pre-commit runs the machine-wide main-branch guard and then this file.
+set -eu
+
+root=$(git rev-parse --show-toplevel)
+
+git diff --cached --name-only --diff-filter=ACMRD | grep -q '^docs/' || exit 0
+
+exec python3 "$root/scripts/check-docs" "$root"
