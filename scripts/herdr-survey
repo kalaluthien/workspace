@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-# Show, for every repository under ~/workspace, which herdr agents hold it and
-# what its git checkout looks like. Read-only.
+# Show, for every repository under ~/workspace and for the container root
+# itself, which herdr agents hold it and what its git checkout looks like.
+# Read-only.
+#
+# The root is a repository too, and it is also every entry's prefix, so its
+# row matches agents by exact cwd while an entry matches by prefix. Without
+# that split the root would repeat every entry's agents under "workspace".
 #
 # Usage: herdr-survey [--json]
 #   --json  emit one JSON object per repository instead of the table
@@ -13,10 +18,12 @@ as_json=false
 
 agents=$(herdr agent list 2>/dev/null || printf '{"result":{"agents":[]}}')
 
-for repo_path in "$WORKSPACE_ROOT"/*/; do
+for repo_path in "$WORKSPACE_ROOT"/*/ "$WORKSPACE_ROOT"; do
   repo_path=${repo_path%/}
   [ -d "$repo_path/.git" ] || continue
   repo_name=$(basename "$repo_path")
+  exact=false
+  [ "$repo_path" = "$WORKSPACE_ROOT" ] && exact=true
 
   branch=$(git -C "$repo_path" branch --show-current 2>/dev/null || true)
   [ -n "$branch" ] || branch=$(git -C "$repo_path" rev-parse --short HEAD 2>/dev/null || echo '-')
@@ -26,7 +33,10 @@ for repo_path in "$WORKSPACE_ROOT"/*/; do
   ahead=$(git -C "$repo_path" rev-list --count '@{upstream}..HEAD' 2>/dev/null || echo 0)
 
   repo_agents=$(printf '%s' "$agents" | jq -c --arg path "$repo_path" \
-    '[.result.agents[] | select(.cwd == $path or (.cwd | startswith($path + "/")))
+    --argjson exact "$exact" \
+    '[.result.agents[]
+      | select(if $exact then .cwd == $path
+               else .cwd == $path or (.cwd | startswith($path + "/")) end)
       | {name: (.name // .agent), status: .agent_status, pane: .pane_id}]')
 
   if $as_json; then

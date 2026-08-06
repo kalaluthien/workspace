@@ -3,9 +3,13 @@
 # A session is spent when it holds no work (empty) or when its last word was
 # the completion sentinel (done); everything else is reported, never closed.
 #
-# Two exclusions are structural, not options. Enumeration walks the repository
-# entries, so sessions in the container root are out of reach, and the calling
-# pane ($HERDR_PANE_ID) is skipped so a sweep cannot close itself.
+# Enumeration walks the repository entries and then the container root, which
+# is a repository too, so a session run from the root is swept like any other.
+# The root pass matches its own cwd exactly rather than by prefix, so an entry
+# session is reported once, under its entry.
+#
+# One exclusion is structural, not an option: the calling pane
+# ($HERDR_PANE_ID) is skipped so a sweep cannot close itself.
 #
 # --shells adds the panes holding no session at all: a bare shell left behind
 # after its work, anywhere under the workspace root including the container
@@ -41,12 +45,17 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+# Match by prefix for an entry, whose sessions may sit in a subdirectory or a
+# worktree, but exactly for the container root, which is every entry's prefix
+# and would otherwise claim all of them a second time under its own label.
 sweep() {
-  local path=$1 label rows
+  local path=$1 label rows exact=false
+  [ "$path" = "$WORKSPACE_ROOT" ] && exact=true
   label=$(basename "$path")
-  rows=$(herdr agent list | jq -c --arg path "$path" '
+  rows=$(herdr agent list | jq -c --arg path "$path" --argjson exact "$exact" '
     .result.agents[]
-    | select(.cwd == $path or (.cwd | startswith($path + "/")))
+    | select(if $exact then .cwd == $path
+             else .cwd == $path or (.cwd | startswith($path + "/")) end)
     | {name: .name, pane: .pane_id, status: .agent_status}')
 
   local row name pane status v closed
@@ -113,5 +122,6 @@ else
   for p in "$WORKSPACE_ROOT"/*/; do
     if [ -d "$p/.git" ]; then sweep "${p%/}"; fi
   done
+  sweep "$WORKSPACE_ROOT"
   if $shells; then sweep_shells "$WORKSPACE_ROOT"; fi
 fi
