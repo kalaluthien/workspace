@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# Deliver a prompt to a delegated session, enriched with the context the
-# session cannot see: sibling sessions in the same repository (collision
-# warning), the worktree convention, and a completion sentinel the
-# orchestrator can wait on.
+# Deliver a prompt to a worker, enriched with the context the worker cannot
+# see: sibling sessions in the same repository (collision warning), the
+# worktree convention, and a completion sentinel the orchestrator can wait on.
 #
 # Usage: send-prompt <target> [--worktree] [--no-sentinel] [--prompt TEXT]
 #        echo "task" | send-prompt <target>

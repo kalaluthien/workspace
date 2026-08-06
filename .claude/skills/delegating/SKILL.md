@@ -1,22 +1,28 @@
 ---
 name: delegating
-description: Orchestrate work across claude sessions in herdr panes, one per ~/workspace repository. Use when a request belongs in a project entry (research → notes, app work → camera, ...) or spans several entries, when the user asks to spawn, reuse, message, monitor, or clean agent sessions, or for fire-and-forget surveys beside monitored implementation. Not for work this session can finish in its own cwd.
+description: Orchestrate work across named worker claude sessions in herdr panes, one per ~/workspace repository. Use when a request belongs in a project entry (research → notes, app work → camera, ...) or spans several entries, when the user asks to spawn, reuse, message, monitor, or clean agent sessions, or for fire-and-forget surveys beside monitored implementation. Not for work this session can finish in its own cwd.
 ---
 
 # Delegating
 
 This session is the orchestrator: it routes, delegates, monitors, and reports —
-it does not do the delegated work itself. All scripts live in
+it does not do the delegated work itself. A session this skill launches and
+names is a worker; "session" alone means any claude session in a pane, named
+or not. All scripts live in
 `scripts/` here, print JSON, and never touch panes they did not create.
 
 ## Decision loop
 1. Route the request to repository entries with the workspace catalogue
    (`~/workspace/.claude/CLAUDE.md`).
-2. Name the session for the work, `<role>-<task>` — `survey-tflite-detectors`,
+2. Name the worker for the work, `<role>-<task>` — `survey-tflite-detectors`,
    `build-preview-crash`, `plan-camera-v3`. The name is the routing key for
-   every later step, so it must say what the pane is for; a reader of
-   `herdr agent list` learns the repository from the pane's `cwd` and the model
-   from the role, and neither belongs in the name. The role is one of five:
+   every later step and the search key for the worker's history:
+   `launch-session` stamps it on the herdr agent and on the claude session
+   (`claude --name`), so `/resume` and the transcript under
+   `~/.claude/projects/` answer to it after the pane is gone. It must say what
+   the pane is for; a reader of `herdr agent list` learns the repository from
+   the pane's `cwd` and the model from the role, and neither belongs in the
+   name. The role is one of five:
 
    | role | the work |
    | --- | --- |
@@ -36,68 +42,74 @@ it does not do the delegated work itself. All scripts live in
    follow the same preference — Opus where they decide, Sonnet where they
    search, classify, or summarize.
 
-3. `scripts/check-sessions <repo>` — live sessions with name, role, status,
-   and verdict. Reuse a session of the role the new task needs whose verdict
+3. `scripts/check-sessions <repo>` — live workers with name, role, status,
+   and verdict. Reuse a worker of the role the new task needs whose verdict
    is `empty` or `done`; the verdict decides, not the status, because a
-   session that pauses mid-turn reports idle and claiming it would clear work
-   still running. Otherwise `scripts/launch-session <repo> <role>-<task>`
+   worker that pauses mid-turn reports idle and claiming it would clear work
+   still running. A `done` worker still standing was never collected — step 6
+   closes a collected one — so read its tail before claiming it.
+   Otherwise `scripts/launch-session <repo> <role>-<task>`
    (every session gets a tab of its own, so a launch never splits a pane and
    never runs out of room; pick `--effort` from the task's breadth per step 2;
    `--model` is an escape hatch for one session).
    Claim a reused session here, before sending:
    `scripts/clean-session <name> --rename <role>-<task>` resets it to a
-   known-empty context and renames the pane for the new task, because a session
-   found idle carries both the last delegation's context and its name. The role
-   has to stay the same, and the new task's breadth has to fit the effort the
+   known-empty context and renames both sides — the herdr agent and the claude
+   session — for the new task, because a worker found idle carries both the
+   last delegation's context and its name. The role has to stay the same, and
+   the new task's breadth has to fit the effort the
    pane launched with — the pane keeps the model and effort `claude` started
    with, and a claim does not switch them — so a task in another role, or one
-   much wider than the pane's effort, is a new session, however free the pane
-   looks. A session launched in this step arrives clean and correctly named.
+   much wider than the pane's effort, is a new worker, however free the pane
+   looks. A worker launched in this step arrives clean and correctly named.
 4. `scripts/send-prompt <name> [--worktree]` — the script appends what the
-   session cannot see: sibling-session collision warnings, the worktree
+   worker cannot see: sibling-session collision warnings, the worktree
    convention, and a `DONE <name>` completion sentinel. A task shaped as a
    mission with completion criteria opens with `/goal` on the prompt's first
-   line — `/goal <mission, then the criteria>` — so the session loops on its
+   line — `/goal <mission, then the criteria>` — so the worker loops on its
    own until its judge model reports the criteria met; the appended sentinel
    rides inside the goal text and still prints when the goal clears.
    A mission whose report will exceed one screen names a scratch file for the
    full deliverable in the prompt — `read-session` captures only the pane
    tail, and a report that scrolled off is a second round-trip to recover.
 5. Wait with the harness, not with the turn. `scripts/watch-sessions <name>...`
-   prints one line per session the moment it stops needing the orchestrator —
+   prints one line per worker the moment it stops needing the orchestrator —
    `done` on its sentinel, `blocked` on a permission prompt, `gone` on a
    closed pane, `pending` when it goes quiet without finishing — and exits
    when the last one lands. Run it two ways, by how many wake-ups the wait
    needs:
    - One session: a background `Bash` call. It exits on the single event and
      the harness re-invokes this session with the line.
-   - Several: the `Monitor` tool. Each session that lands is a notification,
+   - Several: the `Monitor` tool. Each worker that lands is a notification,
      and the watch ends itself when all of them have.
    Neither blocks the turn, and neither needs the user to prompt again. Do not
    foreground a wait and do not end a turn asking the user to check back — a
    foreground wait burns the turn holding a `sleep`, and a timeout ends it
    with nothing delivered. `scripts/await-session` remains for a deliberate
    blocking wait that also prints the pane tail.
-   While a watch stands, spend no turns checking the sessions it covers — no
+   While a watch stands, spend no turns checking the workers it covers — no
    `read-session`, `check-sessions`, or `sweep-sessions` between events. Each
    check turn re-reads the orchestrator's whole context to learn what the
-   watch will deliver anyway; read a session once, when its line arrives.
-   A `pending` or `blocked` session gets `scripts/read-session` and one
+   watch will deliver anyway; read a worker once, when its line arrives.
+   A `pending` or `blocked` worker gets `scripts/read-session` and one
    re-request before escalating to the user. `blocked` also covers a session
    usage limit; the message names a reset time that can already be past when
    the watch fires — read the clock before scheduling any wait, and resume at
    once when the reset has passed.
-6. Report outcomes and ask the session to clean its repository (commit, remove
-   worktree). A delegate reports in its own shape — verbose, ordered by its
-   criteria walk, blind to the sibling sessions. Write the user's report
+6. Collect and retire. Read the worker's output, and when its repository still
+   holds uncommitted work, have it clean up (commit, remove worktree) and wait
+   for that to finish. Then close the pane:
+   `scripts/clean-session <name> --close`. Close only after the output is
+   collected — closing first discards the pane tail — and close only `done`
+   workers; a `pending` or `blocked` one still needs a re-request or an
+   answer. The pane is not the evidence behind the report: the worker's
+   transcript under `~/.claude/projects/` is, and it answers to the worker's
+   name in `/resume`. A worker reports in its own shape — verbose, ordered by
+   its criteria walk, blind to the sibling workers. Write the user's report
    instead of forwarding that: keep the results that change what the user
-   knows or must do, merge the sessions into one narrative, and state the
-   conclusions the delegates left implicit. Wording follows the output
-   style, "Reporting". Leave the session's context standing — it is the
-   evidence behind the report, and the next delegation clears and renames
-   it in step 3. Retiring
-   the pane (`scripts/clean-session <name> --close`) is for sessions this skill
-   launched, only when the user asks.
+   knows or must do, merge the workers into one narrative, and state the
+   conclusions they left implicit. Wording follows the output style,
+   "Reporting".
 7. When the user asks for a session clean-up, `scripts/sweep-sessions` reads
    every pane and prints a verdict: `empty`, `done`, `pending`, or the herdr
    status of a pane too busy to read. Adding `--close` retires the empty and
@@ -164,7 +176,7 @@ close is held for the owner. A row left working with no such tag reads as a
 session that is still running, and the board waits on it for ever.
 
 When the orchestrator collects a board-dispatched session, it checks the
-item's marker before reporting: a delegate can ship the work, print its
+item's marker before reporting: a worker can ship the work, print its
 sentinel, and still leave the row `[/]`. Close the item yourself then — the
 work is verified by the report you just read, and re-asking the session costs
 a round-trip for one line. Do not close a row tagged `#need-you`: the tag
@@ -190,6 +202,7 @@ holds the automatic close, and only the owner closes it.
    decide, Sonnet where they search. One session, so watch it with a
    background `Bash` call.
 5. Its line arrives as `done`, or as `pending` when it stopped early — then
-   read the output and re-request the remainder. Have it clean the repository
-   and report the summary. The sessions stay as they are; the next delegation
-   to `notes` or `camera` clears and renames them when it claims them.
+   read the output and re-request the remainder. Have it clean the repository,
+   close each worker as its output lands (`clean-session <name> --close`), and
+   report the summary. The transcripts keep the evidence under the workers'
+   names.

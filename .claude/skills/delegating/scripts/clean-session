@@ -3,14 +3,16 @@
 # /clear (pane survives for reuse). Reset when claiming a session for new work,
 # not when finishing the old — see SKILL.md step 3. --rename belongs to the same
 # claim: a pane named for the task it just finished lies about the task it is
-# about to run, so a reused pane is renamed as it is cleared. The new name must
-# keep the old role. The pane keeps the model and effort `claude` started with,
+# about to run, so a reused pane is renamed on both sides — the herdr agent and
+# the claude session — as it is cleared. The new name must keep the old role.
+# The pane keeps the model and effort `claude` started with,
 # and a claim does not drive claude's own `/model` and `/effort` switches — so
 # work of another role, or of a breadth the launch effort does not fit, needs
 # its own pane.
-# --close removes the pane — allowed only for sessions this skill launched (a
-# herdr agent name exists only where a script started one); closing anything
-# else needs --force and an explicit user request.
+# --close retires a worker whose output has been collected — the normal end
+# of a delegation (SKILL.md step 6). Allowed only for sessions this skill
+# launched (a herdr agent name exists only where a script started one);
+# closing anything else needs --force and an explicit user request.
 #
 # Usage: clean-session <target> [--rename <role>-<task>] [--close [--force]]
 source "$(dirname "$0")/_lib.sh"
@@ -52,6 +54,17 @@ else
   herdr pane send-text "$pane" "/clear"
   sleep 1
   herdr pane send-keys "$pane" Enter
+  # Re-stamp the claude-side name after the clear — the new name on a rename,
+  # the standing name otherwise — so the transcript keeps answering to the
+  # same name the herdr agent carries.
+  stamp=$name
+  [ -n "$stamp" ] || stamp=$(agent_row "$target" | jq -r '.name // empty')
+  if [ -n "$stamp" ]; then
+    sleep 1
+    herdr pane send-text "$pane" "/rename $stamp"
+    sleep 1
+    herdr pane send-keys "$pane" Enter
+  fi
   [ -n "$name" ] && herdr agent rename "$pane" "$name" >/dev/null
   jq -nc --arg p "$pane" --arg n "$name" \
     '{cleared: $p, name: (if $n == "" then null else $n end)}'

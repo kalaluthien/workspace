@@ -8,7 +8,9 @@
 # Opus (a session owns decisions; Fable stays with the orchestrator, per
 # ~/.claude/CLAUDE.md "Claude Code"). Pass --effort per the task's breadth —
 # the default medium fits a narrow scope. --model is an escape hatch for one
-# session.
+# session. The same name lands on the claude session (`--name`), so `/resume`
+# and the transcript under ~/.claude/projects/ answer to it after the pane
+# closes.
 #
 # Usage: launch-session <repo> <role>-<task>
 #                       [--model fable|opus|sonnet|haiku]
@@ -64,7 +66,8 @@ pane=$(printf '%s' "$created" | jq -r '.result.root_pane.pane_id // empty')
 attempts=0 started=
 until started=$(herdr agent start "$name" --kind claude --pane "$pane" \
     --timeout 90000 \
-    -- --model "$model" --effort "$effort" ${extra[@]+"${extra[@]}"} 2>&1); do
+    -- --model "$model" --effort "$effort" --name "$name" \
+       ${extra[@]+"${extra[@]}"} 2>&1); do
   attempts=$((attempts + 1))
   [ "$attempts" -lt 10 ] || die "agent start failed: $started"
   sleep 1
