@@ -126,11 +126,16 @@ bookkeeping:
 1. Claim the item before anything else: flip its marker to `[/]` in the named
    file. The tap that spawned this session promised "working", and until the
    marker moves the board shows a promise the corpus denies.
-2. Close the item on completion, per the Filing rules in `~/.claude/CLAUDE.md`:
-   delete the row when the work shipped, after lifting any owed remainder into
-   its own `#need-you` item; retag `#need-you` when the work now waits on the
-   owner. A session that ends with the marker still `[/]` leaves a
-   card that reads as running forever.
+2. End the item on completion, per the Filing rules in `~/.claude/CLAUDE.md`,
+   in exactly one of three ways. The work shipped and nothing waits on the
+   owner: delete the row, after lifting any owed remainder into its own
+   `#need-you` item. The work is finished but the close waits on the owner's
+   review: leave the marker `[/]` and tag the row `#need-you`. The work is
+   unfinished and waits on the owner's input: put the marker back to `[ ]` and
+   tag the row `#need-you`. The tag holds the item's next automatic
+   transition, so only the owner ends a tagged row. A session that ends with
+   the marker still `[/]` and no such tag leaves a card that reads as running
+   forever.
 
 With no item after the pool file, the mission is the whole page: every item
 whose marker is `[ ]` and which carries no tag waiting on the owner — the
@@ -149,16 +154,18 @@ Re-read the backlog file immediately before every close: filings and other
 tickets edit it while you work, and a rewrite from the copy you read at
 claim time drops their rows.
 
-End the batch with no row still `[/]`. A mission you will not finish is
-retagged `#need-you`, which hands that row back and is a correct outcome;
-a row left working reads as a session that is still running, and the
-board waits on it for ever.
+End the batch with no row still `[/]` and untagged. A mission you will not
+finish is retagged `#need-you`, which hands that row back and is a correct
+outcome; so is a `[/] #need-you` row, which says the work is finished and the
+close is held for the owner. A row left working with no such tag reads as a
+session that is still running, and the board waits on it for ever.
 
 When the orchestrator collects a board-dispatched session, it checks the
 item's marker before reporting: a delegate can ship the work, print its
 sentinel, and still leave the row `[/]`. Close the item yourself then — the
 work is verified by the report you just read, and re-asking the session costs
-a round-trip for one line.
+a round-trip for one line. Do not close a row tagged `#need-you`: the tag
+holds the automatic close, and only the owner closes it.
 
 ## Worked example — "add object detection to camera"
 1. Not workspace-level work → this skill. Route: research → `notes`,
