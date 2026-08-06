@@ -9,8 +9,9 @@ document. The system's rules: `~/.claude/agents/document-writer.md`; the machine
 
 Template: `~/.claude/agents/document-writer/templates/spec.md`
 
-(none yet — the agent orchestration and service coordination layers are
-still documented in `.claude/` files)
+- [`agent-document-system.md`](agent-document-system.md) — which file holds
+  the document system's rules, the two arrangements that lost and why, and
+  what the choice still owes.
 
 ## Explanations
 

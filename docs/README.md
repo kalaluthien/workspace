@@ -7,7 +7,8 @@ entry's `docs/` — doctypes, templates, components, style, naming, and the
 writing pipeline — is defined once in the `document-writer` agent's own
 files: the constitution `~/.claude/agents/document-writer.md`, with
 `templates/` and `components/` beside it in
-`~/.claude/agents/document-writer/` (owner decision, 2026-08-04). This
+`~/.claude/agents/document-writer/` (the decision and its losing
+alternatives: `agent-document-system.md`). This
 file keeps only the two-kinds table and the machine contract below, which
 `scripts/check-docs` and the board service parse at this path.
 
