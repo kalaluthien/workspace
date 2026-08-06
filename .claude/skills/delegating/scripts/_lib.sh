@@ -87,7 +87,7 @@ shell_verdict() {
              then "shell" else "shell-busy" end' 2>/dev/null || printf 'shell-busy\n'
 }
 
-# session_verdict <pane> <name> <status> -> empty | done | pending | <status>
+# session_verdict <pane> <name> <status> -> empty | done | pending | unknown | <status>
 #
 # Whether a session is free to claim or retire. Status alone cannot say:
 # herdr reports a quiet pane as idle, and a pane goes quiet whenever the
@@ -118,7 +118,8 @@ session_verdict() {
     idle|done) ;;
     *) printf '%s\n' "$3"; return ;;
   esac
-  herdr pane read "$1" --source recent-unwrapped --lines "${SESSION_READ_LINES:-200}" |
+  local v
+  v=$(herdr pane read "$1" --source recent-unwrapped --lines "${SESSION_READ_LINES:-200}" |
     awk -v name="$2" '
       BEGIN { sentinel = (name == "" ? "" : "DONE " name) }
       { seen = NR }
@@ -141,5 +142,65 @@ session_verdict() {
         else if (output_at || input_at)             print "pending"
         else if (banner)                            print "empty"
         else                                        print "unknown"
-      }'
+      }')
+  if [ "$v" = unknown ] && [ -n "$2" ]; then
+    if transcript_says_done "$1" "$2"; then v=done; fi
+  fi
+  printf '%s\n' "$v"
+}
+
+# transcript_says_done <pane> <name> -> exit 0 when the delegate's transcript
+# holds "DONE <name>" as assistant output after the last user message.
+#
+# The screen is a lossy record, but the session's jsonl transcript under
+# ~/.claude/projects/<encoded-cwd>/ is durable: a sentinel that repainted
+# away still sits there as an assistant row. Consulted only when the screen
+# scores unknown. The scoping matters twice over: only the pane's own cwd
+# directory is searched, because the orchestrator's transcript quotes the
+# sentinel inside the prompt it sent, and only assistant rows count, because
+# the delegate's own transcript quotes it in the user row that delivered the
+# prompt. The last-prompt comparison mirrors the screen rule
+# done_at > input_at: a prompt sent after the sentinel reopened the session,
+# so the old sentinel no longer answers for it. A user row is a prompt only
+# when it is real work: tool results, hook injections (isMeta), and command
+# echoes (<command-name>, <local-command-stdout>) do not reopen a session —
+# a delegate's Stop hook routinely appends a filing round after the
+# sentinel, and counting its feedback as a prompt would deny every verdict.
+transcript_says_done() {
+  local cwd dir f
+  cwd=$(herdr agent list |
+    jq -r --arg p "$1" \
+      'first(.result.agents[] | select(.pane_id == $p) | .cwd) // empty')
+  [ -n "$cwd" ] || return 1
+  dir="$HOME/.claude/projects/$(printf '%s' "$cwd" | sed 's,[/.],-,g')"
+  [ -d "$dir" ] || return 1
+  for f in "$dir"/*.jsonl; do
+    [ -e "$f" ] || break
+    grep -q "DONE $2" "$f" 2>/dev/null || continue
+    if jq -r --arg s "DONE $2" '
+         def usertext:
+           if (.message.content | type) == "string" then .message.content
+           else ([.message.content[]? | select(.type? == "text") | .text]
+                 | join(" "))
+           end;
+         select(.type == "user" or .type == "assistant")
+         | if .type == "assistant"
+           then "assistant\t\(
+             [.message.content[]? | .text? // empty] | join(" ")
+             | contains($s))"
+           else "user\t\(
+             (.isMeta != true)
+             and (usertext | length > 0)
+             and ((usertext
+                   | startswith("<command-name>")
+                     or startswith("<local-command-stdout>")) | not))"
+           end
+       ' "$f" 2>/dev/null |
+       awk -F'\t' '
+         $1 == "user" && $2 == "true"      { u = NR }
+         $1 == "assistant" && $2 == "true" { d = NR }
+         END { exit !(d && d > u) }'
+    then return 0; fi
+  done
+  return 1
 }
