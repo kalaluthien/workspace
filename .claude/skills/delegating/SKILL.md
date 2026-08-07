@@ -152,6 +152,18 @@ bookkeeping:
    the marker still `[/]` and no such tag leaves a card that reads as running
    forever.
 
+When the item's scope turns out to hold a technical decision that is unknown
+or open to more than one reading, do not finish the item by choosing an answer
+yourself: the tap asked for the work, not for the decision behind it, and a
+guess ships as if the owner had made it. Write a proposal instead, in that
+project's own docs and per the workspace document system — named options,
+their trade-offs, one recommendation — and commit it. Then append a new
+`#need-you` row to the same backlog file naming the decision, with a sentence
+or two on why it blocks the work and a pointer to the proposal. Hand your own
+row back the third way above — unfinished, waiting on the owner's input —
+and name the blocking row in its body, so a re-tap meets the decision instead
+of the same ambiguity.
+
 With no item after the pool file, the mission is the whole page: every item
 whose marker is `[ ]` and which carries no tag waiting on the owner — the
 same rows the board draws Start live on — in the order the file lists them,
