@@ -164,9 +164,18 @@ row back the third way above — unfinished, waiting on the owner's input —
 and name the blocking row in its body, so a re-tap meets the decision instead
 of the same ambiguity.
 
+When the line naming one item also says the owner tapped Start on it
+themselves, that tap is their confirmation and the row's owner-waiting tag no
+longer holds it. A bare confirm means they accept the recommendation of the
+proposal the row points to exactly as written — anything they wanted changed
+is already in the row's own text. So record the acceptance in that proposal
+document, drop the owner-waiting tag as you claim the row, and then do the
+work the row names. Do not ask the owner anything the confirmation already
+answered.
+
 With no item after the pool file, the mission is the whole page: every item
 whose marker is `[ ]` and which carries no tag waiting on the owner — the
-same rows the board draws Start live on — in the order the file lists them,
+same rows the board's own Start all selects — in the order the file lists them,
 which is the user's own priority. Claim them in one edit before anything
 else, for the reason a single claim is made: until the markers move the
 board shows a promise the corpus denies, and the rows are already held
