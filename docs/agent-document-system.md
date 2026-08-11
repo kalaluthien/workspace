@@ -54,6 +54,11 @@ documents — at which point the spec rules split into a file that
 ## Non-goals and deferred work
 
 - **Re-rendering the entries' view shelves under the style layer** — deferred
-  2026-08-04, still open. The workspace's own five views were re-rendered on
-  2026-08-05 (`01d2800`), but none of camera's five or board's five carries a
-  kicker. Whether to spend that re-render is the owner's call.
+  2026-08-04, half closed. The workspace's own five views were re-rendered on
+  2026-08-05 (`01d2800`), and board's shelf on 2026-08-11 (board `1739016`,
+  released `v1.13.4`) — ten views by then, not the five this bullet counted,
+  and re-rendered under the compacted constitution rather than the style layer
+  alone: kicker, boxed conclusion and highlights, every rationale in a
+  disclosure, and the open page a third shorter across the shelf. Camera's
+  five still carry no kicker, and whether to spend that re-render is the
+  owner's call.
