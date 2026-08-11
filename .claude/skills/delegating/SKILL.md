@@ -22,7 +22,9 @@ or not. All scripts live in
    `~/.claude/projects/` answer to it after the pane is gone. It must say what
    the pane is for; a reader of `herdr agent list` learns the repository from
    the pane's `cwd` and the model from the role, and neither belongs in the
-   name. The role is one of five:
+   name. A worker launched by a board-dispatched mission takes this same name
+   behind the ticket's namespace — "Board-dispatched missions" below. The role
+   is one of five:
 
    | role | the work |
    | --- | --- |
@@ -132,10 +134,12 @@ or not. All scripts live in
 
 ## Board-dispatched missions
 The board's start action spawns a session whose whole prompt is one line:
-`/delegating <pool board file> <item title and body>`. When the arguments open
-with a pool board file path, the mission is that one backlog item, and the
-item's marker is the user-visible state of the job — the board renders the
-file on every scan. Two writes to that file are part of the mission, not
+`/delegating <pool board file> <the rows it claims>`. When the arguments open
+with a pool board file path, the mission is the rows that line names and no
+others, and each row's marker is the user-visible state of the job — the board
+renders the file on every scan. One row arrives as its own title and body; a
+batch arrives as a numbered run, `(1) … (2) …`, in the file's own order, which
+is the user's priority. Two writes to that file are part of the mission, not
 bookkeeping:
 
 1. Claim the item before anything else: flip its marker to `[/]` in the named
@@ -179,19 +183,39 @@ first, then record the answer in the proposal document, drop the tag, and do the
 work the answer selects. Either way, do not ask the owner anything the
 confirmation already answered.
 
-With no item after the pool file, the mission is the whole page: every item
-whose marker is `[ ]` and which carries no tag waiting on the owner — the
-same rows the board's own Start all selects — in the order the file lists them,
-which is the user's own priority. Claim them in one edit before anything
-else, for the reason a single claim is made: until the markers move the
-board shows a promise the corpus denies, and the rows are already held
-against a second tap.
+When the line names several rows, the mission is exactly those rows, in that
+order, and no other row of the file however workable it looks. The board
+froze that set at the tap and claims exactly it, so a row you add to the
+mission is a row nobody claimed and nobody measures — worked beside whatever
+already held it, and still running when the board calls the batch finished. A
+row filed after the tap is not the batch's; it takes a second tap. Claim the
+named rows in one edit before anything else, for the reason a single claim is
+made: until the markers move the board shows a promise the corpus denies, and
+the rows are already held against a second tap.
+
+With no row after the pool file at all — a line typed by hand, never one the
+board sends — the mission is the whole page: every item whose marker is `[ ]`
+and which carries no tag waiting on the owner, in the order the file lists
+them.
 
 Then run them as separate missions, and close each item as its own mission
 ships — not the batch at the end. Fan out only where the missions' changes
 cannot meet; they land in one repository, so each takes its own worktree and
 anything touching the same files runs in sequence. Keep at most three
 running, so one `Monitor` watch covers them.
+
+Name every session a board-dispatched mission launches inside the ticket's
+namespace, which the board's own line hands you: `ticket-<id>--<role>-<task>`,
+the same `<role>-<task>` as anywhere else with that prefix in front. It is
+what makes a worker reachable by anything but this session: the board's cancel
+interrupts every pane in the namespace and closes it once the ticket settles,
+and a worker named outside the namespace survives a cancelled ticket with
+nobody able to name it. Two prices, both known and neither a reason to shorten
+the prefix. herdr allows 32 characters and `launch-session` clips at 29 to
+leave room for its duplicate suffix, so the prefix spends 17 and the task part
+is cut to about 12 — every worked example in this file loses letters. And a
+clipped name is no longer a `/resume` key, so a worker launched this way is
+found through its ticket rather than through its own transcript.
 Re-read the backlog file immediately before every close: filings and other
 tickets edit it while you work, and a rewrite from the copy you read at
 claim time drops their rows.
