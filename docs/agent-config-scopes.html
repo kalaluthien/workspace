@@ -36,6 +36,21 @@
   @media (max-width: 42rem) {
     table { display: block; overflow-x: auto; }
     th, td { min-width: 9rem; }
+    /* Stacked rows: a table over three columns keeps every cell on screen.
+       Each row becomes a block titled by its first cell; the other cells
+       print their column name from data-label. */
+    table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; }
+    table.stack thead { display: none; }
+    table.stack tr { border-bottom: 1px solid #e4e4e4; padding: .5rem 0; }
+    table.stack td { min-width: 0; border-bottom: none; padding: .12rem 0; }
+    table.stack td:first-child { font-weight: 700; }
+    table.stack td[data-label]::before {
+      content: attr(data-label);
+      display: inline-block;
+      width: 7.5rem;
+      color: #555;
+      font-size: .82em;
+    }
   }
   .kicker { font-variant: small-caps; letter-spacing: .16em; font-size: .75rem; font-weight: 600; color: #555; margin: 0 0 .4rem; }
   .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
@@ -189,15 +204,15 @@
       </ol>
     </div>
 
-    <table>
+    <table class="stack">
       <thead><tr><th>kind</th><th>global</th><th>workspace</th><th>project</th><th>format defined in</th></tr></thead>
       <tbody>
-        <tr><td>instruction</td><td><code>CLAUDE.md</code> + <code>RTK.md</code></td><td><code>CLAUDE.md</code></td><td>4 of 5 entries</td><td>"Claude Code" item 1</td></tr>
-        <tr><td>rule</td><td><code>skill-authoring.md</code></td><td><code>services.md</code></td><td><code>camera/</code>: <code>engineering.md</code></td><td><code>setup-claude-rules</code>, global pool</td></tr>
-        <tr><td>skill</td><td>none</td><td><code>delegating/</code></td><td><code>notes/</code>: 6</td><td><code>rules/skill-authoring.md</code>; naming, "Claude Code" item 2</td></tr>
-        <tr><td>agent</td><td><code>debugger.md</code>, <code>document-writer.md</code> + its reference directory</td><td>none</td><td><code>notes/</code>: 3</td><td>none — by example only</td></tr>
-        <tr><td>output style</td><td>none</td><td><code>simplified-technical.md</code></td><td>none</td><td>none</td></tr>
-        <tr><td>memory pool</td><td>18 <code>setup-*</code></td><td>15 files</td><td>4 of 5 entries</td><td>"Filing" table + pool contract</td></tr>
+        <tr><td>instruction</td><td data-label="global"><code>CLAUDE.md</code> + <code>RTK.md</code></td><td data-label="workspace"><code>CLAUDE.md</code></td><td data-label="project">4 of 5 entries</td><td data-label="format defined in">"Claude Code" item 1</td></tr>
+        <tr><td>rule</td><td data-label="global"><code>skill-authoring.md</code></td><td data-label="workspace"><code>services.md</code></td><td data-label="project"><code>camera/</code>: <code>engineering.md</code></td><td data-label="format defined in"><code>setup-claude-rules</code>, global pool</td></tr>
+        <tr><td>skill</td><td data-label="global">none</td><td data-label="workspace"><code>delegating/</code></td><td data-label="project"><code>notes/</code>: 6</td><td data-label="format defined in"><code>rules/skill-authoring.md</code>; naming, "Claude Code" item 2</td></tr>
+        <tr><td>agent</td><td data-label="global"><code>debugger.md</code>, <code>document-writer.md</code> + its reference directory</td><td data-label="workspace">none</td><td data-label="project"><code>notes/</code>: 3</td><td data-label="format defined in">none — by example only</td></tr>
+        <tr><td>output style</td><td data-label="global">none</td><td data-label="workspace"><code>simplified-technical.md</code></td><td data-label="project">none</td><td data-label="format defined in">none</td></tr>
+        <tr><td>memory pool</td><td data-label="global">18 <code>setup-*</code></td><td data-label="workspace">15 files</td><td data-label="project">4 of 5 entries</td><td data-label="format defined in">"Filing" table + pool contract</td></tr>
       </tbody>
     </table>
 

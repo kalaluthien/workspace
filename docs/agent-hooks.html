@@ -35,6 +35,21 @@
   @media (max-width: 42rem) {
     table { display: block; overflow-x: auto; }
     th, td { min-width: 9rem; }
+    /* Stacked rows: a table over three columns keeps every cell on screen.
+       Each row becomes a block titled by its first cell; the other cells
+       print their column name from data-label. */
+    table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; }
+    table.stack thead { display: none; }
+    table.stack tr { border-bottom: 1px solid #e4e4e4; padding: .5rem 0; }
+    table.stack td { min-width: 0; border-bottom: none; padding: .12rem 0; }
+    table.stack td:first-child { font-weight: 700; }
+    table.stack td[data-label]::before {
+      content: attr(data-label);
+      display: inline-block;
+      width: 7.5rem;
+      color: #555;
+      font-size: .82em;
+    }
   }
   .kicker { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: #666; margin: 0 0 .6rem; }
   .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
@@ -249,13 +264,13 @@
       </ol>
     </div>
 
-    <table>
+    <table class="stack">
       <thead><tr><th>Event</th><th>Matcher</th><th>What runs</th><th>What it guards</th></tr></thead>
       <tbody>
-        <tr><td><code>UserPromptSubmit</code></td><td>every prompt</td><td><code>echo</code> of one reminder line</td><td>the reply's register — plain, everyday language over jargon</td></tr>
-        <tr><td><code>PreToolUse</code></td><td><code>Bash</code></td><td><code>rtk hook claude</code></td><td>the token budget — the command is rewritten to its rtk proxy, which trims the output</td></tr>
-        <tr><td><code>PostToolUse</code></td><td><code>Write|Edit</code></td><td><code>check-backlog-format.py</code></td><td>the backlog item grammar in any pool's <code>backlog.md</code></td></tr>
-        <tr><td><code>Stop</code></td><td>every turn</td><td><code>stop-takeaway-check.py</code></td><td>the durable takeaway — the Filing reminder</td></tr>
+        <tr><td><code>UserPromptSubmit</code></td><td data-label="Matcher">every prompt</td><td data-label="What runs"><code>echo</code> of one reminder line</td><td data-label="What it guards">the reply's register — plain, everyday language over jargon</td></tr>
+        <tr><td><code>PreToolUse</code></td><td data-label="Matcher"><code>Bash</code></td><td data-label="What runs"><code>rtk hook claude</code></td><td data-label="What it guards">the token budget — the command is rewritten to its rtk proxy, which trims the output</td></tr>
+        <tr><td><code>PostToolUse</code></td><td data-label="Matcher"><code>Write|Edit</code></td><td data-label="What runs"><code>check-backlog-format.py</code></td><td data-label="What it guards">the backlog item grammar in any pool's <code>backlog.md</code></td></tr>
+        <tr><td><code>Stop</code></td><td data-label="Matcher">every turn</td><td data-label="What runs"><code>stop-takeaway-check.py</code></td><td data-label="What it guards">the durable takeaway — the Filing reminder</td></tr>
       </tbody>
     </table>
 
@@ -302,15 +317,15 @@
       </ol>
     </div>
 
-    <table>
+    <table class="stack">
       <thead><tr><th>Repository</th><th><code>core.hooksPath</code></th><th>Chained after the guard</th><th>Runs <code>check-docs</code></th><th>What that hook adds</th></tr></thead>
       <tbody>
-        <tr><td><code>workspace</code></td><td><code>.git/local-hooks</code></td><td><code>hooks/pre-commit</code></td><td>yes</td><td>nothing else — the hook exists to run the docs-contract checker</td></tr>
-        <tr><td><code>board</code></td><td><code>.git/local-hooks</code></td><td><code>hooks/pre-commit</code></td><td>yes</td><td>a credential-shape scan of the staged diff — API keys, tokens, private-key headers</td></tr>
-        <tr><td><code>camera</code></td><td><code>.git/local-hooks</code></td><td><code>hooks/pre-commit</code></td><td>yes, after its own <code>script/check-docs.py</code></td><td>camera-roll bytes and metadata, Kotlin block comments, and release-commit invariants</td></tr>
-        <tr><td><code>notes</code></td><td><code>.git/local-hooks</code></td><td><code>.githooks/pre-commit</code></td><td>no — no <code>docs/</code> directory</td><td>the front-matter schema of staged blog, journal, and wiki notes</td></tr>
-        <tr><td><code>mabinogi-mobile-automation</code></td><td><code>.git/local-hooks</code></td><td><code>.git/hooks/pre-commit</code></td><td>no — its <code>docs/</code> holds only <code>images/</code></td><td>the pre-commit framework, running one local hook: the shell completion stays in sync with the script</td></tr>
-        <tr><td><code>kalaluthien.github.io</code></td><td>unset</td><td>—</td><td>no — no <code>docs/</code> directory</td><td>—</td></tr>
+        <tr><td><code>workspace</code></td><td data-label="core.hooksPath"><code>.git/local-hooks</code></td><td data-label="Chained after the guard"><code>hooks/pre-commit</code></td><td data-label="Runs check-docs">yes</td><td data-label="What that hook adds">nothing else — the hook exists to run the docs-contract checker</td></tr>
+        <tr><td><code>board</code></td><td data-label="core.hooksPath"><code>.git/local-hooks</code></td><td data-label="Chained after the guard"><code>hooks/pre-commit</code></td><td data-label="Runs check-docs">yes</td><td data-label="What that hook adds">a credential-shape scan of the staged diff — API keys, tokens, private-key headers</td></tr>
+        <tr><td><code>camera</code></td><td data-label="core.hooksPath"><code>.git/local-hooks</code></td><td data-label="Chained after the guard"><code>hooks/pre-commit</code></td><td data-label="Runs check-docs">yes, after its own <code>script/check-docs.py</code></td><td data-label="What that hook adds">camera-roll bytes and metadata, Kotlin block comments, and release-commit invariants</td></tr>
+        <tr><td><code>notes</code></td><td data-label="core.hooksPath"><code>.git/local-hooks</code></td><td data-label="Chained after the guard"><code>.githooks/pre-commit</code></td><td data-label="Runs check-docs">no — no <code>docs/</code> directory</td><td data-label="What that hook adds">the front-matter schema of staged blog, journal, and wiki notes</td></tr>
+        <tr><td><code>mabinogi-mobile-automation</code></td><td data-label="core.hooksPath"><code>.git/local-hooks</code></td><td data-label="Chained after the guard"><code>.git/hooks/pre-commit</code></td><td data-label="Runs check-docs">no — its <code>docs/</code> holds only <code>images/</code></td><td data-label="What that hook adds">the pre-commit framework, running one local hook: the shell completion stays in sync with the script</td></tr>
+        <tr><td><code>kalaluthien.github.io</code></td><td data-label="core.hooksPath">unset</td><td data-label="Chained after the guard">—</td><td data-label="Runs check-docs">no — no <code>docs/</code> directory</td><td data-label="What that hook adds">—</td></tr>
       </tbody>
     </table>
 

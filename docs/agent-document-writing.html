@@ -35,6 +35,21 @@
   @media (max-width: 42rem) {
     table { display: block; overflow-x: auto; }
     th, td { min-width: 9rem; }
+    /* Stacked rows: a table over three columns keeps every cell on screen.
+       Each row becomes a block titled by its first cell; the other cells
+       print their column name from data-label. */
+    table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; }
+    table.stack thead { display: none; }
+    table.stack tr { border-bottom: 1px solid #e4e4e4; padding: .5rem 0; }
+    table.stack td { min-width: 0; border-bottom: none; padding: .12rem 0; }
+    table.stack td:first-child { font-weight: 700; }
+    table.stack td[data-label]::before {
+      content: attr(data-label);
+      display: inline-block;
+      width: 7.5rem;
+      color: #555;
+      font-size: .82em;
+    }
   }
   .kicker { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: #666; margin: 0 0 .6rem; }
   .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
@@ -227,26 +242,26 @@
       </ol>
     </div>
 
-    <table>
+    <table class="stack">
       <thead><tr><th>Option</th><th>What it does</th><th>Cost</th><th>What it gives up</th></tr></thead>
       <tbody>
         <tr>
           <td><strong>README as master</strong></td>
-          <td>Keeps <code>docs/README.md</code> as the constitution and demotes every other site to a pointer.</td>
-          <td>Six sites trimmed; the README grows to absorb what they held.</td>
-          <td>Locality. The writer still needs the rules inside its own definition to act on them, so the README&ndash;agent duplication survives as structure rather than accident.</td>
+          <td data-label="What it does">Keeps <code>docs/README.md</code> as the constitution and demotes every other site to a pointer.</td>
+          <td data-label="Cost">Six sites trimmed; the README grows to absorb what they held.</td>
+          <td data-label="What it gives up">Locality. The writer still needs the rules inside its own definition to act on them, so the README&ndash;agent duplication survives as structure rather than accident.</td>
         </tr>
         <tr>
           <td><strong>Writer as constitution</strong></td>
-          <td>Makes <code>document-writer.md</code> the one normative description of the whole system, spec rules included.</td>
-          <td>One file serves two audiences, so spec-only prose rides in the writer&rsquo;s context on every invocation.</td>
-          <td>A clean single audience per file, and a single repository: the definition is versioned in <code>~/.claude</code>, not beside the documents it governs.</td>
+          <td data-label="What it does">Makes <code>document-writer.md</code> the one normative description of the whole system, spec rules included.</td>
+          <td data-label="Cost">One file serves two audiences, so spec-only prose rides in the writer&rsquo;s context on every invocation.</td>
+          <td data-label="What it gives up">A clean single audience per file, and a single repository: the definition is versioned in <code>~/.claude</code>, not beside the documents it governs.</td>
         </tr>
         <tr>
           <td><strong>Writer as sole author</strong></td>
-          <td>Routes every document, spec and view alike, through the writer, so its definition is total by construction.</td>
-          <td>Every spec change becomes a delegation; all documentation serializes behind one agent.</td>
-          <td>The rule that a spec is written by the agent doing the work, in the same change as what it governs &mdash; that agent is the one holding the context.</td>
+          <td data-label="What it does">Routes every document, spec and view alike, through the writer, so its definition is total by construction.</td>
+          <td data-label="Cost">Every spec change becomes a delegation; all documentation serializes behind one agent.</td>
+          <td data-label="What it gives up">The rule that a spec is written by the agent doing the work, in the same change as what it governs &mdash; that agent is the one holding the context.</td>
         </tr>
       </tbody>
     </table>

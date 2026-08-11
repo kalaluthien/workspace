@@ -35,6 +35,21 @@
   @media (max-width: 42rem) {
     table { display: block; overflow-x: auto; }
     th, td { min-width: 9rem; }
+    /* Stacked rows: a table over three columns keeps every cell on screen.
+       Each row becomes a block titled by its first cell; the other cells
+       print their column name from data-label. */
+    table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; }
+    table.stack thead { display: none; }
+    table.stack tr { border-bottom: 1px solid #e4e4e4; padding: .5rem 0; }
+    table.stack td { min-width: 0; border-bottom: none; padding: .12rem 0; }
+    table.stack td:first-child { font-weight: 700; }
+    table.stack td[data-label]::before {
+      content: attr(data-label);
+      display: inline-block;
+      width: 7.5rem;
+      color: #555;
+      font-size: .82em;
+    }
   }
   .kicker {
     font-size: .72rem;
@@ -77,9 +92,6 @@
   mark { background: #ffef9e; color: inherit; padding: 0 .12em; }
   /* Red, dashed: what was cut from the taxonomy. */
   .cut { color: #a33; border-bottom: 1px dashed #a33; }
-  .callout { border: 1px solid #ccc; border-left-width: 4px; padding: .55rem .9rem; margin: 1.2rem 0; font-size: .88rem; line-height: 1.5; }
-  .callout .tag { font-variant: small-caps; letter-spacing: .06em; font-weight: 600; margin-right: .45rem; }
-  .callout.gap { border-left-color: #8a5a00; }
   details { border: 1px solid #e4e4e4; padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
   details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
   details[open] summary { margin-bottom: .5rem; }
@@ -108,7 +120,7 @@
       <dt>Doctype</dt>  <dd>explanation</dd>
       <dt>Question</dt> <dd>what kinds of memory file exist, and what keeps the set MECE? (concept view)</dd>
       <dt>Updated</dt>  <dd>2026-08-11</dd>
-      <dt>Commit</dt>   <dd>c66bc5c</dd>
+      <dt>Commit</dt>   <dd>workspace aee35fd · dotclaude 72d6186</dd>
     </dl>
   </header>
 
@@ -131,60 +143,61 @@
         <code>backlog</code> and <code>profile-</code> assert a state the world
         can move, so both are <mark>updated in place</mark>.</p>
       <p><span class="badge">4</span><strong>Procedural.</strong>
-        <code>setup-</code> and <code>feedback-</code> say how to act, so both
-        are <mark>deleted when the tool is gone</mark>.</p>
+        <code>setup-</code>, <code>feedback-</code> and <code>pitfalls</code> say
+        how to act, so all three are <mark>deleted when the tool is
+        gone</mark>.</p>
     </div>
 
-    <figure id="fig-axis" class="pan">
-      <svg viewBox="0 0 480 240" role="img" style="min-width:480px">
-        <title>One question, the three lifecycle classes it splits into, and the five filename prefixes those classes admit</title>
+    <figure id="fig-axis">
+      <svg viewBox="0 0 360 320" role="img">
+        <title>One question, the three lifecycle classes it splits into, and the six filename prefixes those classes admit</title>
         <defs>
           <marker id="arrow-memtypes" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
             <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
           </marker>
         </defs>
 
-        <rect x="160" y="14" width="160" height="48" fill="none" stroke="currentColor"/>
-        <circle cx="184" cy="14" r="11" fill="#ffffff" stroke="currentColor"/>
-        <text x="184" y="14" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">1</text>
-        <text x="176" y="48" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Falsifier</text>
+        <rect x="8" y="14" width="150" height="48" fill="none" stroke="currentColor"/>
+        <circle cx="32" cy="14" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="32" y="14" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">1</text>
+        <text x="20" y="46" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Falsifier</text>
 
-        <path d="M200,62 V96 H76 V168" fill="none" stroke="currentColor" marker-end="url(#arrow-memtypes)"/>
-        <text x="138" y="84" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">nothing</text>
+        <path d="M60,62 V96 H176" fill="none" stroke="currentColor" marker-end="url(#arrow-memtypes)"/>
+        <text x="118" y="86" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">nothing</text>
 
-        <path d="M240,62 V168" fill="none" stroke="currentColor" marker-end="url(#arrow-memtypes)"/>
-        <text x="232" y="126" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">the world</text>
-        <text x="232" y="139" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">moves</text>
+        <path d="M60,62 V176 H176" fill="none" stroke="currentColor" marker-end="url(#arrow-memtypes)"/>
+        <text x="118" y="166" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">the world moves</text>
 
-        <path d="M280,62 V116 H404 V168" fill="none" stroke="currentColor" marker-end="url(#arrow-memtypes)"/>
-        <text x="350" y="92" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">the tool</text>
-        <text x="350" y="104" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">changes</text>
+        <path d="M60,62 V264 H176" fill="none" stroke="currentColor" marker-end="url(#arrow-memtypes)"/>
+        <text x="118" y="254" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">the tool changes</text>
 
-        <rect x="8" y="170" width="136" height="58" fill="none" stroke="currentColor"/>
-        <circle cx="32" cy="170" r="11" fill="#ffffff" stroke="currentColor"/>
-        <text x="32" y="170" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">2</text>
-        <text x="20" y="200" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Episodic</text>
-        <text x="20" y="216" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">history-</text>
+        <rect x="180" y="68" width="170" height="56" fill="none" stroke="currentColor"/>
+        <circle cx="204" cy="68" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="204" y="68" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">2</text>
+        <text x="192" y="99" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Episodic</text>
+        <text x="192" y="115" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">history-</text>
 
-        <rect x="172" y="170" width="136" height="58" fill="none" stroke="currentColor"/>
-        <circle cx="196" cy="170" r="11" fill="#ffffff" stroke="currentColor"/>
-        <text x="196" y="170" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">3</text>
-        <text x="184" y="200" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Semantic</text>
-        <text x="184" y="216" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">backlog, profile-</text>
+        <rect x="180" y="148" width="170" height="56" fill="none" stroke="currentColor"/>
+        <circle cx="204" cy="148" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="204" y="148" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">3</text>
+        <text x="192" y="179" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Semantic</text>
+        <text x="192" y="195" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">backlog, profile-</text>
 
-        <rect x="336" y="170" width="136" height="58" fill="none" stroke="currentColor"/>
-        <circle cx="360" cy="170" r="11" fill="#ffffff" stroke="currentColor"/>
-        <text x="360" y="170" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">4</text>
-        <text x="348" y="200" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Procedural</text>
-        <text x="348" y="216" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">setup-, feedback-</text>
+        <rect x="180" y="227" width="170" height="74" fill="none" stroke="currentColor"/>
+        <circle cx="204" cy="227" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="204" y="227" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">4</text>
+        <text x="192" y="258" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Procedural</text>
+        <text x="192" y="274" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">setup-, feedback-,</text>
+        <text x="192" y="290" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">pitfalls</text>
       </svg>
       <figcaption>
         Static structure of the memtype axis, declared in
-        <code>~/.claude/CLAUDE.md</code> &sect;Filing; 480 viewBox units, so it
-        pans. Key: badge — the statement of that number in
-        <a href="#answer">the answer</a>; top box — the one question; lower box
-        — one <code>metadata.type</code> class over the prefixes it admits;
-        arrow — one answer, labelled with what falsifies a file there.
+        <code>~/.claude/CLAUDE.md</code> &sect;Filing, lines 146–152; drawn
+        vertically at 360 viewBox units, the widest that does not pan. Key:
+        badge — the statement of that number in <a href="#answer">the
+        answer</a>; left box — the one question; right box — one
+        <code>metadata.type</code> class over the prefixes it admits; arrow —
+        one answer, labelled with what falsifies a file there.
       </figcaption>
     </figure>
 
@@ -209,9 +222,12 @@
       <p><span class="badge">1</span><strong>Work or owner.</strong> Semantic
         splits on <mark>what the file is about</mark>: live work, or the
         owner.</p>
-      <p><span class="badge">2</span><strong>Cost of loss.</strong> Procedural
-        splits on <mark>what losing the file costs</mark>: a probe, or a
-        repeated failure.</p>
+      <p><span class="badge">2</span><strong>Cost of loss.</strong>
+        <code>setup-</code> and <code>feedback-</code> split on <mark>what losing
+        the file costs</mark>: a probe, or a repeated failure.</p>
+      <p><span class="badge">3</span><strong>Reach.</strong>
+        <code>pitfalls</code> takes what <mark>does not generalize</mark> — one
+        project's own traps, in one file per pool.</p>
     </div>
 
     <table>
@@ -222,17 +238,9 @@
         <tr><td><code>profile-</code></td><td>a standing owner preference</td><td>rewritten when the preference changes</td></tr>
         <tr><td><code>setup-</code></td><td>one tool's or environment's own facts</td><td>deleted when the tool or fact is gone</td></tr>
         <tr><td><code>feedback-</code></td><td>a rule bought with an observed failure</td><td>deleted when the practice is gone</td></tr>
+        <tr><td><code>pitfalls</code></td><td>one project's debugging traps, in its own technology or conventions; one file per pool</td><td>an entry is deleted when its technology is gone</td></tr>
       </tbody>
     </table>
-
-    <div class="callout gap">
-      <span class="tag">gap</span>
-      The schema moved after this view's evidence was walked. Every claim here
-      stands on <code>~/.claude</code> at <code>1fe7e9d</code>, whose table held
-      these five prefixes; at <code>a644f45</code> it holds a sixth,
-      <code>pitfalls</code>, added with the debugger constitution in
-      <code>b327289</code>. Fix: a full re-verification, not a style pass.
-    </div>
 
     <details>
       <summary>Each lifecycle follows from its own discriminator, not from a house style</summary>
@@ -245,6 +253,15 @@
         <li>A <code>feedback-</code> rule was <strong>bought with an observed
           failure</strong> and cannot be re-derived, so losing one repeats the
           failure.</li>
+        <li><code>pitfalls</code> and <code>feedback-</code> are both bought with
+          a failure, and <strong>generality tells them apart</strong>: a trap tied
+          to one project's technology stays in that pool's single
+          <code>pitfalls.md</code>, while a rule that travels earns its own
+          <code>feedback-&lt;topic&gt;</code> file (<code>~/.claude/agents/debugger.md</code>
+          &sect;Filing).</li>
+        <li>A fixed filename is <strong>not a memtype signal</strong>:
+          <code>backlog</code> and <code>pitfalls</code> both take exactly one
+          file per pool, yet sit in different classes.</li>
       </ul>
     </details>
 
@@ -256,71 +273,74 @@
         file's <mark>lifecycle and never its pool</mark>; scope picks the
         pool.</p>
       <p><span class="badge">2</span><strong>The crossing.</strong> At the
-        2026-08-05 walk, <code>setup-</code> alone carried <mark>16 of 25
-        files</mark> across <mark>four of six pools</mark>.</p>
+        2026-08-11 walk, <code>setup-</code> sat in <mark>five of the six
+        pools</mark>, and the workspace pool held <mark>all six
+        prefixes</mark>.</p>
+      <p><span class="badge">3</span><strong>Full agreement.</strong>
+        <mark>All 67 files declare a type the table lists</mark> — the four that
+        did not were corrected on 2026-08-11.</p>
     </div>
 
     <figure id="fig-crossing">
-      <svg viewBox="0 0 340 210" role="img">
-        <title>The memtype axis and the pool axis are independent: a file's place on one says nothing about its place on the other</title>
-        <line x1="86" y1="30" x2="86" y2="160" stroke="currentColor"/>
-        <line x1="86" y1="160" x2="318" y2="160" stroke="currentColor"/>
-
-        <line x1="82" y1="52" x2="86" y2="52" stroke="currentColor"/>
-        <line x1="82" y1="94" x2="86" y2="94" stroke="currentColor"/>
-        <line x1="82" y1="134" x2="86" y2="134" stroke="currentColor"/>
-        <text x="76" y="52" dy=".35em" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".75">procedural</text>
-        <text x="76" y="94" dy=".35em" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".75">semantic</text>
-        <text x="76" y="134" dy=".35em" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".75">episodic</text>
-
-        <line x1="140" y1="160" x2="140" y2="164" stroke="currentColor"/>
-        <line x1="202" y1="160" x2="202" y2="164" stroke="currentColor"/>
-        <line x1="272" y1="160" x2="272" y2="164" stroke="currentColor"/>
-        <text x="140" y="176" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".75">global</text>
-        <text x="202" y="176" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".75">workspace</text>
-        <text x="272" y="176" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".75">project</text>
-
-        <text x="86" y="18" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">memtype · lifecycle</text>
-        <text x="318" y="196" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="bold" fill="currentColor">pool · scope</text>
-
-        <circle cx="202" cy="94" r="5" fill="currentColor"/>
-        <text x="217" y="94" dy=".35em" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">one file</text>
-      </svg>
+      <table class="stack">
+        <thead><tr><th>Memtype</th><th>Global pool</th><th>Workspace pool</th><th>Project pools</th></tr></thead>
+        <tbody>
+          <tr><td>episodic</td><td data-label="Global">—</td><td data-label="Workspace">1</td><td data-label="Project">6</td></tr>
+          <tr><td>semantic</td><td data-label="Global">—</td><td data-label="Workspace">2</td><td data-label="Project">4</td></tr>
+          <tr><td>procedural</td><td data-label="Global">20</td><td data-label="Workspace">14</td><td data-label="Project">20</td></tr>
+        </tbody>
+      </table>
       <figcaption>
-        Scatter of one real file on the two axes, 340 viewBox units. The dot is
-        <code>profile-model-architectures</code>. Key: axis — one independent
-        choice; tick label — one value that axis takes; dot — one file, read off
-        both axes at once.
+        Matrix of the two axes, all 67 files at the walk of 2026-08-11 16:55;
+        four columns, so it stacks at phone width. Key: row — one memtype, the
+        lifecycle axis; column — one pool scope, the scope axis, with the four
+        project pools pooled into one; cell — how many files carry that
+        memtype's prefix there, and a dash means none.
       </figcaption>
     </figure>
 
     <table>
       <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>memtype · lifecycle</td><td>axis</td><td>the kind a file declares, set by the falsifier</td></tr>
-        <tr><td>pool · scope</td><td>axis</td><td>the directory it lives in, set by the fact's reach</td></tr>
-        <tr><td>tick label</td><td>scale value</td><td>one value its axis can take</td></tr>
-        <tr><td>one file</td><td>plotted instance</td><td>a real file, at one value on each axis</td></tr>
+        <tr><td>row</td><td>lifecycle axis value</td><td>the kind a file declares, set by the falsifier</td></tr>
+        <tr><td>column</td><td>scope axis value</td><td>the pool it lives in, set by the fact's reach</td></tr>
+        <tr><td>cell</td><td>file count</td><td>files at that pair of values, counted by filename prefix</td></tr>
       </tbody>
     </table>
 
     <details>
-      <summary>All 25 files across six pools carry one of the five prefixes, and every file's <code>metadata.type</code> matches its prefix's row (census, walked 2026-08-05)</summary>
-      <table>
-        <thead><tr><th>Pool</th><th><code>history-</code></th><th><code>backlog</code></th><th><code>profile-</code></th><th><code>setup-</code></th><th><code>feedback-</code></th></tr></thead>
+      <summary>All 67 files across six pools carry one of the six prefixes, and 67 of 67 declare the <code>metadata.type</code> their prefix maps to (census, walked 2026-08-11 16:55, re-walked 16:59)</summary>
+      <p>Protocol: count every <code>*.md</code> under
+      <code>~/.claude/projects/*/memory/</code> except each pool's
+      <code>MEMORY.md</code>, which is the catalogue of the pool and carries no
+      memtype. A file's name gives its prefix; its frontmatter
+      <code>metadata.type</code> gives the declared type, and the check is
+      whether the two agree.</p>
+      <table class="stack">
+        <thead><tr><th>Pool</th><th><code>history-</code></th><th><code>backlog</code></th><th><code>profile-</code></th><th><code>setup-</code></th><th><code>feedback-</code></th><th><code>pitfalls</code></th></tr></thead>
         <tbody>
-          <tr><td>global</td><td>—</td><td>—</td><td>—</td><td>13</td><td>—</td></tr>
-          <tr><td>workspace</td><td>1</td><td>1</td><td>1</td><td>1</td><td>—</td></tr>
-          <tr><td>camera</td><td>1</td><td>1</td><td>—</td><td>1</td><td>—</td></tr>
-          <tr><td>notes</td><td>—</td><td>—</td><td>—</td><td>1</td><td>2</td></tr>
-          <tr><td>board</td><td>—</td><td>1</td><td>—</td><td>—</td><td>—</td></tr>
-          <tr><td>mabinogi</td><td>—</td><td>1</td><td>—</td><td>—</td><td>—</td></tr>
-          <tr><td><strong>total</strong></td><td>2</td><td>4</td><td>1</td><td>16</td><td>2</td></tr>
+          <tr><td>global</td><td data-label="history-">—</td><td data-label="backlog">—</td><td data-label="profile-">—</td><td data-label="setup-">18</td><td data-label="feedback-">2</td><td data-label="pitfalls">—</td></tr>
+          <tr><td>workspace</td><td data-label="history-">1</td><td data-label="backlog">1</td><td data-label="profile-">1</td><td data-label="setup-">2</td><td data-label="feedback-">11</td><td data-label="pitfalls">1</td></tr>
+          <tr><td>board</td><td data-label="history-">5</td><td data-label="backlog">1</td><td data-label="profile-">—</td><td data-label="setup-">2</td><td data-label="feedback-">11</td><td data-label="pitfalls">1</td></tr>
+          <tr><td>camera</td><td data-label="history-">1</td><td data-label="backlog">1</td><td data-label="profile-">—</td><td data-label="setup-">1</td><td data-label="feedback-">—</td><td data-label="pitfalls">1</td></tr>
+          <tr><td>notes</td><td data-label="history-">—</td><td data-label="backlog">1</td><td data-label="profile-">—</td><td data-label="setup-">1</td><td data-label="feedback-">2</td><td data-label="pitfalls">—</td></tr>
+          <tr><td>mabinogi</td><td data-label="history-">—</td><td data-label="backlog">1</td><td data-label="profile-">—</td><td data-label="setup-">—</td><td data-label="feedback-">—</td><td data-label="pitfalls">1</td></tr>
+          <tr><td><strong>total</strong></td><td data-label="history-">7</td><td data-label="backlog">5</td><td data-label="profile-">1</td><td data-label="setup-">24</td><td data-label="feedback-">26</td><td data-label="pitfalls">4</td></tr>
         </tbody>
       </table>
-      <p>Each pool's <code>MEMORY.md</code> index is excluded from the count: it
-      is the catalogue of the pool, not a member of it, and carries no
-      memtype.</p>
+      <ul>
+        <li><strong>Four declarations were corrected the same day.</strong> The
+          16:55 walk found <code>feedback-backlog-wording</code>,
+          <code>feedback-doc-scope</code>, <code>feedback-prompt-brevity</code>
+          and <code>feedback-status-displays</code> — all in the workspace pool —
+          declaring <code>type: feedback</code>, a value the table has no row
+          for. Each was set to <code>procedural</code> on 2026-08-11, the table
+          gained no row, and the re-walk found no deviation.</li>
+        <li><strong>The empty global cells are the scope axis, not the memtype
+          axis</strong>: no memtype is barred from a pool — the filing route
+          picks the pool by the fact's reach, and that mapping is the sibling
+          view's subject.</li>
+      </ul>
     </details>
 
     <h2 id="exclusions">Exclusions</h2>
@@ -344,6 +364,13 @@
       </tbody>
     </table>
 
+    <ul>
+      <li><strong>The set is open.</strong> A kind that no row fits is added to
+        the table in the same change that invents it, so the boundary moves by
+        edit, not by drift — <code>pitfalls</code> joined on 2026-08-06
+        (dotclaude <code>b327289</code>).</li>
+    </ul>
+
     <details>
       <summary>The audit's three moves each preserved their file's content (audit entry, workspace <code>history-workspace-refactor</code>, 2026-08-04)</summary>
       <ul>
@@ -362,10 +389,12 @@
 
     <h2 id="omissions">Omissions</h2>
     <ul>
-      <li><strong>The pin's reach</strong> — the Commit field pins
-        <code>~/workspace</code>. The schema is a second repository,
-        <code>~/.claude</code> at <code>1fe7e9d</code>; the pools are
-        version-controlled nowhere.</li>
+      <li><strong>The pin's reach</strong> — the Commit field pins both
+        repositories this view reads. The pools themselves are
+        version-controlled nowhere (<code>~/.claude/.gitignore</code> ignores
+        <code>projects/</code>), and several sessions write them at once, so
+        every count here is one walk's snapshot. What the view claims is the
+        structure — six prefixes in three classes — not the totals.</li>
       <li><strong>File contents</strong> — what each memtype holds, never what
         any file says.</li>
       <li><strong>Pool routes</strong> — the sibling view
@@ -374,8 +403,10 @@
       <li><strong>Item grammar</strong> — the marker, tag, and date form inside a
         <code>backlog.md</code> belongs to the pool contract.</li>
       <li><strong>Enforcement</strong> — no installed hook pairs a prefix with
-        its <code>metadata.type</code> (re-checked at <code>a644f45</code>), so
-        the census is a walk, not a guarantee.</li>
+        its <code>metadata.type</code> (re-checked over
+        <code>~/.claude/hooks/</code> and <code>~/workspace/hooks/</code>), so
+        the census is a walk, not a guarantee — the four declarations this walk
+        caught are what that missing check lets through.</li>
     </ul>
 
   </section>
@@ -383,19 +414,23 @@
   <footer class="sources">
     <h2 id="sources">Sources</h2>
     <ul>
-      <li><code>~/.claude/CLAUDE.md</code> &sect;Filing, lines 129–137, at
-        dotclaude <code>1fe7e9d</code> — the memtype definition, the type table,
-        the discriminators</li>
+      <li><code>~/.claude/CLAUDE.md</code> &sect;Filing, lines 146–156 — the
+        memtype definition, the type table (148–152), the discriminators (154),
+        and the one-file-per-pool names (156)</li>
       <li><code>~/.claude/CLAUDE.md</code> &sect;"The pool contract", lines
-        149–204 — the <code>frontmatter.type</code> key the census checks</li>
-      <li><code>~/.claude/CLAUDE.md</code> at <code>a644f45</code>, and commit
-        <code>b327289</code> — the sixth prefix the gap block reports</li>
+        222–228 — the <code>frontmatter.type</code> key the census checks</li>
+      <li><code>~/.claude/agents/debugger.md</code> &sect;Filing, lines 78–88 —
+        what <code>pitfalls</code> holds, and the type it declares</li>
+      <li>dotclaude <code>b327289</code> (2026-08-06) and <code>8c78a4e</code>
+        (2026-08-04) — the commits that added <code>pitfalls</code> and that
+        named the memtypes</li>
       <li><code>history-workspace-refactor</code>, workspace pool, lines 106–124
         — the 2026-08-04 "memtype audit (MECE pass)" entry</li>
       <li>the live pools under <code>~/.claude/projects/*/memory/</code>, walked
-        2026-08-05 for the census and the prefix-to-type check</li>
-      <li><code>~/.claude/hooks/</code> and <code>~/.claude/.gitignore</code> —
-        what the hooks check, and what dotclaude tracks</li>
+        2026-08-11 for the census and the prefix-to-type check</li>
+      <li><code>~/.claude/hooks/</code>, <code>~/workspace/hooks/</code> and
+        <code>~/.claude/.gitignore</code> — what the hooks check, and what
+        dotclaude tracks</li>
       <li><code>docs/agent-config-scopes.html</code> — the scope routes this view
         leaves to it</li>
     </ul>
