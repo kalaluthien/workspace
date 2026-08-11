@@ -165,13 +165,19 @@ and name the blocking row in its body, so a re-tap meets the decision instead
 of the same ambiguity.
 
 When the line naming one item also says the owner tapped Start on it
-themselves, that tap is their confirmation and the row's owner-waiting tag no
-longer holds it. A bare confirm means they accept the recommendation of the
-proposal the row points to exactly as written — anything they wanted changed
-is already in the row's own text. So record the acceptance in that proposal
-document, drop the owner-waiting tag as you claim the row, and then do the
-work the row names. Do not ask the owner anything the confirmation already
-answered.
+themselves, that tap is under the owner's own finger, so it confirms — but the
+board has no interface for a choice, so it cannot decide. Read the row and the
+proposal it points to, and judge what the row's owner-waiting tag was waiting
+for. Waiting for a confirmation — one stated recommendation, needing only
+acceptance: the tap is that acceptance. Record it in the proposal document,
+drop the owner-waiting tag as you claim the row, and do the work the row names.
+Waiting for a decision — a choice among options, or an input only the owner can
+give: the tap does not carry it, and reading it as picking the recommendation
+decides a question the owner never answered. Ask the owner with the
+`AskUserQuestion` tool, options taken from the proposal and the recommendation
+first, then record the answer in the proposal document, drop the tag, and do the
+work the answer selects. Either way, do not ask the owner anything the
+confirmation already answered.
 
 With no item after the pool file, the mission is the whole page: every item
 whose marker is `[ ]` and which carries no tag waiting on the owner — the
