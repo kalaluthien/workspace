@@ -13,15 +13,20 @@
 source "$(dirname "$0")/_lib.sh"
 require_herdr
 
+# Match by prefix for an entry, whose sessions may sit in a subdirectory or a
+# worktree, but exactly for the container root, which is every entry's prefix
+# and would otherwise claim all of them under its own label.
 scan() {
-  local path=$1 label ws
+  local path=$1 label ws exact=false
+  [ "$path" = "$WORKSPACE_ROOT" ] && exact=true
   label=$(basename "$path")
   ws=$(workspace_id_for_label "$label")
   local agents='[]'
   if [ -n "$ws" ]; then
-    agents=$(herdr agent list | jq -c --arg path "$path" '
+    agents=$(herdr agent list | jq -c --arg path "$path" --argjson exact "$exact" '
       [.result.agents[]
-       | select(.cwd == $path or (.cwd | startswith($path + "/")))
+       | select(if $exact then .cwd == $path
+                else .cwd == $path or (.cwd | startswith($path + "/")) end)
        | {name, agent, status: .agent_status, pane: .pane_id}]')
     # A name reads <role>-<task>; the role says what the pane was launched for
     # and therefore which model it runs. A null name means an unmanaged session.

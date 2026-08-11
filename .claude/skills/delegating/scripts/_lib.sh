@@ -10,9 +10,15 @@ require_herdr() {
 }
 
 # repo_path <repo-name-or-abs-path> -> absolute repo path
+#
+# The container root is a repository too, and its label is its own directory
+# name, so that one name resolves to the root itself rather than to a
+# non-existent entry beneath it. The name is read off $WORKSPACE_ROOT instead
+# of hardcoded, so the mapping follows a reconfigured root.
 repo_path() {
   case $1 in
     /*) printf '%s\n' "$1" ;;
+    "$(basename "$WORKSPACE_ROOT")") printf '%s\n' "$WORKSPACE_ROOT" ;;
     *)  printf '%s\n' "$WORKSPACE_ROOT/$1" ;;
   esac
 }
