@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
-# The docs contract, checked on any commit that stages docs/.
+# The docs contract and the figure rules, checked on any commit that stages
+# docs/.
 #
 # scripts/check-docs parses the fenced `json contract=docs` block out of
 # docs/README.md and checks this repository's docs/ against it: every view
@@ -19,5 +20,18 @@ set -eu
 root=$(git rev-parse --show-toplevel)
 
 git diff --cached --name-only --diff-filter=ACMRD | grep -q '^docs/' || exit 0
+
+# The figure rules — the 10-unit annotation floor, the pan wiring past 360
+# units, the 620-unit maximum — on the views this commit stages.
+#
+# The checker lives in ~/.claude, the repository that also holds the rule it
+# enforces (agents/document-writer.md, "Figures"), and every entry calls that
+# one copy by absolute path rather than keeping its own that drifts. A clone
+# on a machine without it has no rule to read and skips.
+figure_checker="$HOME/.claude/git-hooks/check-figures"
+views=$(git diff --cached --name-only --diff-filter=ACMR -- 'docs/*.html')
+if [ -n "$views" ] && [ -x "$figure_checker" ]; then
+	printf '%s\n' "$views" | sed "s|^|$root/|" | xargs python3 "$figure_checker"
+fi
 
 exec python3 "$root/scripts/check-docs" "$root"
