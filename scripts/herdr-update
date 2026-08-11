@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# herdr-update — bring herdr (Homebrew) and the Collie plugin to their latest
+# releases, print the release notes the update skips over, and verify the
+# Collie bridge came back up.
+#
+# Does nothing when both are already current, so it is safe to run any time.
+# The release notes are printed for the operator to scan for command or
+# variable changes that local scripts depend on — that judgment is not
+# automated here.
+set -euo pipefail
+
+# ---------- herdr (Homebrew; herdr's own self-update is disabled) ----------
+echo "checking herdr…"
+brew update >/dev/null
+installed="$(herdr --version | awk '{print $2}')"
+brew_latest="$(brew info --json=v2 herdr | jq -r '.formulae[0].versions.stable')"
+
+if [ "$installed" = "$brew_latest" ]; then
+  echo "herdr $installed is current (Homebrew stable)"
+else
+  echo "herdr $installed -> $brew_latest — release notes in between:"
+  # herdr also tags "preview-…" builds; only v* tags are releases.
+  gh api repos/herdrdev/herdr/releases \
+    --jq '[.[] | select(.tag_name | startswith("v")) | {tag_name, body}]' \
+    | jq -r --arg cur "v$installed" \
+        '(map(.tag_name) | index($cur)) as $i
+         | .[0:($i // length)][] | "\n## \(.tag_name)\n\(.body)"'
+  brew upgrade herdr
+  echo "herdr now: $(herdr --version)"
+fi
+
+# Homebrew can lag the upstream tag; say so instead of claiming "latest".
+upstream="$(gh api repos/herdrdev/herdr/releases \
+  --jq '[.[] | select(.tag_name | startswith("v"))][0].tag_name')"
+if [ "$upstream" != "v$brew_latest" ]; then
+  echo "note: upstream has $upstream but Homebrew still ships $brew_latest"
+fi
+
+# ---------- Collie plugin ----------
+# `herdr plugin list` keeps printing the install-time pin after an update,
+# so the truth is the Herdr-managed checkout's own package.json.
+echo
+echo "checking collie…"
+checkout="$(ls -d "$HOME/.config/herdr/plugins/github/herdr.collie-"* | head -1)"
+cur="$(jq -r .version "$checkout/package.json")"
+latest="$(gh api repos/AltanS/collie/releases/latest --jq '.tag_name')"
+
+if [ "v$cur" = "$latest" ]; then
+  echo "collie $cur is current"
+else
+  echo "collie $cur -> $latest — release notes in between:"
+  gh api repos/AltanS/collie/releases --jq 'map({tag_name, body})' \
+    | jq -r --arg cur "v$cur" \
+        '(map(.tag_name) | index($cur)) as $i
+         | .[0:($i // length)][] | "\n## \(.tag_name)\n\(.body)"'
+
+  # The plugin ships its own update action: fetch, rebuild, restart.
+  herdr plugin action invoke update --plugin herdr.collie >/dev/null
+
+  # The action runs detached; poll its log entry until it settles.
+  for _ in $(seq 60); do
+    status="$(herdr plugin log --plugin herdr.collie \
+      | jq -r '[.result.logs[] | select(.action_id=="update")]
+                | max_by(.started_unix_ms) | .status')"
+    [ "$status" != "running" ] && break
+    sleep 5
+  done
+
+  entry="$(herdr plugin log --plugin herdr.collie \
+    | jq '[.result.logs[] | select(.action_id=="update")]
+          | max_by(.started_unix_ms)')"
+  if [ "$(jq -r .status <<<"$entry")" != "succeeded" ]; then
+    echo "collie update failed:" >&2
+    jq -r .stderr <<<"$entry" >&2
+    exit 1
+  fi
+  jq -r .stdout <<<"$entry" | tail -8
+fi
+
+# The update's own status block already says "Collie is running"; one live
+# probe confirms the bridge answers after whatever this run did.
+url="$(jq -r .stdout <<<"${entry:-}" 2>/dev/null \
+  | sed -n 's/.*local *\(http[^ ]*\).*/\1/p' | head -1)"
+url="${url:-http://127.0.0.1:8787}"
+code="$(curl -s -o /dev/null -w '%{http_code}' "$url")"
+if [ "$code" = "200" ]; then
+  echo "collie bridge OK ($url)"
+else
+  echo "collie bridge NOT answering at $url (HTTP $code)" >&2
+  exit 1
+fi
