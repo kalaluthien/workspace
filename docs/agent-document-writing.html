@@ -68,20 +68,20 @@
     <p class="kicker">workspace &middot; docs &middot; constitution</p>
     <h1>Writer constitution</h1>
     <dl class="provenance">
-      <dt>Doctype</dt> <dd>proposal</dd>
-      <dt>Status</dt>  <dd>Accepted 2026-08-04 &mdash; recorded in <code>docs/README.md</code>; no spec</dd>
-      <dt>Updated</dt> <dd>2026-08-04</dd>
-      <dt>Commit</dt>  <dd>d599966</dd>
+      <dt>Doctype</dt>  <dd>proposal</dd>
+      <dt>Status</dt>   <dd>Accepted 2026-08-04 &mdash; recorded in <code>docs/agent-document-system.md</code></dd>
+      <dt>Question</dt> <dd>Which single file should hold the document system&rsquo;s rules?</dd>
+      <dt>Updated</dt>  <dd>2026-08-11</dd>
+      <dt>Commit</dt>   <dd>c66bc5c</dd>
     </dl>
   </header>
 
   <section>
 
     <p>Seven sites stated this document system&rsquo;s rules and a new rule
-    reached only six of them, so the writer agent&rsquo;s definition should
+    reached only six of them, so the writer agent&rsquo;s own definition should
     hold the one normative description and every other mention should become a
-    pointer &mdash; which shipped on 2026-08-04, leaving the view shelf
-    inconsistent.</p>
+    pointer.</p>
 
     <h2 id="answer">Answer</h2>
 
@@ -89,29 +89,24 @@
       <span class="label">Conclusion</span>
       <ol>
         <li><span class="n">1</span><strong>Constitution.</strong>
-          <code>~/.claude/agents/document-writer.md</code> now holds
-          <mark>the whole normative description</mark> &mdash; the two-kinds
-          split, the three doctypes, naming and catalogue, the procedure, the
-          style and the guardrails &mdash; in 192 lines, with
-          <code>templates/</code> and <code>components/</code> beside it.</li>
-        <li><span class="n">2</span><strong>Pointers.</strong> The restating
-          sites are pointers or gone: <code>docs/README.md</code> kept
-          <mark>the two-kinds table and the contract block</mark> alone,
-          <code>.claude/CLAUDE.md</code> kept one routing line, and both
-          entries&rsquo; template copies were deleted (workspace
-          <code>4ddc0d4</code>, camera <code>cf93d7f</code>, board
+          <code>~/.claude/agents/document-writer.md</code> holds
+          <mark>the whole normative description</mark> &mdash; the two kinds,
+          the three doctypes, naming, the procedure, the style, the guardrails
+          &mdash; in 231 lines, with <code>templates/</code> and
+          <code>components/</code> beside it (<code>~/.claude</code>
+          <code>a644f45</code>).</li>
+        <li><span class="n">2</span><strong>Pointers.</strong> Four sites kept
+          <mark>a pointer and nothing more</mark>, and the entries&rsquo; eight
+          template copies were deleted (camera <code>cf93d7f</code>, board
           <code>ce99e34</code>).</li>
-        <li><span class="n">3</span><strong>Rules changed after the
-          move.</strong> Two owner decisions today edited the style layer that
-          <mark>only the constitution now carries</mark>: the header drops the
-          dek and the notice callout, with what qualifies the Commit pin going
-          to Omissions, and every section heading is a noun phrase of one to
-          three words (<code>~/.claude</code> <code>1094fb2</code>).</li>
-        <li><span class="n">4</span><strong>Remainder.</strong> Enforcement did
-          not follow: <code>scripts/check-docs</code> <mark>still has no
-          caller</mark>, and <mark>four of the five workspace views</mark>
-          predate the style layer, so whether to re-render them is an open
-          owner decision.</li>
+        <li><span class="n">3</span><strong>Enforcement.</strong> It landed
+          after the move: <mark>all three repositories&rsquo; pre-commit hooks
+          run <code>scripts/check-docs</code></mark> (workspace
+          <code>591864e</code>).</li>
+        <li><span class="n">4</span><strong>What is left.</strong>
+          <mark>The entries&rsquo; fifteen views</mark> still wait on a
+          re-render, and the templates still carry 493 lines of rule prose.
+          Both are the owner&rsquo;s call.</li>
       </ol>
     </div>
 
@@ -120,36 +115,65 @@
     <div class="box">
       <span class="label">Conclusion</span>
       <ol>
-        <li><span class="n">1</span><strong>Seven writing sites.</strong> At
-          workspace <code>b969155</code> the rule set was written in
-          <code>docs/README.md</code>, <code>.claude/CLAUDE.md</code>, the agent
-          definition, four parent templates, five components, and eight entry
-          template copies &mdash; <mark>934 copied comment lines</mark> in the
-          entries alone.</li>
+        <li><span class="n">1</span><strong>Seven sites.</strong> At workspace
+          <code>b969155</code> the rules sat in <code>docs/README.md</code>,
+          <code>.claude/CLAUDE.md</code>, the agent definition, four templates,
+          five components, and eight entry copies &mdash;
+          <mark>934 copied comment lines</mark> in the entries alone.</li>
         <li><span class="n">2</span><strong>A rule reached six.</strong> The
-          brevity ground rule added on 2026-08-04 landed in six files and in
+          brevity rule added on 2026-08-04 landed in six files and in
           <mark>none of the eight entry copies</mark> (camera
           <code>140ac74</code>, board <code>43358c0</code>), so adding one rule
           was a seven-site edit that nothing completed.</li>
       </ol>
     </div>
 
-    <p>The owner paid for it as the only reader of every copy, and the drift
-    was demonstrated rather than predicted: camera&rsquo;s
-    <code>proposal.html</code> named a different filename grammar than the
-    parent&rsquo;s, and board&rsquo;s copies carried &ldquo;when the two
-    disagree, the parent wins&rdquo;, which names the drift without preventing
-    it.</p>
+    <figure id="fig-drift">
+      <svg viewBox="0 0 320 190" role="img">
+        <title>One rule written on 2026-08-04 landed in six files and missed the eight entry template copies</title>
+        <defs>
+          <marker id="arrow-drift" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+          </marker>
+          <marker id="arrow-drift-miss" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="#a33"/>
+          </marker>
+        </defs>
+
+        <rect x="90" y="10" width="140" height="40" fill="none" stroke="currentColor"/>
+        <text x="102" y="30" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Brevity rule</text>
+        <text x="102" y="44" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">2026-08-04</text>
+
+        <line x1="120" y1="50" x2="75" y2="118" stroke="currentColor" marker-end="url(#arrow-drift)"/>
+        <text x="76" y="90" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">reached</text>
+
+        <line x1="200" y1="50" x2="245" y2="118" stroke="#a33" stroke-dasharray="5 4" marker-end="url(#arrow-drift-miss)"/>
+        <text x="250" y="90" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="#a33">missed</text>
+
+        <rect x="10" y="120" width="130" height="50" fill="none" stroke="currentColor"/>
+        <text x="22" y="142" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">6 files</text>
+        <text x="22" y="158" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">rule landed</text>
+
+        <rect x="180" y="120" width="130" height="50" fill="none" stroke="#a33"/>
+        <text x="192" y="142" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="#a33">8 copies</text>
+        <text x="192" y="158" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="#a33" opacity=".8">never updated</text>
+      </svg>
+      <figcaption>
+        The drift, drawn at workspace <code>b969155</code>. Key: box &mdash; a
+        set of rule sites; arrow &mdash; the one edit of 2026-08-04, from rule
+        to site; red &mdash; the half the edit never reached.
+      </figcaption>
+    </figure>
 
     <details>
-      <summary>Each of the seven sites, and where its rules sit now</summary>
+      <summary>The seven sites, where their rules sit now, and the drift the owner could already see</summary>
       <table>
         <thead><tr><th>Site</th><th>Rules it held at <code>b969155</code></th><th>Where they sit now</th></tr></thead>
         <tbody>
           <tr>
             <td><code>docs/README.md</code></td>
             <td>The whole rule set plus the machine contract, 181 lines.</td>
-            <td>78 lines: the two-kinds table, the <code>json contract=docs</code> block, one pointer.</td>
+            <td>79 lines: the two-kinds table, the <code>json contract=docs</code> block, one pointer.</td>
           </tr>
           <tr>
             <td><code>.claude/CLAUDE.md</code></td>
@@ -159,12 +183,12 @@
           <tr>
             <td><code>document-writer.md</code></td>
             <td>The read order, the pipeline, the rubric rule, the house style; 86 lines.</td>
-            <td>192 lines, holding the whole system.</td>
+            <td>231 lines, holding the whole system.</td>
           </tr>
           <tr>
             <td><code>docs/templates/</code> &times;4, <code>docs/components/</code> &times;5</td>
             <td>Writing rules well past the machine contract each file owes.</td>
-            <td>Moved whole to <code>~/.claude/agents/document-writer/</code>; still 546 comment lines.</td>
+            <td>Moved whole to <code>~/.claude/agents/document-writer/</code>; still 493 comment lines.</td>
           </tr>
           <tr>
             <td><code>camera/docs/templates/</code> &times;4</td>
@@ -174,10 +198,16 @@
           <tr>
             <td><code>board/docs/templates/</code> &times;4</td>
             <td>The same headers with a deference note; 461 comment lines.</td>
-            <td>Deleted; <code>board/docs/</code> holds documents only.</td>
+            <td>Deleted; <code>board/docs/INDEX.md</code> points at the constitution.</td>
           </tr>
         </tbody>
       </table>
+      <p>The owner paid for it as the only reader of every copy, and the drift
+      was demonstrated rather than predicted: camera&rsquo;s
+      <code>proposal.html</code> named a different filename grammar than the
+      parent&rsquo;s, and board&rsquo;s copies carried &ldquo;when the two
+      disagree, the parent wins&rdquo;, which names the drift without
+      preventing it.</p>
     </details>
 
     <h2 id="options">Options</h2>
@@ -186,8 +216,8 @@
       <span class="label">Conclusion</span>
       <ol>
         <li><span class="n">1</span><strong>Two axes.</strong>
-          <mark>Locality</mark> &mdash; is the file that holds a rule loaded by
-          the actor that must obey it, at the moment the rule binds;
+          <mark>Locality</mark> &mdash; does the actor that must obey a rule
+          load the file holding it, at the moment the rule binds;
           <mark>enforcement</mark> &mdash; what makes a violation fail rather
           than merely be discouraged.</li>
         <li><span class="n">2</span><strong>One axis decided it.</strong> Only
@@ -216,7 +246,7 @@
           <td><strong>Writer as sole author</strong></td>
           <td>Routes every document, spec and view alike, through the writer, so its definition is total by construction.</td>
           <td>Every spec change becomes a delegation; all documentation serializes behind one agent.</td>
-          <td>The rule that a spec is written by the agent doing the work, in the same change as what it governs, whose whole point is that the doing agent holds the context.</td>
+          <td>The rule that a spec is written by the agent doing the work, in the same change as what it governs &mdash; that agent is the one holding the context.</td>
         </tr>
       </tbody>
     </table>
@@ -228,9 +258,8 @@
       <ol>
         <li><span class="n">1</span><strong>Writer as constitution.</strong>
           One sentence governs it &mdash; <mark>a rule lives in the single file
-          its actor loads at the moment the rule binds</mark>, and every other
-          mention is a pointer &mdash; and the writer is the only actor that
-          touches every view in every entry.</li>
+          its actor loads at the moment the rule binds</mark> &mdash; and the
+          writer is the only actor that touches every view in every entry.</li>
         <li><span class="n">2</span><strong>The cost it accepted.</strong> The
           constitution lives in <code>~/.claude</code> while the documents live
           in the entries, so <mark>no single commit changes a rule and the
@@ -243,133 +272,117 @@
       </ol>
     </div>
 
-    <p>The smallest first step was one commit, and it is the one that landed:
-    workspace <code>4ddc0d4</code> rewrote the definition to hold the rule set
-    and shrank <code>docs/README.md</code> to the two-kinds table, the contract
-    block and a pointer. The writer&rsquo;s move to the user level at
-    <code>b6bff78</code> had already put it where a session in any entry loads
-    it, and the entry copies followed as deletions rather than rewrites.</p>
+    <ul>
+      <li><strong>The first step was one commit.</strong> Workspace
+        <code>4ddc0d4</code> rewrote the definition to hold the rule set and
+        shrank <code>docs/README.md</code> to the two-kinds table, the contract
+        block and a pointer.</li>
+      <li><strong>A spec now records the decision.</strong>
+        <code>docs/agent-document-system.md</code> (<code>312746d</code>)
+        carries the choice, both kill reasons, and the deferred work.</li>
+    </ul>
 
-    <div class="figure-row">
-      <figure id="fig-deference">
-        <svg viewBox="0 0 320 180" role="img">
-          <title>Panel 1 — every rule site points at the constitution, which holds the rules</title>
-          <defs>
-            <marker id="arrow-deference" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
-              <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
-            </marker>
-          </defs>
-          <rect x="30" y="12" width="260" height="62" fill="none" stroke="currentColor"/>
-          <text x="42" y="36" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Constitution</text>
-          <text x="42" y="52" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">document-writer.md</text>
-          <text x="42" y="66" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">templates, components</text>
-          <line x1="160" y1="132" x2="160" y2="78" stroke="currentColor" marker-end="url(#arrow-deference)"/>
-          <text x="170" y="108" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">points at</text>
-          <rect x="30" y="134" width="260" height="40" fill="none" stroke="currentColor"/>
-          <text x="42" y="152" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Pointer sites</text>
-          <text x="42" y="166" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">4 files, 3 repositories</text>
-        </svg>
-        <figcaption>
-          Panel 1, the writing shape at the pin. Key: solid box &mdash; an
-          element that exists; solid arrow &mdash; the one-line deference each
-          pointer site carries.
-        </figcaption>
-      </figure>
+    <details>
+      <summary>The move needed no new home: the writer already sat at the user level</summary>
+      <p>The writer&rsquo;s earlier move to <code>~/.claude</code>
+      (<code>b6bff78</code>) had already put its definition where a session in
+      any entry loads it. That is why the entry template copies could follow as
+      plain deletions rather than as rewrites.</p>
+    </details>
 
-      <figure id="fig-enforcement">
-        <svg viewBox="0 0 320 180" role="img">
-          <title>Panel 2 — the contract checker exists, but no pre-commit hook calls it</title>
-          <defs>
-            <marker id="arrow-enforcement" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
-              <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
-            </marker>
-          </defs>
-          <rect x="30" y="12" width="260" height="50" fill="none" stroke="currentColor"/>
-          <text x="42" y="34" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Pre-commit hooks</text>
-          <text x="42" y="50" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">three repositories</text>
-          <line x1="160" y1="64" x2="160" y2="118" stroke="currentColor" stroke-dasharray="5 4" marker-end="url(#arrow-enforcement)"/>
-          <text x="170" y="95" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">would call</text>
-          <rect x="30" y="120" width="260" height="50" fill="none" stroke="currentColor"/>
-          <text x="42" y="142" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Contract checker</text>
-          <text x="42" y="158" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">scripts/check-docs</text>
-        </svg>
-        <figcaption>
-          Panel 2, the enforcement shape at the pin. Key: solid box &mdash; an
-          element that exists; dashed arrow &mdash; the one channel that does
-          not, so nothing fails a violation.
-        </figcaption>
-      </figure>
-    </div>
+    <figure id="fig-shape">
+      <svg viewBox="0 0 320 200" role="img">
+        <title>Four pointer sites defer to the constitution; the entries' fifteen views have not been re-rendered under it</title>
+        <defs>
+          <marker id="arrow-shape" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <rect x="60" y="10" width="200" height="52" fill="none" stroke="currentColor"/>
+        <text x="72" y="32" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Constitution</text>
+        <text x="72" y="48" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">document-writer.md</text>
+
+        <line x1="76" y1="138" x2="104" y2="66" stroke="currentColor" marker-end="url(#arrow-shape)"/>
+        <text x="76" y="105" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">points at</text>
+
+        <line x1="244" y1="138" x2="216" y2="66" stroke="currentColor" stroke-dasharray="5 4" marker-end="url(#arrow-shape)"/>
+        <text x="250" y="100" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">restyle</text>
+        <text x="250" y="113" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">pending</text>
+
+        <rect x="6" y="140" width="140" height="52" fill="none" stroke="currentColor"/>
+        <text x="16" y="162" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Pointer sites</text>
+        <text x="16" y="178" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">4 files, 3 repos</text>
+
+        <rect x="174" y="140" width="140" height="52" fill="none" stroke="currentColor"/>
+        <text x="184" y="162" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">Entry views</text>
+        <text x="184" y="178" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">camera 5, board 10</text>
+      </svg>
+      <figcaption>
+        What defers to the constitution, at the pinned commit. Key: solid box
+        &mdash; an element that exists; solid arrow &mdash; a channel that
+        exists; dashed arrow &mdash; the one channel that does not.
+      </figcaption>
+    </figure>
 
     <table>
       <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>Constitution</td><td>file, exists</td><td><code>~/.claude/agents/document-writer.md</code>, with <code>templates/</code> and <code>components/</code> beside it</td></tr>
+        <tr><td>Constitution</td><td>file, exists</td><td><code>~/.claude/agents/document-writer.md</code>, 231 lines, with <code>templates/</code> and <code>components/</code> beside it</td></tr>
         <tr><td>Pointer sites</td><td>set, exists</td><td><code>docs/README.md</code>, <code>.claude/CLAUDE.md</code>, <code>camera/docs/README.md</code>, <code>board/docs/INDEX.md</code></td></tr>
         <tr><td>points at</td><td>edge</td><td>the one-line deference each pointer site carries instead of the rule</td></tr>
-        <tr><td>Pre-commit hooks</td><td>set, exists</td><td>the installed hooks in workspace, camera and board</td></tr>
-        <tr><td>Contract checker</td><td>file, exists</td><td><code>scripts/check-docs</code>, which parses the <code>json contract=docs</code> block</td></tr>
-        <tr><td>would call</td><td>edge, speculative</td><td>a pre-commit hook invoking the checker; drawn dashed because no hook does</td></tr>
+        <tr><td>Entry views</td><td>set, exists</td><td>camera&rsquo;s five views (<code>d8741ec</code>) and board&rsquo;s ten (<code>80e2fb6</code>); four carry the kicker</td></tr>
+        <tr><td>restyle pending</td><td>edge, speculative</td><td>the re-render of those views onto the style layer; dashed because it has not happened</td></tr>
       </tbody>
     </table>
 
     <h3 id="remainder">Remainder</h3>
 
-    <p>Three pieces of the recommendation did not land, and none of the three
-    is decided here.</p>
-
     <ul>
-      <li><strong>Enforcement</strong> &mdash; the workspace hook is the
-        <code>no-main-commits</code> guard alone, camera&rsquo;s runs its own
-        <code>script/check-docs.py</code>, and board&rsquo;s checks staged
-        content for credentials, so <code>scripts/check-docs</code> is written
-        and never run.</li>
-      <li><strong>The shelf</strong> &mdash; of the five views in
-        <code>docs/</code>, only <code>agent-hooks.html</code> carries the
-        style layer, and the other four predate the kicker, the boxed
-        conclusion and the highlight; whether to re-render them is an open
-        owner decision.</li>
-      <li><strong>The templates</strong> &mdash; the plan had them demote to
-        skeleton plus machine contract, but they moved beside the constitution
-        instead and still carry 546 comment lines of rule prose, and whether
-        that relocation satisfies the plan is recorded nowhere.</li>
+      <li><strong>The entries&rsquo; shelves.</strong> Eleven of the fifteen
+        entry views predate the style layer, and
+        <code>docs/agent-document-system.md</code> defers the re-render to the
+        owner. The workspace&rsquo;s own five views were re-rendered on
+        2026-08-05 (<code>01d2800</code>).</li>
+      <li><strong>The templates.</strong> The plan had them demote to skeleton
+        plus machine contract. They moved beside the constitution instead and
+        still carry 493 comment lines of rule prose (<code>~/.claude</code>
+        <code>a644f45</code>); nothing records whether that satisfies the
+        plan.</li>
     </ul>
 
     <h2 id="omissions">Omissions</h2>
 
-    <p>This document claims what the rules said, which option won, and what of
-    it exists at the pin; nothing else. Not shown, deliberately:</p>
-
-    <ul>
-      <li><strong>The pin&rsquo;s reach</strong> &mdash; the Commit field pins
-        <code>~/workspace</code>, which holds none of the constitution: the
-        definition, templates and components are tracked in
-        <code>~/.claude</code> at <code>1094fb2</code>, and the entry deletions
-        are camera <code>cf93d7f</code> (repository at <code>2e6eb36</code>)
-        and board <code>ce99e34</code> (repository at
-        <code>0631c01</code>).</li>
-      <li><strong>The acceptance record</strong> &mdash; Status reads Accepted
-        on the owner decision dated 2026-08-04 in <code>docs/README.md</code>,
-        not on a specification; <code>docs/INDEX.md</code> lists no
-        specification at all, so nothing normative records this outcome.</li>
-      <li><strong>Whether the checker passes</strong> &mdash; the checker was
-        read as a file and its callers were read as files; it was not run at
-        this pin, so only its lack of a caller is claimed here.</li>
-      <li><strong>The other shelves</strong> &mdash; the style-layer count
-        covers <code>~/workspace/docs/</code>; camera&rsquo;s and
-        board&rsquo;s own view shelves were not surveyed.</li>
-    </ul>
+    <details>
+      <summary>Four things this document does not claim &mdash; and the Commit field pins <code>~/workspace</code> alone</summary>
+      <ul>
+        <li><strong>The pin&rsquo;s reach.</strong> <code>~/workspace</code>
+          holds none of the constitution: the definition, templates and
+          components sit in <code>~/.claude</code> at <code>a644f45</code>, and
+          the entries at camera <code>d8741ec</code> and board
+          <code>80e2fb6</code>.</li>
+        <li><strong>Whether the checker passes.</strong> The three hooks were
+          read as files; <code>scripts/check-docs</code> was not run at this
+          pin, so only its callers are claimed.</li>
+        <li><strong>What counts as restyled.</strong> A view counts as carrying
+          the style layer when it has a kicker; boxed conclusions and
+          highlights were not checked view by view.</li>
+        <li><strong>The counts at <code>b969155</code>.</strong> The line counts
+          for the seven sites come from this document&rsquo;s earlier revision,
+          not from a fresh count at that commit.</li>
+      </ul>
+    </details>
 
   </section>
 
   <footer class="sources">
     <h2 id="sources">Sources</h2>
     <ul>
-      <li>The previous revision of this document, rendered at <code>b969155</code></li>
-      <li><code>~/.claude/agents/document-writer.md</code>, with <code>templates/</code> and <code>components/</code>, at <code>~/.claude</code> <code>1094fb2</code></li>
-      <li>Owner decisions, 2026-08-04: the document system moves into the writer constitution (<code>docs/README.md</code>); the header carries no dek and no notice callout, and every section heading is a noun phrase (<code>~/.claude</code> <code>1094fb2</code>)</li>
-      <li><code>docs/README.md</code>; <code>docs/INDEX.md</code>; <code>.claude/CLAUDE.md</code>; <code>scripts/check-docs</code>; <code>.git/hooks/pre-commit</code></li>
-      <li><code>camera/docs/README.md</code>; <code>camera/hooks/pre-commit</code>; <code>board/docs/</code>; <code>board/hooks/pre-commit</code></li>
+      <li>The previous revision of this document, rendered at <code>d599966</code></li>
+      <li><code>~/.claude/agents/document-writer.md</code>, with <code>templates/</code> and <code>components/</code>, at <code>~/.claude</code> <code>a644f45</code></li>
+      <li><code>docs/agent-document-system.md</code> &mdash; the spec that records the decision, both kill reasons, and the deferred re-render</li>
+      <li><code>docs/README.md</code>; <code>docs/INDEX.md</code>; <code>.claude/CLAUDE.md</code>; <code>scripts/check-docs</code>; <code>hooks/pre-commit</code>; <code>.git/local-hooks/pre-commit</code></li>
+      <li><code>camera/docs/README.md</code>; <code>camera/hooks/pre-commit</code>; <code>board/docs/INDEX.md</code>; <code>board/hooks/pre-commit</code></li>
     </ul>
   </footer>
 
