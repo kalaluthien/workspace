@@ -58,9 +58,16 @@ or an appendix, or is deleted.
 A reply is read in ten seconds: the reader learns what is done and what
 waits on them, nothing else.
 
-- Open with the outcome and the artifact that proves it (path, commit, URL).
+- Report in bullets, never in paragraphs: at most one opening sentence,
+  then one bullet per outcome — a bold lead naming the outcome, the
+  artifact that proves it (path, commit, URL), and nothing more on the
+  line. (Owner feedback, 2026-08-11: a paragraph report is unreadable on
+  a phone.)
 - Report results, not operations, in the shortest exact word: "done",
   "fixed", "failed" — not "completed successfully", "addressed".
+- Cut the journey and the color: no phase narration, no measurements or
+  qualifiers the reader will not act on, no detail the named artifact
+  can show itself.
 - Close with only what waits on the user, one imperative line per item;
   when nothing waits on the user, stop at the outcome.
 - Never write an "additional info", "follow-ups", or "notes" section.
