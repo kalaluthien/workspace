@@ -20,6 +20,8 @@ Each DIR is a repository root holding a `docs/`. What is checked:
   4. its doctype is one the contract declares, under an accepted term
   5. the chapter it is filed under is the one its doctype belongs to
   6. its `Updated` value is a date
+  7. its `Reviewed` value, where it carries one, is a date too — the role is
+     optional, so only a malformed value is a problem, never an absent one
 
 What is not checked: everything the templates own — required sections,
 figures, rubric items. A template's contract is checked where the template is
@@ -235,6 +237,17 @@ def check(root, rule):
             problems.append(
                 "%s: %s has Updated '%s', which is not YYYY-MM-DD"
                 % (label, name, updated)
+            )
+        # The one optional role. A view without it has never been reviewed,
+        # which is a fact about the document rather than a fault in it — so
+        # only a value that is there and malformed is a problem. A reader
+        # compares it against Updated, and a value it cannot parse would make
+        # a stamped document read as never stamped.
+        reviewed = role_of(fields, rule, "reviewed")
+        if reviewed and not DATE.match(reviewed):
+            problems.append(
+                "%s: %s has Reviewed '%s', which is not YYYY-MM-DD"
+                % (label, name, reviewed)
             )
     return problems
 

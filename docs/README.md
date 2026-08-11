@@ -35,11 +35,23 @@ Each role lists its accepted `<dt>` terms, primary first. The retired
 migration finished on 2026-08-03 (board `4ee9f83`, camera `140ac74`), and
 the contract reads `Doctype` alone.
 
+Three roles are required of every view — `doctype`, `question`, `updated`.
+`reviewed` is the one optional role: it carries the date somebody last read
+the document against the tree and found it still true. A view without it is
+valid everywhere, and it means the document has never been reviewed — not
+that the review is missing. That is also what a re-render leaves behind: the
+writer fills the provenance block from its template, which carries no
+`Reviewed` term, so a rewritten document reads as never reviewed again. The
+rule and its reason are the writer constitution's
+(`~/.claude/agents/document-writer.md`); this is only where the term is
+declared. A reader comparing the two dates compares *authored* dates: file
+mtime is a checkout timestamp, not a written time.
+
 ```json contract=docs
 {
   "contract": "docs",
   "version": 1,
-  "updated": "2026-08-03",
+  "updated": "2026-08-12",
 
   "view": { "dir": "docs", "extension": ".html", "depth": 1 },
 
@@ -55,7 +67,8 @@ the contract reads `Doctype` alone.
     "roles": {
       "doctype": ["Doctype"],
       "question": ["Question", "Goal"],
-      "updated": ["Updated"]
+      "updated": ["Updated"],
+      "reviewed": ["Reviewed"]
     }
   },
 
