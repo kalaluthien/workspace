@@ -62,20 +62,12 @@
   details { border: 1px solid #e4e4e4; padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
   details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
   details[open] summary { margin-bottom: .5rem; }
-  figure { margin: 2rem 0; }
+  figure { margin: 2.2rem 0; }
   figure svg { display: block; width: 100%; height: auto; }
   figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
-  ol.steps { list-style: none; padding-left: 0; margin: 1.4rem 0; counter-reset: step; }
-  ol.steps > li { position: relative; padding-left: 2.5rem; margin: 2rem 0; counter-increment: step; }
-  ol.steps > li::before {
-    content: counter(step);
-    position: absolute; left: 0; top: .15rem;
-    display: flex; align-items: center; justify-content: center;
-    width: 1.55rem; height: 1.55rem;
-    border: 1px solid #111; border-radius: 50%;
-    background: #ffffff; color: #111;
-    font-size: .82rem; font-weight: 700; line-height: 1;
-  }
+  ol.steps { padding-left: 1.6rem; }
+  ol.steps > li { margin: 1.3rem 0; }
+  ol.steps > li::marker { font-weight: 700; }
   footer.sources { margin-top: 4rem; border-top: 1px solid #e4e4e4; padding-top: 1rem; font-size: .85rem; color: #555; }
   footer.sources h2 { font-size: .8rem; margin: 0 0 .3rem; font-variant: small-caps; letter-spacing: .06em; font-weight: 600; }
   footer.sources ul { margin: 0; padding-left: 1.1rem; }
@@ -91,7 +83,7 @@
     <dl class="provenance">
       <dt>Doctype</dt> <dd>guide</dd>
       <dt>Goal</dt>    <dd>A service reachable at <code>https://&lt;name&gt;.&lt;tailnet&gt;.ts.net</code> on its own tailnet node, installable on a phone beside every other service, with no handler left on the machine node.</dd>
-      <dt>Updated</dt> <dd>2026-08-06</dd>
+      <dt>Updated</dt> <dd>2026-08-11</dd>
       <dt>Commit</dt>  <dd>3e3d22f</dd>
     </dl>
   </header>
@@ -100,51 +92,39 @@
     <h2 id="answer">Answer</h2>
     <div class="conclusion">
       <span class="tag">conclusion</span>
-      <p><span class="badge">1</span> &middot; <strong>One node per service.</strong>
-      A node carries exactly one <code>*.ts.net</code> name, and a phone matches
-      an installed web app by scheme and host while ignoring the port, so
-      <mark>a second service needs a second node</mark>, never a second port.</p>
-      <p><span class="badge">2</span> &middot; <strong>A sidecar container is that node.</strong>
-      One <code>tailscale/tailscale</code> container per service holds the name
-      and proxies <code>:443</code> to the service&#39;s existing host port;
-      <mark>it publishes the service, it never starts it</mark>.</p>
-      <p><span class="badge">3</span> &middot; <strong>Verify before retiring.</strong>
+      <p><span class="badge">1</span> &middot; <strong>One helper per service.</strong>
+      A <code>tailscale/tailscale</code> container — a sidecar — runs beside the
+      service as its own node on the tailnet, holding the hostname and passing
+      <code>:443</code> to the port the service already listens on.
+      <mark>It publishes the service, it never starts it.</mark></p>
+      <p><span class="badge">2</span> &middot; <strong>Verify, then retire.</strong>
       The new hostname must answer <code>HTTP/2 200</code> before the machine
-      node&#39;s old mount comes off, <mark>one named port at a time</mark> —
-      <code>tailscale serve reset</code> wipes every other service&#39;s handler
-      with it.</p>
-      <p><span class="badge">4</span> &middot; <strong>The node is not the last step.</strong>
-      The service&#39;s own hostname setting moves into its launch path, and
-      <mark>the phone app is reinstalled from the new URL</mark>, because an
-      installed app belongs to the origin it was installed from.</p>
+      node&#39;s old handler comes off, <mark>one named port at a time</mark>.</p>
+      <p><span class="badge">3</span> &middot; <strong>Two things follow the node.</strong>
+      The hostname setting inside the service moves into its launch path, and
+      <mark>the phone app is reinstalled from the new URL</mark>.</p>
     </div>
-
-    <details>
-      <summary>Two ports on one node cannot both be installed as phone apps — the collision is in the name, not the port</summary>
-      <p>
-        A node carries one <code>*.ts.net</code> name with no alias and no
-        custom MagicDNS record, and <code>tailscale cert</code> is bound to the
-        node&#39;s own domains. Android matches an installed web app by scheme
-        and host and ignores the port, so the app installed first claims the
-        second service&#39;s URL — an installed app on <code>:443</code> claimed
-        a second service on <code>:8443</code>, and Chrome offered &quot;open&quot;
-        in the menu slot where &quot;install app&quot; belongs.
-      </p>
-    </details>
 
     <h2 id="prerequisites">Prerequisites</h2>
     <ul>
-      <li>colima running with the docker CLI, per the <code>setup-colima</code> memory.</li>
-      <li>The service already answering on a host loopback port such as <code>127.0.0.1:8300</code> — the sidecar publishes it, never starts it.</li>
-      <li>MagicDNS and HTTPS certificates enabled for the tailnet in the admin console — a tailnet-level setting, not a container variable, per <code>notes/wiki/tailscale.md</code>.</li>
-      <li>A <strong>reusable, non-ephemeral</strong> auth key written by the owner to <code>~/.config/ts-sidecar/authkey</code>, mode 600 — an ephemeral key deletes the identity the node exists to hold.</li>
+      <li>colima running with the docker CLI (<code>setup-colima</code> memory).</li>
+      <li>The service already answering on a host loopback port, such as <code>127.0.0.1:8300</code>.</li>
+      <li>MagicDNS and HTTPS certificates on for the tailnet, set in the admin console (<code>notes/wiki/tailscale.md</code>).</li>
+      <li>A <strong>reusable, non-ephemeral</strong> auth key at <code>~/.config/ts-sidecar/authkey</code>, mode 600, written by the owner.</li>
     </ul>
+    <details>
+      <summary>An ephemeral auth key destroys the identity the node exists to hold</summary>
+      <p>
+        Tailscale deletes an ephemeral device when it goes offline, so the node
+        loses its name and its certificates every time the container stops.
+      </p>
+    </details>
 
     <h2 id="steps">Steps</h2>
     <ol class="steps">
       <li>
-        <p>Name the node after the service and write its serve configuration,
-        since the name becomes the hostname.</p>
+        <p>Name the node after the service and write its serve configuration.
+        The name becomes the hostname.</p>
 <pre>app=board          # → board.&lt;tailnet&gt;.ts.net
 port=8300          # the service&#39;s existing host port
 tailnet=…          # the tailnet&#39;s MagicDNS suffix, as on any existing node
@@ -162,45 +142,57 @@ cat &gt; ~/.config/ts-sidecar/$app/serve.json &lt;&lt;JSON
 JSON</pre>
 
         <figure id="fig-proxy-path">
-          <svg viewBox="0 0 320 200" role="img">
+          <svg viewBox="0 0 320 220" role="img">
             <title>The proxy target crosses the colima VM boundary: the sidecar container reaches the macOS loopback service through host.docker.internal</title>
             <defs>
               <marker id="arrow-proxy-path" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
                 <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
               </marker>
             </defs>
-            <rect x="10" y="12" width="210" height="76" fill="none" stroke="currentColor" opacity=".45"/>
+            <rect x="10" y="12" width="210" height="86" fill="none" stroke="currentColor" opacity=".45"/>
             <text x="18" y="27" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".6">colima vm</text>
-            <rect x="24" y="34" width="182" height="46" fill="none" stroke="currentColor"/>
-            <text x="34" y="54" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">sidecar node</text>
-            <text x="34" y="70" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">container · :443</text>
-            <line x1="115" y1="88" x2="115" y2="118" stroke="currentColor" marker-end="url(#arrow-proxy-path)"/>
-            <text x="125" y="107" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">host.docker.internal</text>
-            <rect x="10" y="118" width="210" height="76" fill="none" stroke="currentColor" opacity=".45"/>
-            <text x="18" y="133" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".6">macos host</text>
-            <rect x="24" y="140" width="182" height="46" fill="none" stroke="currentColor"/>
-            <text x="34" y="160" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">service</text>
-            <text x="34" y="176" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">127.0.0.1:8300</text>
+            <rect x="24" y="38" width="182" height="50" fill="none" stroke="currentColor"/>
+            <text x="34" y="58" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">sidecar node</text>
+            <text x="34" y="74" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">container · :443</text>
+            <line x1="115" y1="98" x2="115" y2="128" stroke="currentColor" marker-end="url(#arrow-proxy-path)"/>
+            <text x="125" y="117" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">host.docker.internal</text>
+            <rect x="10" y="128" width="210" height="86" fill="none" stroke="currentColor" opacity=".45"/>
+            <text x="18" y="143" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".6">macos host</text>
+            <rect x="24" y="154" width="182" height="50" fill="none" stroke="currentColor"/>
+            <text x="34" y="174" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">service</text>
+            <text x="34" y="190" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">127.0.0.1:8300</text>
           </svg>
           <figcaption>
-            Deployment view of the proxy target written above, two namespaces.
-            Key: thin frame — a network namespace; solid box — a running
-            process, its second line the address it listens on; arrow — the one
-            HTTP channel, labelled with the name that resolves across the
-            boundary.
+            Where the proxy target above points, across two namespaces. Key:
+            thin frame — a network namespace; solid box — a running process,
+            with the address it listens on; arrow — the HTTP channel, labelled
+            with the name that crosses the boundary.
           </figcaption>
         </figure>
 
         <div class="callout notice">
           <span class="tag">notice</span>
-          <code>--network host</code> would place the proxy in the Linux VM
-          rather than on the Mac, and from there a <code>127.0.0.1</code>-only
-          bind is unreachable.
+          <code>--network host</code> would put the proxy in the Linux VM, not
+          on the Mac, where a <code>127.0.0.1</code>-only bind is unreachable.
         </div>
+
+        <details>
+          <summary>A second service needs a second node, never a second port — the collision is in the name</summary>
+          <p>
+            A node carries one <code>*.ts.net</code> name, with no alias and no
+            custom MagicDNS record, and <code>tailscale cert</code> is bound to
+            the node&#39;s own domains. Android matches an installed web app by
+            scheme and host and ignores the port, so the app installed first
+            claims the second service&#39;s URL. An installed app on
+            <code>:443</code> claimed a second service on <code>:8443</code>, and
+            Chrome offered &quot;open&quot; in the menu slot where &quot;install
+            app&quot; belongs.
+          </p>
+        </details>
       </li>
 
       <li>
-        <p>Start the sidecar node as a container of its own; the run prints the
+        <p>Start the sidecar node as a container of its own. The run prints the
         container id and nothing else.</p>
 <pre>docker run -d --name "ts-$app" --restart unless-stopped \
   -v "$HOME/.local/state/ts-$app:/var/lib/tailscale" \
@@ -218,69 +210,76 @@ JSON</pre>
           <ul>
             <li>Consequence: the node registers as ephemeral, so it is deleted
             when the container stops and the replacement can hold
-            <code>&lt;name&gt;-1</code> permanently; the certificates live there
-            too, so every restart re-issues from Let&#39;s Encrypt into the
-            duplicate-certificate limit, which resets at about one per 34
+            <code>&lt;name&gt;-1</code> for good. The certificates go with it, so
+            every restart re-issues from Let&#39;s Encrypt into the
+            duplicate-certificate limit, which resets about once per 34
             hours.</li>
-            <li>Avoidance: set it and bind-mount a host directory onto it, both
-            as shown above.</li>
+            <li>Avoidance: set it and bind-mount a host directory onto it, as
+            shown above.</li>
           </ul>
         </div>
         <details>
           <summary><code>TS_AUTHKEY_FILE</code> and <code>TS_SERVE_PORT</code> do not exist — the real mechanisms are already in the command</summary>
           <p>
             A <code>file:</code> prefix on the <code>TS_AUTHKEY</code> value
-            reads the key from a path, <code>TS_SERVE_CONFIG</code> is the only
-            serve mechanism, and the mount is the directory holding
-            <code>serve.json</code> rather than the file, because the watch is
-            on the directory and a bind-mounted file&#39;s inode is replaced on
+            reads the key from a path, and <code>TS_SERVE_CONFIG</code> is the
+            only serve mechanism. The mount is the directory holding
+            <code>serve.json</code> rather than the file, because the watch is on
+            the directory and a bind-mounted file&#39;s inode is replaced on
             edit.
           </p>
         </details>
       </li>
 
       <li>
-        <p>Verify the new hostname answers before changing anything else,
-        allowing up to a minute for the first certificate.</p>
+        <p>Verify the new hostname answers before changing anything else. The
+        first certificate can take up to a minute.</p>
 <pre>docker logs "ts-$app" | tail -20
 tailscale status | grep "$app"
 curl -sI "https://$app.$tailnet.ts.net/" | head -1</pre>
-        <p>A working run prints <code>HTTP/2 200</code> and a status line
-        carrying exactly the chosen name, with no <code>-1</code> suffix.</p>
+        <p>A working run prints <code>HTTP/2 200</code>, and the status line
+        carries exactly the chosen name with no <code>-1</code> suffix.</p>
       </li>
 
       <li>
         <p>Move the service&#39;s own hostname setting onto the node name,
-        deriving it from that name plus the tailnet suffix, or the service
-        rejects requests arriving at the new origin.</p>
-        <p>Where the setting lives differs per service, so the move is done when
-        the derived value sits in the service&#39;s launch path rather than in a
-        shell one-off the next deploy undoes.</p>
+        derived from that name plus the tailnet suffix. Where the setting lives
+        differs per service. The step is done when the service still answers at
+        the new hostname after a redeploy.</p>
+        <div class="callout warning">
+          <span class="tag">warning</span>
+          Setting the value by hand in a shell instead of in the launch path.
+          <ul>
+            <li>Consequence: the next deploy restores the old hostname and the
+            service answers 400 at the new origin.</li>
+            <li>Avoidance: edit the launch script or its configuration file, then
+            redeploy.</li>
+          </ul>
+        </div>
         <details>
           <summary>An identity gate keeps working across the move, verified 2026-08-02</summary>
           <p>
-            The proxy now arrives from a container rather than the host
-            loopback, yet the tailnet identity of the requesting device still
-            reaches the service: a message sent through Collie&#39;s phone app
-            across its sidecar was accepted with the trusted-user setting
-            unchanged.
+            The proxy now arrives from a container rather than the host loopback,
+            yet the tailnet identity of the requesting device still reaches the
+            service. A message sent through Collie&#39;s phone app across its
+            sidecar was accepted with the trusted-user setting unchanged.
           </p>
         </details>
       </li>
 
       <li>
-        <p>Retire the old mount on the machine node, one port at a time, and
-        only once the new hostname answers 200.</p>
+        <p>Retire the old handler on the machine node, one port at a time, once
+        the new hostname answers 200.</p>
 <pre>tailscale serve --https=8443 off
 tailscale serve status</pre>
         <p>The status output then reports no configuration for that port.</p>
         <div class="callout warning">
           <span class="tag">warning</span>
-          <code>tailscale serve reset</code> is never the way to turn a mount
+          <code>tailscale serve reset</code> is never the way to turn a handler
           off.
           <ul>
-            <li>Consequence: it removes every handler on the host, including
-            other services&#39;.</li>
+            <li>Consequence: it removes every handler on the host, other
+            services&#39; included.</li>
             <li>Avoidance: name the one port, as above.</li>
           </ul>
         </div>
@@ -294,9 +293,16 @@ tailscale status | grep "$app"</pre>
       </li>
 
       <li>
-        <p>Reinstall the app on the phone from the new URL, because an installed
-        web app belongs to its origin and the old install is a different app
-        that will not follow the move.</p>
+        <p>Reinstall the app on the phone: uninstall the old one, then install
+        from <code>https://&lt;name&gt;.&lt;tailnet&gt;.ts.net</code>. The phone
+        then lists the service as its own app.</p>
+        <details>
+          <summary>The old install does not follow the move — to the phone, a new origin is a new app</summary>
+          <p>
+            Android matches an installed web app by scheme and host, so the app
+            installed from the old hostname keeps pointing at the old origin.
+          </p>
+        </details>
       </li>
     </ol>
 
@@ -308,8 +314,8 @@ tailscale status | grep "$app"</pre>
       <code>https://&lt;name&gt;.&lt;tailnet&gt;.ts.net</code>, and
       <mark>the machine node reports no configuration for the retired port</mark>.</p>
       <p><span class="badge">2</span> &middot; <strong>Its own identity.</strong>
-      Both names come back from a container restart <mark>with no
-      <code>-1</code> suffix</mark>.</p>
+      Every name survives a container restart <mark>with no <code>-1</code>
+      suffix</mark>.</p>
       <p><span class="badge">3</span> &middot; <strong>Its own app.</strong>
       <mark>Each service installs on the phone on its own</mark>, from its own
       hostname.</p>
@@ -318,9 +324,8 @@ tailscale status | grep "$app"</pre>
     <h2 id="recovery">Recovery</h2>
     <div class="callout gap">
       <span class="tag">gap</span>
-      The walk kept no per-step failure record, so a cell reading &quot;not
-      recorded&quot; below is a hole in the record rather than a failure that
-      did not happen.
+      The walk kept no per-step failure record, so &quot;not recorded&quot; below
+      marks a hole in the record, not a failure that did not happen.
     </div>
     <table>
       <tr><th>Symptom</th><th>Cause</th><th>Way back</th></tr>
@@ -345,9 +350,9 @@ tailscale status | grep "$app"</pre>
         <td>Not recorded — the recognition only</td>
       </tr>
       <tr>
-        <td>A check fails right after a mount is retired</td>
+        <td>A check fails right after a handler is retired</td>
         <td>Not recorded</td>
-        <td>Restore that mount and stop rather than retiring the next port; no
+        <td>Restore that handler and stop rather than retiring the next port; no
         restore command is recorded</td>
       </tr>
     </table>

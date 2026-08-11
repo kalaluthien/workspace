@@ -81,14 +81,18 @@
     <dl class="provenance">
       <dt>Doctype</dt>  <dd>explanation</dd>
       <dt>Question</dt> <dd>what hooks run around a working session, which layer owns each, and what does each guard? (runtime view)</dd>
-      <dt>Updated</dt>  <dd>2026-08-06</dd>
-      <dt>Commit</dt>   <dd>c1f8670</dd>
+      <dt>Updated</dt>  <dd>2026-08-11</dd>
+      <dt>Commit</dt>   <dd>c66bc5c</dd>
     </dl>
   </header>
 
   <section>
 
     <h2 id="answer">Answer</h2>
+
+    <p>Four hooks fire inside the session itself, and a second layer — each
+      repository's own git hooks — takes over the moment a session runs
+      <code>git commit</code>.</p>
 
     <div class="box">
       <span class="label">Conclusion</span>
@@ -99,19 +103,18 @@
           that shapes the reply instead of checking something.</li>
         <li><span class="n">2</span><strong>Tool call.</strong>
           <code>PreToolUse</code> on <code>Bash</code> <mark>rewrites the
-          command through rtk</mark> to cut output tokens, and
+          command through rtk</mark> to cut output tokens.
           <code>PostToolUse</code> on <code>Write|Edit</code> <mark>fails a
           backlog write</mark> whose items break the pool contract's
           grammar.</li>
         <li><span class="n">3</span><strong>Git layer.</strong> A
-          <code>git commit</code> inside that Bash call leaves the harness
-          entirely: all six repositories run <mark>the same
-          <code>no-main-commits</code> guard</mark>, five then chain their own
-          hook, and three of those <mark>check the workspace docs
-          contract</mark>.</li>
+          <code>git commit</code> inside that Bash call leaves the harness:
+          all six repositories run <mark>the same <code>no-main-commits</code>
+          guard</mark>, five then chain their own hook, and three of those
+          <mark>check the workspace docs contract</mark>.</li>
         <li><span class="n">4</span><strong>Turn end.</strong>
           <code>Stop</code> <mark>blocks one stop per working turn</mark> with
-          the Filing reminder — a turn that only answered in text is let
+          the Filing reminder. A turn that only answered in text is let
           straight through.</li>
       </ol>
     </div>
@@ -132,7 +135,7 @@
         <text x="34" y="64" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">UserPromptSubmit</text>
 
         <line x1="105" y1="76" x2="105" y2="104" stroke="currentColor" marker-end="url(#arrow-session)"/>
-        <text x="115" y="95" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">session runs</text>
+        <text x="115" y="94" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">session runs</text>
 
         <rect x="20" y="106" width="170" height="56" fill="none" stroke="currentColor"/>
         <circle cx="44" cy="106" r="11" fill="#ffffff" stroke="currentColor"/>
@@ -161,12 +164,11 @@
       <figcaption>
         Runtime view, one session at the pinned trees; 360 viewBox units, so it
         does not pan. Key: box — a moment at which something fires, its circled
-        numeral keying the conclusion statement above and the Elements row
-        below, its second line naming what runs there; arrow — the session
-        moving on, labelled with what carries it; the branch into
-        <strong>Git layer</strong> — a Bash command that calls git, the one
-        crossing between the two layers. No element is dashed: everything drawn
-        is installed at the pinned trees.
+        numeral keying the conclusion above and the Elements row below, its
+        second line naming what runs there; arrow — the session moving on,
+        labelled with what carries it; the branch into
+        <strong>Git layer</strong> — the one crossing between the two layers.
+        Nothing is dashed: everything drawn is installed.
       </figcaption>
     </figure>
 
@@ -174,12 +176,12 @@
     <table>
       <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>1 &middot; Prompt in</td><td>session moment</td><td>the prompt is submitted; the hook carries no matcher, so its one line of output joins every prompt's context</td></tr>
-        <tr><td>2 &middot; Tool call</td><td>session moment</td><td>a tool runs; one hook wraps <code>Bash</code> before the call, another follows <code>Write</code> and <code>Edit</code></td></tr>
-        <tr><td>3 &middot; Git layer</td><td>repository boundary</td><td>the hooks git finds for one clone, reached only when a command actually invokes git</td></tr>
+        <tr><td>1 &middot; Prompt in</td><td>session moment</td><td>the prompt is submitted; the hook has no matcher, so its line joins every prompt</td></tr>
+        <tr><td>2 &middot; Tool call</td><td>session moment</td><td>a tool runs; one hook wraps <code>Bash</code>, another follows <code>Write</code> and <code>Edit</code></td></tr>
+        <tr><td>3 &middot; Git layer</td><td>repository boundary</td><td>the hooks git finds for one clone, reached only when a command invokes git</td></tr>
         <tr><td>4 &middot; Turn end</td><td>session moment</td><td>the model tries to end the turn; the hook decides whether it may</td></tr>
         <tr><td>session runs</td><td>sequence edge</td><td>the turn proceeds from the prompt into its tool calls</td></tr>
-        <tr><td>commit</td><td>crossing edge</td><td>a Bash command that commits hands control to that repository's own hook chain</td></tr>
+        <tr><td>commit</td><td>crossing edge</td><td>a committing Bash command hands control to that clone's hook chain</td></tr>
         <tr><td>turn ends</td><td>sequence edge</td><td>tool calls are exhausted and the model attempts to stop</td></tr>
       </tbody>
     </table>
@@ -195,23 +197,37 @@
           git's. No event fires both layers.</li>
         <li><span class="n">2</span><strong>One follows the operator, the other
           the clone.</strong> The four harness hooks sit in <mark>one
-          file</mark>, <code>~/.claude/settings.json</code>, and so apply in
-          every repository this operator works; a git hook lives <mark>inside a
-          clone</mark>, is never cloned, and fires for every actor — a peer
-          agent, or the owner at a terminal — not only a Claude session.</li>
+          file</mark> and so apply in every repository this operator works. A
+          git hook lives <mark>inside a clone</mark>, is never cloned, and
+          fires for every actor — a peer agent, or the owner at a terminal —
+          not only a Claude session.</li>
       </ol>
     </div>
 
     <table>
       <thead><tr><th></th><th>Harness layer</th><th>Git layer</th></tr></thead>
       <tbody>
-        <tr><td>Configured in</td><td><code>~/.claude/settings.json</code>, <code>hooks</code> section — no project settings file defines any</td><td>an executable under each clone's <code>.git/hooks/</code>, or the <code>core.hooksPath</code> directory it names instead</td></tr>
+        <tr><td>Configured in</td><td><code>~/.claude/settings.json</code>, <code>hooks</code> section</td><td>an executable under the clone's <code>.git/hooks/</code>, or the <code>core.hooksPath</code> directory named instead</td></tr>
         <tr><td>Fires on</td><td>prompt submit, tool call, turn end</td><td>the commit about to be made</td></tr>
-        <tr><td>Sees</td><td>the session: prompt text, tool payload on stdin, the transcript</td><td>the repository: current branch, staged index, working tree</td></tr>
-        <tr><td>Tracked</td><td>yes — <code>~/.claude</code> tracks <code>settings.json</code>, <code>hooks/</code>, and <code>git-hooks/</code></td><td>the guard and each repository's own hook are; the entry point under <code>.git/</code> and the config value are not, so the wiring is installed per clone</td></tr>
-        <tr><td>Override</td><td>none</td><td><code>git commit --no-verify</code>, named in the guard's own message</td></tr>
+        <tr><td>Sees</td><td>the session: prompt, tool payload, transcript</td><td>the repository: branch, staged index, working tree</td></tr>
+        <tr><td>Tracked</td><td>yes, in <code>~/.claude</code></td><td>partly — the guard and each repository's own hook, but not the wiring</td></tr>
+        <tr><td>Override</td><td>none</td><td><code>git commit --no-verify</code></td></tr>
       </tbody>
     </table>
+
+    <details>
+      <summary>Untracked wiring is why the git layer is installed once per clone, not cloned with it</summary>
+      <ul>
+        <li><strong>Harness side.</strong> No project settings file defines any
+          hook; <code>~/.claude</code> tracks <code>settings.json</code>,
+          <code>hooks/</code>, and <code>git-hooks/</code>.</li>
+        <li><strong>Git side.</strong> The entry point under <code>.git/</code>
+          and the <code>core.hooksPath</code> value are not tracked, so a fresh
+          clone starts with no chain until someone wires it.</li>
+        <li><strong>The override is advertised.</strong> The guard's own refusal
+          message names <code>git commit --no-verify</code>.</li>
+      </ul>
+    </details>
 
     <h2 id="harness">Harness hooks</h2>
 
@@ -221,7 +237,7 @@
         <li><span class="n">1</span><strong>Two guard the record, two guard the
           conduct.</strong> <code>PostToolUse</code> and <code>Stop</code>
           <mark>hold the memory pools' rules</mark> — the item grammar and the
-          Filing pass; <code>PreToolUse</code> and
+          Filing pass. <code>PreToolUse</code> and
           <code>UserPromptSubmit</code> shape cost and register and
           <mark>refuse nothing</mark>.</li>
         <li><span class="n">2</span><strong><code>Stop</code> asks twice
@@ -237,11 +253,23 @@
       <thead><tr><th>Event</th><th>Matcher</th><th>What runs</th><th>What it guards</th></tr></thead>
       <tbody>
         <tr><td><code>UserPromptSubmit</code></td><td>every prompt</td><td><code>echo</code> of one reminder line</td><td>the reply's register — plain, everyday language over jargon</td></tr>
-        <tr><td><code>PreToolUse</code></td><td><code>Bash</code></td><td><code>rtk hook claude</code></td><td>the token budget: the command is rewritten to its rtk proxy, which trims the output</td></tr>
-        <tr><td><code>PostToolUse</code></td><td><code>Write|Edit</code></td><td><code>check-backlog-format.py</code></td><td>the backlog item grammar in any pool's <code>backlog.md</code>; the offending line comes back on stderr, and an unreadable contract is a refusal, never a pass</td></tr>
-        <tr><td><code>Stop</code></td><td>every turn</td><td><code>stop-takeaway-check.py</code></td><td>the durable takeaway: it walks the transcript back to the last real user prompt and blocks that stop with the Filing reminder only if a tool call happened in between</td></tr>
+        <tr><td><code>PreToolUse</code></td><td><code>Bash</code></td><td><code>rtk hook claude</code></td><td>the token budget — the command is rewritten to its rtk proxy, which trims the output</td></tr>
+        <tr><td><code>PostToolUse</code></td><td><code>Write|Edit</code></td><td><code>check-backlog-format.py</code></td><td>the backlog item grammar in any pool's <code>backlog.md</code></td></tr>
+        <tr><td><code>Stop</code></td><td>every turn</td><td><code>stop-takeaway-check.py</code></td><td>the durable takeaway — the Filing reminder</td></tr>
       </tbody>
     </table>
+
+    <details>
+      <summary>Both checking hooks fail loud: the offending line comes back, and an unreadable contract is a refusal</summary>
+      <ul>
+        <li><strong>Backlog check.</strong> It returns the offending line on
+          stderr, and it refuses rather than passes when it cannot read the
+          pool contract.</li>
+        <li><strong>Stop check.</strong> It walks the transcript back to the
+          last real user prompt, and blocks the stop only if a tool call
+          happened in between.</li>
+      </ul>
+    </details>
 
     <h2 id="git">Git hooks</h2>
 
@@ -258,17 +286,17 @@
           Where a repository owns a pre-commit hook,
           <code>core.hooksPath</code> names <code>.git/local-hooks</code>,
           whose entry hook <mark>runs the guard first and the repository's own
-          hook second</mark>; only <code>kalaluthien.github.io</code> still
+          hook second</mark>. Only <code>kalaluthien.github.io</code> still
           runs the guard alone.</li>
-        <li><span class="n">3</span><strong>The docs contract now has
+        <li><span class="n">3</span><strong>The docs contract has
           callers.</strong> <code>~/workspace/scripts/check-docs</code> is run
           by <mark>workspace, board, and camera</mark> on any commit that
           stages <code>docs/</code>; the other three ship no view it could
           check.</li>
         <li><span class="n">4</span><strong>One hook outside the chain.</strong>
           board also runs a <code>reference-transaction</code> hook, which
-          <mark>starts one deploy per new version tag</mark>; it is installed in
-          that same <code>core.hooksPath</code> directory, because the setting
+          <mark>starts one deploy per new version tag</mark>. It sits in that
+          same <code>core.hooksPath</code> directory, because the setting
           <mark>replaces <code>.git/hooks</code> rather than adding to
           it</mark>.</li>
       </ol>
@@ -302,7 +330,7 @@
         <text x="34" y="60" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="currentColor" opacity=".7">.git/local-hooks/pre-commit</text>
 
         <line x1="120" y1="66" x2="120" y2="92" stroke="currentColor" marker-end="url(#arrow-chain)"/>
-        <text x="130" y="84" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">first</text>
+        <text x="130" y="82" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">first</text>
 
         <rect x="20" y="94" width="200" height="50" fill="none" stroke="currentColor"/>
         <circle cx="44" cy="94" r="11" fill="#ffffff" stroke="currentColor"/>
@@ -315,7 +343,7 @@
         <text x="260" y="168" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">blocked</text>
 
         <line x1="120" y1="144" x2="120" y2="170" stroke="currentColor" marker-end="url(#arrow-chain)"/>
-        <text x="130" y="162" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">otherwise</text>
+        <text x="130" y="160" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">otherwise</text>
 
         <rect x="20" y="172" width="200" height="50" fill="none" stroke="currentColor"/>
         <circle cx="44" cy="172" r="11" fill="#ffffff" stroke="currentColor"/>
@@ -328,8 +356,7 @@
         that set <code>core.hooksPath</code>; 340 viewBox units, so it does not
         pan. Key: circled numeral — one stage, keyed to the legend; solid arrow
         — control passing on, labelled with the condition; bare text outside any
-        box — an exit. <code>kalaluthien.github.io</code>, which sets no
-        <code>core.hooksPath</code>, runs stage 2 alone.
+        box — an exit. <code>kalaluthien.github.io</code> runs stage 2 alone.
       </figcaption>
     </figure>
 
@@ -342,37 +369,54 @@
         ordered ahead of it; a non-zero exit here ends the commit.</li>
       <li><strong>Repo hook</strong> — repository check. The hook that
         repository would have run anyway, <code>exec</code>'d last, so its exit
-        status is the commit's. In workspace and board the entry hook tests it
-        for existence first, so a branch predating the file still commits;
-        the other three <code>exec</code> it unconditionally.</li>
+        status is the commit's.</li>
     </ol>
+
+    <details>
+      <summary>Two of the five entry hooks test for the repository hook first, so an old branch still commits</summary>
+      <p>In workspace and board the entry hook checks that the repository's own
+        hook exists before running it. A branch that predates the file
+        therefore still commits. The other three <code>exec</code> it
+        unconditionally.</p>
+    </details>
 
     <div class="callout warning">
       <span class="tag">Warning</span> <code>core.hooksPath</code> replaces
-      <code>.git/hooks</code>; it does not add to it, so setting it silently
-      retires every hook still living there — a hooks directory git no longer
-      reads is not an error, it is no hook at all. The trap this leaves behind
-      is textual: an install line or a precondition that names
-      <code>.git/hooks</code> reports a hook git will never call, so the check
-      that should catch the absence is the thing asserting it is fine. Resolve
-      <code>git config core.hooksPath</code> first and fall back to
-      <code>.git/hooks</code> only when it is unset — which is what
-      <code>board/hooks/reference-transaction</code>'s install line and
-      <code>board/scripts/release-patch</code>'s precondition now both do, at
-      board <code>044804c</code>.
+      <code>.git/hooks</code>; it does not add to it.
+      <ul>
+        <li>Consequence: setting it silently retires every hook still living
+          there, and a hooks directory git no longer reads is not an error —
+          it is no hook at all.</li>
+        <li>Avoidance: resolve <code>git config core.hooksPath</code> first,
+          and fall back to <code>.git/hooks</code> only when it is unset.</li>
+      </ul>
     </div>
 
     <details>
+      <summary>The trap this leaves is textual: a line naming <code>.git/hooks</code> reports a hook git will never call</summary>
+      <p>An install line or a precondition written against
+        <code>.git/hooks</code> asserts that the wiring is fine, so the check
+        that should catch the absence is the thing hiding it.
+        <code>board/hooks/reference-transaction</code>'s install line and
+        <code>board/scripts/release-patch</code>'s precondition now both
+        resolve the setting first, at board <code>044804c</code>.</p>
+    </details>
+
+    <details>
       <summary><code>core.hooksPath</code> must be absolute, or every hook silently stops running inside a linked worktree</summary>
-      <p>Git resolves a relative <code>core.hooksPath</code> against the working
-        directory. A linked worktree's own <code>.git</code> is a file, not a
-        directory, so <code>.git/local-hooks</code> resolves to a path that does
-        not exist there — and a missing hooks directory is not an error, it is
-        no hook at all. Probed on git 2.54.0, 2026-08-06: with a relative value
-        the entry hook fired in the main checkout and not in a
-        <code>git worktree add</code> checkout of the same repository; setting
-        the absolute value in the worktree restored it. All five configured
-        repositories now hold the absolute form:</p>
+      <ul>
+        <li><strong>Why it breaks.</strong> Git resolves a relative
+          <code>core.hooksPath</code> against the working directory. A linked
+          worktree's own <code>.git</code> is a file, not a directory, so
+          <code>.git/local-hooks</code> resolves to a path that does not exist
+          there — and a missing hooks directory is no hook at all.</li>
+        <li><strong>The probe.</strong> Git 2.54.0, 2026-08-06: with a relative
+          value the entry hook fired in the main checkout and not in a
+          <code>git worktree add</code> checkout of the same repository.
+          Setting the absolute value in the worktree restored it.</li>
+        <li><strong>The fix, already applied.</strong> All five configured
+          repositories now hold the absolute form.</li>
+      </ul>
 <pre>git config core.hooksPath "$PWD/.git/local-hooks"</pre>
     </details>
 
@@ -381,33 +425,34 @@
       and what each refuses; nothing else. Not shown, deliberately:</p>
     <ul>
       <li><strong>The pin's reach</strong> — the Commit field pins
-        <code>~/workspace</code>, which holds the shared checker and its own
-        <code>hooks/</code> but no other repository's: the harness hooks and the
-        shared guard are tracked in <code>~/.claude</code> at
-        <code>13d1aa5</code>, the chained hooks in their own repositories at
-        board <code>f3d4224</code> and camera <code>d8741ec</code>, and the
-        entry hook under <code>.git/local-hooks/</code> is version-controlled
-        nowhere.</li>
-      <li><strong>Inside the chained hooks</strong> — the last column of the
-        repository table names what each adds in one line; the checks
-        themselves belong to those repositories' own documents.</li>
-      <li><strong>What <code>check-docs</code> checks</strong> — the six rules
-        it applies and the contract block it parses are stated where the
-        contract lives, <code>docs/README.md</code>; this view claims only who
-        calls it and when.</li>
-      <li><strong>The rtk rewrite</strong> — which commands rtk proxies, and by
-        how much it trims them, is the tool's own fact
-        (<code>~/.claude/RTK.md</code>), not this view's.</li>
-      <li><strong>Other hook kinds</strong> — the walk covered
-        <code>.git/hooks/</code> and <code>.git/local-hooks/</code> in the six
-        repositories on 2026-08-06, samples excluded; the only hook file found
-        outside the pre-commit chain was board's
-        <code>reference-transaction</code>. Server-side hooks and CI checks are
-        a different layer again.</li>
-      <li><strong>Ordering across layers</strong> — the figure shows that a
-        Bash call crosses into git, not how a harness hook and a git hook would
-        interleave if both had something to say.</li>
+        <code>~/workspace</code> only; the other trees are pinned per claim.</li>
+      <li><strong>Inside the chained hooks</strong> — one line each in the table
+        above; the checks belong to those repositories' own documents.</li>
+      <li><strong>What <code>check-docs</code> checks</strong> — its rules live
+        with the contract, in <code>docs/README.md</code>.</li>
+      <li><strong>The rtk rewrite</strong> — which commands rtk proxies, and how
+        much it trims, is the tool's own fact (<code>~/.claude/RTK.md</code>).</li>
+      <li><strong>Other hook kinds</strong> — server-side hooks and CI checks
+        are a different layer again.</li>
+      <li><strong>Ordering across layers</strong> — how a harness hook and a git
+        hook would interleave if both had something to say.</li>
     </ul>
+
+    <details>
+      <summary>The trees behind the claims, and how far the hook walk reached</summary>
+      <ul>
+        <li><strong>Other trees.</strong> The harness hooks and the shared guard
+          are tracked in <code>~/.claude</code> at <code>13d1aa5</code>; the
+          chained hooks sit in their own repositories at board
+          <code>f3d4224</code> and camera <code>d8741ec</code>; the entry hook
+          under <code>.git/local-hooks/</code> is version-controlled
+          nowhere.</li>
+        <li><strong>The walk.</strong> It covered <code>.git/hooks/</code> and
+          <code>.git/local-hooks/</code> in the six repositories on 2026-08-06,
+          samples excluded. Board's <code>reference-transaction</code> was the
+          only hook found outside the pre-commit chain.</li>
+      </ul>
+    </details>
 
   </section>
 
@@ -427,7 +472,8 @@
         the protected branch names, the detached-HEAD pass, and the
         <code>--no-verify</code> override</li>
       <li>the <code>core.hooksPath</code> values and installed hook files of the
-        six repositories under <code>~/workspace</code>, walked 2026-08-06</li>
+        six repositories under <code>~/workspace</code>, walked 2026-08-06 and
+        re-read 2026-08-11</li>
       <li><code>hooks/pre-commit</code> in workspace, board
         (<code>f3d4224</code>), and camera (<code>d8741ec</code>);
         <code>notes/.githooks/pre-commit</code> and
