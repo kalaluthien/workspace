@@ -49,4 +49,4 @@ Template: `~/.claude/agents/document-writer/templates/proposal.html`
 - [`agent-backlog-writing.html`](agent-backlog-writing.html) — what rule
   should structure a backlog row's text, and where that rule and its guard
   should live: three structuring options, three homes, and the reach
-  argument that picks one of each; Open.
+  argument that picks one of each; Accepted 2026-08-12.
