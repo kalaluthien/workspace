@@ -46,3 +46,7 @@ Template: `~/.claude/agents/document-writer/templates/proposal.html`
   `document-writer` agent's own definition: the options, why locality decided
   it, and the enforcement and re-render work the shipped move left behind;
   Accepted 2026-08-04.
+- [`agent-backlog-writing.html`](agent-backlog-writing.html) — what rule
+  should structure a backlog row's text, and where that rule and its guard
+  should live: three structuring options, three homes, and the reach
+  argument that picks one of each; Open.
