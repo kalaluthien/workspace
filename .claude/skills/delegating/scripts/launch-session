@@ -43,6 +43,27 @@ role=$(role_of "$name")
 [ -n "$model" ] || model=opus
 [ -n "$effort" ] || effort=medium
 
+# herdr encodes the AGENT_ARGs into the pane's shell command line, and refuses
+# any argument holding a control character — newline, tab, carriage return,
+# escape and DEL — with invalid_agent_argument ("agent arguments cannot be
+# encoded safely for the target shell"). Quotes, $, backticks and non-ASCII
+# text all pass (probed against 0.8.0). The refusal is caught here rather than
+# left to herdr for two reasons. It is terminal, so the retry below would
+# spend ten seconds re-sending an argv that can never be accepted and would
+# then blame the launch instead of the argument. And it arrives after a
+# workspace or a tab has been created, so a refusal from herdr strands a pane
+# this script would have to clean up. A caller reaches it by passing a
+# multi-line prompt as an extra argument, which is how a session is handed
+# text longer than a pane's 1024-byte line accepts.
+for arg in "$model" "$effort" ${extra[@]+"${extra[@]}"}; do
+  case $arg in
+    *[[:cntrl:]]*)
+      die "an agent argument holds a control character, which herdr cannot
+encode for the pane's shell; fold it to spaces or pass the text another way:
+$(printf '%q' "$arg")" ;;
+  esac
+done
+
 # herdr 0.8.0: `agent start` no longer creates its pane — it claims an
 # existing shell pane (--kind --pane) and appends AGENT_ARGs to the kind's
 # canonical executable. Creating a workspace or a tab yields that shell as
