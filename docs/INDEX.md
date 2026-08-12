@@ -27,6 +27,10 @@ Template: `~/.claude/agents/document-writer/templates/explanation.html`
 - [`agent-hooks.html`](agent-hooks.html) — the hooks that fire around a
   working session, split by the layer that owns them: four Claude Code
   hooks in one settings file, and the git guard every repository runs.
+- [`agent-document-writer.html`](agent-document-writer.html) — how the
+  document-writer subagent is put together — one constitution file with its
+  templates and components beside it — and how one view goes from request to
+  delivered file.
 
 ## Guides
 
@@ -41,11 +45,6 @@ Template: `~/.claude/agents/document-writer/templates/guide.html`
 
 Template: `~/.claude/agents/document-writer/templates/proposal.html`
 
-- [`agent-document-writing.html`](agent-document-writing.html) — moving the
-  document system's rules out of the seven sites that restated them into the
-  `document-writer` agent's own definition: the options, why locality decided
-  it, and the enforcement and re-render work the shipped move left behind;
-  Accepted 2026-08-04.
 - [`agent-backlog-writing.html`](agent-backlog-writing.html) — what rule
   should structure a backlog row's text, and where that rule and its guard
   should live: three structuring options, three homes, and the reach
