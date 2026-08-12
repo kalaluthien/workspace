@@ -53,6 +53,17 @@ or an appendix, or is deleted.
 - Pair a rule with an example in durable documents; in chat, only when the
   rule is ambiguous without one.
 - Use tables only for short enumerable facts; explanations go in prose.
+- A cross-reference that quotes a section title is resolved by a script
+  against the target's actual headings before delivery, never proofread.
+  Reading fixes a document's bold leads and table rows in memory far more
+  strongly than its headings, so a title recalled minutes after reading the
+  source is often a phrase that is not a heading at all — the reference then
+  looks right to its author and to every later reader who does not follow it.
+  Cross-references authored this way carry a measurable error rate, so a
+  document set that points into itself or into another repository needs a
+  resolver rather than a careful re-read. (Observed 2026-08-12: 4 of 50
+  citations in one design set named a bold lead or a table row; all four had
+  survived authoring and one re-read.)
 
 ## Reporting
 A reply is read in ten seconds: the reader learns what is done and what
