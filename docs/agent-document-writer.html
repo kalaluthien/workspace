@@ -114,9 +114,9 @@
     <h1>Document writer</h1>
     <dl class="provenance">
       <dt>Doctype</dt>  <dd>explanation</dd>
-      <dt>Question</dt> <dd>how does one document request travel through the writer's parts and come back as a delivered view? (mechanism)</dd>
+      <dt>Question</dt> <dd>how are the writer's three rule layers built inside, and how does one request travel through them? (mechanism)</dd>
       <dt>Updated</dt>  <dd>2026-08-13</dd>
-      <dt>Commit</dt>   <dd>workspace 26b5274 · dotclaude e19479b</dd>
+      <dt>Commit</dt>   <dd>workspace 803540c · dotclaude e19479b</dd>
     </dl>
   </header>
 
@@ -124,80 +124,84 @@
 
     <h2 id="answer">Answer</h2>
 
-    <p>The caller names the doctype, the path and the sources; the writer
-    fills that doctype's template, checks it against the template's own
-    rubric, and hands the file back with a report for the caller to
-    commit.</p>
+    <p>One file holds the rules, one template per doctype holds that
+    doctype's contract and its checklist, and five components hold one page
+    part each as working markup — the writer reads them in that order, fills
+    the template, scores the checklist, and hands the file back.</p>
 
     <div class="conclusion">
       <span class="tag">Conclusion</span>
       <p><span class="badge">1</span><strong>Request.</strong> The caller
         names <mark>the doctype, the target path and the sources</mark>. The
         writer chooses none of the three.</p>
-      <p><span class="badge">2</span><strong>Render.</strong> The writer
-        fills the template from the components and the sources, and
-        <mark>pins the commit</mark> it read them at.</p>
-      <p><span class="badge">3</span><strong>Rubric check.</strong> The
-        writer walks the template's rubric item by item and <mark>fixes
-        every failure before delivery</mark>.</p>
-      <p><span class="badge">4</span><strong>Delivery.</strong> Two things
-        come back: <mark>the file and the rubric report</mark>. The writer
-        runs no git command.</p>
+      <p><span class="badge">2</span><strong>Read.</strong> The writer reads
+        <mark>the constitution, then that doctype's template, then the
+        components</mark> the template names, then the sources.</p>
+      <p><span class="badge">3</span><strong>Fill.</strong> The writer copies
+        the template to the path, pastes the component markup in,
+        <mark>deletes every template comment</mark>, and pins the commit it
+        read the sources at.</p>
+      <p><span class="badge">4</span><strong>Check.</strong> The writer scores
+        <mark>the template's own rubric</mark> and fixes each failure. The
+        file and the report go back; the caller commits.</p>
     </div>
 
     <figure id="fig-path">
-      <svg viewBox="0 0 330 385" role="img">
-        <title>One document request travelling through the writer's four stages, with the rubric loop and the exit to the caller</title>
+      <svg viewBox="0 0 340 460" role="img">
+        <title>One request travelling through the writer's four steps, with the rubric loop and the exit to the caller</title>
         <defs>
           <marker id="arrow-path" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
             <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
           </marker>
         </defs>
 
-        <rect x="20" y="20" width="180" height="56" fill="none" stroke="currentColor"/>
+        <rect x="20" y="20" width="190" height="78" fill="none" stroke="currentColor"/>
         <circle cx="44" cy="20" r="11" fill="#ffffff" stroke="currentColor"/>
         <text x="44" y="20" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">1</text>
         <text x="34" y="52" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Request</text>
-        <text x="34" y="68" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">doctype · path · sources</text>
+        <text x="34" y="70" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">doctype, target path,</text>
+        <text x="34" y="86" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">named sources</text>
 
-        <line x1="110" y1="76" x2="110" y2="100" stroke="currentColor" marker-end="url(#arrow-path)"/>
+        <line x1="115" y1="98" x2="115" y2="118" stroke="currentColor" marker-end="url(#arrow-path)"/>
 
-        <rect x="20" y="104" width="180" height="56" fill="none" stroke="currentColor"/>
-        <circle cx="44" cy="104" r="11" fill="#ffffff" stroke="currentColor"/>
-        <text x="44" y="104" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">2</text>
-        <text x="34" y="136" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Render</text>
-        <text x="34" y="152" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">template · sources</text>
+        <rect x="20" y="122" width="190" height="78" fill="none" stroke="currentColor"/>
+        <circle cx="44" cy="122" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="44" y="122" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">2</text>
+        <text x="34" y="154" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Read</text>
+        <text x="34" y="172" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">constitution, template,</text>
+        <text x="34" y="188" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">components, sources</text>
 
-        <line x1="110" y1="160" x2="110" y2="184" stroke="currentColor" marker-end="url(#arrow-path)"/>
+        <line x1="115" y1="200" x2="115" y2="220" stroke="currentColor" marker-end="url(#arrow-path)"/>
 
-        <rect x="20" y="188" width="180" height="56" fill="none" stroke="currentColor"/>
-        <circle cx="44" cy="188" r="11" fill="#ffffff" stroke="currentColor"/>
-        <text x="44" y="188" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">3</text>
-        <text x="34" y="220" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Rubric check</text>
-        <text x="34" y="236" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">item by item</text>
+        <rect x="20" y="224" width="190" height="78" fill="none" stroke="currentColor"/>
+        <circle cx="44" cy="224" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="44" y="224" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">3</text>
+        <text x="34" y="256" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Fill</text>
+        <text x="34" y="274" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">copy in, cite, pin</text>
+        <text x="34" y="290" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">delete every comment</text>
 
-        <path d="M200,216 H290 V132 H204" fill="none" stroke="currentColor" marker-end="url(#arrow-path)"/>
-        <text x="245" y="180" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">on failure</text>
+        <line x1="115" y1="302" x2="115" y2="322" stroke="currentColor" marker-end="url(#arrow-path)"/>
 
-        <line x1="110" y1="244" x2="110" y2="268" stroke="currentColor" marker-end="url(#arrow-path)"/>
+        <rect x="20" y="326" width="190" height="78" fill="none" stroke="currentColor"/>
+        <circle cx="44" cy="326" r="11" fill="#ffffff" stroke="currentColor"/>
+        <text x="44" y="326" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">4</text>
+        <text x="34" y="358" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Check</text>
+        <text x="34" y="376" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">rubric, item by item</text>
+        <text x="34" y="392" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">fix, then hand back</text>
 
-        <rect x="20" y="272" width="180" height="56" fill="none" stroke="currentColor"/>
-        <circle cx="44" cy="272" r="11" fill="#ffffff" stroke="currentColor"/>
-        <text x="44" y="272" dy=".35em" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">4</text>
-        <text x="34" y="304" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="bold" fill="currentColor">Delivery</text>
-        <text x="34" y="320" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">file · rubric report</text>
+        <path d="M210,366 H300 V264 H214" fill="none" stroke="currentColor" marker-end="url(#arrow-path)"/>
+        <text x="255" y="320" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">on failure</text>
 
-        <line x1="110" y1="328" x2="110" y2="352" stroke="currentColor" marker-end="url(#arrow-path)"/>
-        <text x="110" y="370" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">caller commits</text>
+        <line x1="115" y1="404" x2="115" y2="424" stroke="currentColor" marker-end="url(#arrow-path)"/>
+        <text x="115" y="442" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">file + report to caller</text>
       </svg>
       <figcaption>
-        Keyed stage figure: the path of one request through the four steps
-        of the writer's procedure (<code>document-writer.md</code>, lines
-        7–9 and 79–98), drawn at 330 viewBox units, inside the width that
-        pans. Key: circled numeral — one stage, keyed to
-        <a href="#answer">the answer</a> and to <a href="#elements">the
-        elements table</a>; solid arrow — the forward path; the labelled
-        solid edge — the loop back; bare text outside any box — the exit.
+        Keyed stage figure: one request walking the writer's procedure
+        (<code>document-writer.md</code>, lines 77–98), drawn at 340 viewBox
+        units, inside the width that pans. Key: circled numeral — one step,
+        keyed to the answer above and to <a href="#elements">the elements
+        table</a>; solid arrow — the forward path; the labelled solid edge —
+        the loop back; bare text outside any box — the exit.
       </figcaption>
     </figure>
 
@@ -205,72 +209,57 @@
     <table>
       <thead><tr><th>Element</th><th>Type</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>Request</td><td>stage 1</td><td>the caller names the doctype, the target path and the sources</td></tr>
-        <tr><td>Render</td><td>stage 2</td><td>the writer fills the doctype template from the components and the named sources</td></tr>
-        <tr><td>Rubric check</td><td>stage 3</td><td>the writer scores the document against the template's own checklist</td></tr>
-        <tr><td>Delivery</td><td>stage 4</td><td>one file at the target path, plus the rubric report in the writer's final message</td></tr>
-        <tr><td>on failure</td><td>loop edge</td><td>a failed item sends the document back to the render stage; only a clean pass leaves</td></tr>
-        <tr><td>caller commits</td><td>exit</td><td>the document leaves the writer; every git step from here is the caller's</td></tr>
+        <tr><td>Request</td><td>step 1</td><td>the caller's message; it also carries what the caller must not do, such as touching a second file</td></tr>
+        <tr><td>Read</td><td>step 2</td><td>four reads in a fixed order; the last one includes the existing document when this is a rewrite</td></tr>
+        <tr><td>Fill</td><td>step 3</td><td>the template becomes the document; an ungroundable claim is dropped, not softened</td></tr>
+        <tr><td>Check</td><td>step 4</td><td>the template's checklist, scored item by item, with no partial credit</td></tr>
+        <tr><td>on failure</td><td>loop edge</td><td>a failed item sends the document back to step 3; only a clean pass leaves</td></tr>
+        <tr><td>file + report</td><td>exit</td><td>one file at the target path and the scored rubric in the final message; every git step is the caller's</td></tr>
       </tbody>
     </table>
 
-    <h2 id="parts">Parts</h2>
+    <h2 id="constitution">Constitution</h2>
 
     <div class="conclusion">
       <span class="tag">Conclusion</span>
-      <p><span class="badge">1</span><strong>One rule file.</strong>
-        <code>~/.claude/agents/document-writer.md</code> is the <mark>only
-        normative site</mark>. Every other place holds a pointer to it plus
-        the machine contract its own tools read.</p>
-      <p><span class="badge">2</span><strong>Shapes beside it.</strong>
-        <code>templates/</code> holds one file per doctype and
-        <code>components/</code> holds five page parts, both under
-        <code>~/.claude/agents/document-writer/</code>.</p>
-      <p><span class="badge">3</span><strong>Copied, never linked.</strong>
-        A component is <mark>pasted into the document</mark>, so the finished
-        page opens on its own from <code>file://</code>.</p>
+      <p><span class="badge">1</span><strong>One file, five sections.</strong>
+        System, Procedure, Style, Guardrails, Report — <mark>each holds one
+        kind of rule</mark>, and nothing else is normative.</p>
+      <p><span class="badge">2</span><strong>Style is most of it.</strong>
+        <mark>137 of the file's 255 lines</mark> say how the page reads; the
+        other four sections share the rest.</p>
+      <p><span class="badge">3</span><strong>It breaks ties.</strong> Where a
+        template rule and this file disagree, <mark>this file wins</mark> and
+        the writer names the override in its report.</p>
     </div>
 
-    <figure id="fig-files">
-      <table class="filemap">
-        <tbody>
-          <tr><td>~/.claude/agents/</td><td>where a subagent definition lives</td></tr>
-          <tr><td>├── document-writer.md</td><td>the constitution: the whole rule set, plus the agent's name and model</td></tr>
-          <tr><td>└── document-writer/</td><td>the shapes the constitution names</td></tr>
-          <tr><td>    ├── templates/</td><td>one file per doctype — four files</td></tr>
-          <tr><td>    └── components/</td><td>five page parts — see the table below</td></tr>
-        </tbody>
-      </table>
-      <figcaption>
-        File map, <code>~/.claude/agents/</code> at the pinned dotclaude
-        commit, trimmed to the two directories the writer loads. Key:
-        indentation — directory nesting; right column — the part's role.
-        <a href="#doctypes">Doctypes</a> names the four template files.
-      </figcaption>
-    </figure>
-
-    <ul>
-      <li><strong>A template carries its own rubric.</strong> The checklist
-        sits in the template's opening comment, so the writer and a later
-        reviewer score the same list.</li>
-      <li><strong>The constitution wins a tie.</strong> Where a template
-        rule and the constitution disagree, the constitution holds, and the
-        writer names the override in its report.</li>
-      <li><strong>Each component is its own example.</strong> The file
-        demonstrates the rules it states, so the writer copies working
-        markup rather than reading a description of it.</li>
-    </ul>
-
     <table>
-      <thead><tr><th>Component</th><th>What it holds</th></tr></thead>
+      <thead><tr><th>Section</th><th>Lines</th><th>The kind of rule it holds</th></tr></thead>
       <tbody>
-        <tr><td><code>base.html</code></td><td>the page skeleton: measure, type, and how wide content behaves on a phone</td></tr>
-        <tr><td><code>provenance.html</code></td><td>the header field block and the sources footer</td></tr>
-        <tr><td><code>callout.html</code></td><td>four labelled blocks: notice, gap, warning, recovery</td></tr>
-        <tr><td><code>figure.html</code></td><td>the diagram kit: which form fits which data, and the size limits</td></tr>
-        <tr><td><code>disclosure.html</code></td><td>the collapsed block that holds evidence and rationale</td></tr>
+        <tr><td>System</td><td>17–75</td><td>what a document <em>is</em>: the two kinds, the three doctypes, the header fields, naming and catalogue</td></tr>
+        <tr><td>Procedure</td><td>77–98</td><td>the four ordered steps of one render, drawn as <a href="#fig-path">the path figure</a></td></tr>
+        <tr><td>Style</td><td>100–236</td><td>how the page reads: language, structure, colour, figures, citing — five sub-sections</td></tr>
+        <tr><td>Guardrails</td><td>238–248</td><td>four prohibitions that hold whatever the doctype</td></tr>
+        <tr><td>Report</td><td>250–255</td><td>what the writer's final message carries, and that it carries nothing else</td></tr>
       </tbody>
     </table>
+
+    <ul>
+      <li><strong>Nothing is written that cannot be checked.</strong> Step 3
+        of the procedure: "What you cannot verify, you do not write — name it
+        as not shown, or ask the caller in your report"
+        (<code>document-writer.md:92–94</code>).</li>
+      <li><strong>The writer never decides.</strong> Guardrails opens with
+        "Decide nothing. A decision you find unrecorded is reported back,
+        never written into the view" (<code>document-writer.md:240–241</code>).</li>
+      <li><strong>Style leads with one ground rule.</strong> "keep the
+        document short, and separate the crucial from the detail —
+        obsessively" (<code>document-writer.md:113–114</code>); the rest of
+        the section serves it.</li>
+      <li><strong>Every other site holds a pointer.</strong> A repository's
+        <code>docs/README.md</code> keeps only its machine contract and a
+        link here (<code>document-writer.md:11–15</code>).</li>
+    </ul>
 
     <details>
       <summary>Why the rules sit in the agent's own file, and not in a docs README</summary>
@@ -278,8 +267,8 @@
       rule binds. The writer is the only actor that touches every view in
       every repository, and its own definition is the file it always loads
       (owner decision, 2026-08-04, <code>docs/agent-document-system.md</code>).</p>
-      <p>Before it, seven sites stated the rules, and the drift showed up in
-      the tree rather than in an argument: one entry's template copy named a
+      <p>Before it, seven sites stated the rules, and the drift showed in the
+      tree rather than in an argument: one entry's template copy named a
       different filename grammar than its parent, and another's said "when
       the two disagree, the parent wins", which names the drift without
       preventing it.</p>
@@ -293,141 +282,218 @@
       commit changes a rule and the documents that follow it.</p>
     </details>
 
-    <h2 id="kinds">Kinds</h2>
+    <h2 id="templates">Templates</h2>
 
     <div class="conclusion">
       <span class="tag">Conclusion</span>
-      <p><span class="badge">1</span><strong>Two kinds.</strong>
-        <code>.md</code> is a specification and <code>.html</code> is a
-        view: <mark>the extension is the kind</mark>.</p>
-      <p><span class="badge">2</span><strong>Views only.</strong> The writer
-        renders views. <mark>The agent doing the work</mark> writes the
-        spec, in the same change as what the spec governs.</p>
-      <p><span class="badge">3</span><strong>A view decides nothing.</strong>
-        A view only shows a decision <mark>a spec already records</mark>,
-        written in the same change.</p>
+      <p><span class="badge">1</span><strong>A comment, then a page.</strong>
+        Every template opens with <mark>one long comment</mark> — notes,
+        contract, rubric — and the page skeleton follows it.</p>
+      <p><span class="badge">2</span><strong>The rubric ships with the
+        shape.</strong> The checklist sits in that comment, so
+        <mark>writer and reviewer score the same list</mark>.</p>
+      <p><span class="badge">3</span><strong>Four files, one filled.</strong>
+        Three view templates, plus <code>spec.md</code>, which
+        <mark>the writer never fills</mark>.</p>
     </div>
 
-    <table>
-      <thead><tr><th></th><th>Specification (<code>.md</code>)</th><th>View (<code>.html</code>)</th></tr></thead>
-      <tbody>
-        <tr><td><strong>Authority</strong></td><td>normative: when the spec and the artifact disagree, one of them is wrong</td><td>derived: pinned to a commit, expected to go stale</td></tr>
-        <tr><td><strong>Written by</strong></td><td>the agent doing the work</td><td>the <code>document-writer</code> subagent</td></tr>
-        <tr><td><strong>Read by</strong></td><td>agents</td><td>the owner</td></tr>
-        <tr><td><strong>Decisions</strong></td><td>records them, with the reason and the date</td><td>surfaces one already recorded; makes none</td></tr>
-      </tbody>
-    </table>
+    <figure id="fig-template">
+<pre>  2 &lt;!--                                     ─┐ 1 notes
+  3   Doctype: explanation. The system's r…   │
+ 21     mechanism        how does X work?…   ─┘
+ 38   required-fields: Doctype, Question,…   ─┐ 2 contract
+ 40   required-elements: figure, figcaption  ─┘
+ 42   rubric — the writer checks every it…   ─┐ 3 rubric
+ 97   - [ ] Wide content that still pans …    │
+ 99 --&gt;                                      ─┘
+105 &lt;style&gt;                                  ─┐ 4 styles
+170 &lt;/style&gt;                                 ─┘
+173 &lt;article&gt;                                ─┐ 5 skeleton
+177     &lt;dl class="provenance"&gt;               │
+220   &lt;footer class="sources"&gt;               ─┘</pre>
+      <figcaption>
+        Specimen anatomy of <code>templates/explanation.html</code> at the
+        pinned commit. Key: the left column is the file's own line number;
+        each line is that line's opening characters, cut at <code>…</code>;
+        each bracket spans one band, named by the numbered legend below.
+        Band order is the file's grammar; the three view templates share it,
+        and <code>spec.md</code> carries bands 1 to 3 only.
+      </figcaption>
+    </figure>
 
-    <h2 id="doctypes">Doctypes</h2>
-
-    <div class="conclusion">
-      <span class="tag">Conclusion</span>
-      <p><span class="badge">1</span><strong>Three shapes.</strong> The
-        reader's question picks one: <mark>explanation, guide or
-        proposal</mark>.</p>
-      <p><span class="badge">2</span><strong>One question each.</strong> A
-        document that answers two questions is <mark>two
-        documents</mark>.</p>
-      <p><span class="badge">3</span><strong>Only a proposal may describe
-        what does not exist.</strong> An explanation and a guide make claims
-        <mark>the repository can settle</mark>, and a claim it cannot settle
-        is a defect in them.</p>
-    </div>
+    <ol>
+      <li><strong>notes</strong> — band. What this doctype adds and nothing
+        the constitution already says: "this file adds only what is
+        particular to this doctype"
+        (<code>explanation.html:3–5</code>). Line 21 is one row of the table
+        that picks the lead figure from the question's level — six levels,
+        six different figures owed.</li>
+      <li><strong>contract</strong> — band. Three <code>required-</code>
+        lines: the header fields, the sections, and the elements the finished
+        document must carry.</li>
+      <li><strong>rubric</strong> — band. The scored checklist: "the writer
+        checks every item before delivering and reports the result; the
+        reviewer scores against the same list. Binary, no partial credit"
+        (<code>explanation.html:42–44</code>).</li>
+      <li><strong>styles</strong> — band. The inline CSS, already copied from
+        the components, so the finished page needs no other file.</li>
+      <li><strong>skeleton</strong> — band. The page to fill: header fields,
+        lead figure, elements table, sections, sources footer. Every comment
+        inside it is deleted at render.</li>
+    </ol>
 
     <table class="stack">
-      <thead><tr><th>Doctype</th><th>The reader's question</th><th>Header fields it adds</th><th>Template</th></tr></thead>
+      <thead><tr><th>Template</th><th>Header fields</th><th>Required sections</th><th>Rubric items</th></tr></thead>
       <tbody>
         <tr>
-          <td>explanation</td>
-          <td data-label="Question">how does it work, why is it this way, what shape does it have, what did we find</td>
-          <td data-label="Adds">Question</td>
-          <td data-label="Template"><code>explanation.html</code></td>
+          <td><code>explanation.html</code></td>
+          <td data-label="Fields">Doctype, Question, Updated, Commit</td>
+          <td data-label="Sections">Elements, Omissions, Sources</td>
+          <td data-label="Rubric">24</td>
         </tr>
         <tr>
-          <td>guide</td>
-          <td data-label="Question">how do I do it</td>
-          <td data-label="Adds">Goal</td>
-          <td data-label="Template"><code>guide.html</code></td>
+          <td><code>guide.html</code></td>
+          <td data-label="Fields">Doctype, Goal, Updated, Commit</td>
+          <td data-label="Sections">Answer, Prerequisites, Steps, Acceptance, Recovery, Sources</td>
+          <td data-label="Rubric">17</td>
         </tr>
         <tr>
-          <td>proposal</td>
-          <td data-label="Question">what should change, and to what</td>
-          <td data-label="Adds">Status, Question</td>
-          <td data-label="Template"><code>proposal.html</code></td>
+          <td><code>proposal.html</code></td>
+          <td data-label="Fields">Doctype, Status, Question, Updated, Commit</td>
+          <td data-label="Sections">Problem, Options, Recommendation, Sources</td>
+          <td data-label="Rubric">17</td>
+        </tr>
+        <tr>
+          <td><code>spec.md</code></td>
+          <td data-label="Fields">Status, Scope, Last verified</td>
+          <td data-label="Sections">Purpose</td>
+          <td data-label="Rubric">6</td>
         </tr>
       </tbody>
     </table>
 
     <ul>
+      <li><strong>The reader's question picks the template.</strong> How does
+        it work → explanation; how do I do it → guide; what should change →
+        proposal (<code>document-writer.md:38–42</code>).</li>
       <li><strong>Every view carries a question line.</strong> That is the
-        Question field, or a guide's Goal. The reading surfaces draw it
-        under the title, and a view without one lists with a blank line
-        (observed 2026-08-07, board).</li>
+        Question field, or a guide's Goal. A view without one lists with a
+        blank line on the reading surfaces (observed 2026-08-07, board).</li>
       <li><strong>The fourth template is not a doctype.</strong>
-        <code>templates/spec.md</code> is the one specification template,
-        and the writer does not fill it.</li>
+        <code>spec.md</code> is the one specification template. It offers
+        five section shapes — decision, rule, procedure, capability, ledger —
+        and the agent doing the work fills it, in the same change as what the
+        spec governs.</li>
+      <li><strong>No template carries a <code>Reviewed</code> term.</strong>
+        The writer fills the header from the template, so a re-render leaves
+        the page reading as never reviewed. That is the intent, not a
+        defect.</li>
     </ul>
 
-    <h2 id="handover">Handover</h2>
+    <details>
+      <summary>Why a re-render un-reviews the page</summary>
+      <p>The <code>Reviewed</code> date says when somebody last read the
+      document against the tree and found it still true. A re-render replaces
+      the prose, so a review of the old prose no longer vouches for
+      anything (owner, 2026-08-12).</p>
+      <p>The term is declared in the docs contract,
+      <code>~/workspace/docs/README.md</code>, where a reader parses it. A
+      view without it is valid everywhere: it means never reviewed, not
+      missing.</p>
+    </details>
+
+    <h2 id="components">Components</h2>
 
     <div class="conclusion">
       <span class="tag">Conclusion</span>
-      <p><span class="badge">1</span><strong>Delivery is a message.</strong>
-        The writer leaves the file and the rubric report, and
-        <mark>runs no git command</mark>.</p>
-      <p><span class="badge">2</span><strong>The catalogue moves with the
-        document.</strong> The caller edits <code>INDEX.md</code> in the
-        <mark>same commit</mark> as the document.</p>
-      <p><span class="badge">3</span><strong>A re-render un-reviews the
-        page.</strong> The writer <mark>never writes a
-        <code>Reviewed</code> date</mark>, and never carries an old one
-        over.</p>
+      <p><span class="badge">1</span><strong>Five parts, one file each.</strong>
+        Base, provenance, callout, figure, disclosure — <mark>one page part
+        per file</mark>.</p>
+      <p><span class="badge">2</span><strong>Each file is its own
+        example.</strong> The page it renders <mark>obeys the rules it
+        states</mark>, so the writer copies markup that already works.</p>
+      <p><span class="badge">3</span><strong>Copied, never linked.</strong>
+        The markup is <mark>pasted into the document</mark>, so the finished
+        page opens on its own from <code>file://</code>.</p>
     </div>
 
+    <figure id="fig-component">
+<pre>  2 &lt;!--                                     ─┐ 1 rules
+  3   Component: base — the page skeleton…    │
+ 13   Rules the skeleton enforces:           ─┘
+ 32   /* component: base */                  ─┐ 2 marked css
+ 66   table { border-collapse: collapse;…     │
+103   /* end component: base */              ─┘
+108   &lt;h1&gt;base&lt;/h1&gt;                          ─┐ 3 self demo
+115   &lt;table&gt;                                 │
+121 &lt;pre&gt;$ echo "a command and its outp…     ─┘</pre>
+      <figcaption>
+        Specimen anatomy of <code>components/base.html</code> at the pinned
+        commit. Key: the left column is the file's own line number; each line
+        is that line's opening characters, cut at <code>…</code>; each
+        bracket spans one band, named by the numbered legend below. All five
+        components share these three bands.
+      </figcaption>
+    </figure>
+
+    <ol>
+      <li><strong>rules</strong> — band. What the part is and what it
+        enforces, in prose: "This file demonstrates itself: its own
+        <code>&lt;style&gt;</code> block is the component"
+        (<code>base.html:3–4</code>).</li>
+      <li><strong>marked css</strong> — band. The style the writer copies. The
+        two <code>/* component: … */</code> markers say where the copy starts
+        and stops, so nothing around them travels with it.</li>
+      <li><strong>self demo</strong> — band. A working page built from the
+        part, so every rule above it has a visible instance on the same
+        screen.</li>
+    </ol>
+
     <table>
-      <thead><tr><th>What</th><th>Who owns it</th><th>Note</th></tr></thead>
+      <thead><tr><th>Component</th><th>What it holds</th><th>How it shows itself</th></tr></thead>
       <tbody>
-        <tr><td>the view file</td><td>the writer</td><td>one document per invocation, at the caller's path</td></tr>
-        <tr><td>the rubric report</td><td>the writer</td><td>every item pass or fail, one line of evidence each</td></tr>
-        <tr><td>the commit</td><td>the caller</td><td>with the <code>INDEX.md</code> line in it</td></tr>
-        <tr><td>the <code>Reviewed</code> date</td><td>a review run</td><td>absent means never reviewed, not missing</td></tr>
+        <tr><td><code>base.html</code></td><td>the page skeleton: a 42rem measure, system sans-serif, and how wide content behaves on a phone</td><td>its own style block, plus one paragraph, table and code block</td></tr>
+        <tr><td><code>provenance.html</code></td><td>the header field block and the sources footer</td><td>its own header and footer, filled with real values</td></tr>
+        <tr><td><code>callout.html</code></td><td>four labelled blocks — notice, gap, warning, recovery — and which to pick</td><td>one block of each kind, each about itself</td></tr>
+        <tr><td><code>figure.html</code></td><td>the diagram kit: which form fits which data, label geometry, size limits</td><td>panels, a file map, a specimen and a stage figure that obey the rules they state</td></tr>
+        <tr><td><code>disclosure.html</code></td><td>the collapsed block that holds evidence and rationale</td><td>two blocks, the second one a bad summary named as bad</td></tr>
       </tbody>
     </table>
 
-    <details>
-      <summary>Why a re-render leaves the page reading as never reviewed</summary>
-      <p>The <code>Reviewed</code> date says when somebody last read the
-      document against the tree and found it still true. A re-render
-      replaces the prose, so a review of the old prose no longer vouches for
-      anything.</p>
-      <p>The mechanism matches the rule by itself: the writer fills the
-      header from its template, and no template carries a
-      <code>Reviewed</code> term. The docs contract,
-      <code>~/workspace/docs/README.md</code>, declares the term, and a
-      reader parses it there (owner, 2026-08-12).</p>
-    </details>
+    <ul>
+      <li><strong>The components carry the rules the constitution only
+        numbers.</strong> The 10-unit label floor and the 360-unit pan
+        threshold are stated in the constitution; the arithmetic behind them
+        is in <code>figure.html:34–41</code>.</li>
+      <li><strong>A component can hold a trap the writer would not
+        guess.</strong> "Suffix every id (arrow-&lt;diagram&gt;, not arrow) —
+        inline SVG shares one id namespace with the whole page"
+        (<code>figure.html:99–101</code>).</li>
+      <li><strong>Disclosure has one law of use.</strong> "Default closed. A
+        block worth opening by default is body content"
+        (<code>disclosure.html:21</code>).</li>
+    </ul>
 
     <h2 id="omissions">Omissions</h2>
 
     <ul>
-      <li><strong>The style rules stay in the constitution.</strong> It also
-        fixes the language, the colour and the figure forms of a view. The
-        path figure shows where those rules apply, not what they say.</li>
-      <li><strong>The rubric keeps its own items.</strong> Stage 3 shows
-        that a check happens, not what the check covers.</li>
-      <li><strong>The spec side is named, not walked.</strong> Who writes a
-        spec is in <a href="#kinds">Kinds</a>; the section shapes inside
-        <code>templates/spec.md</code> are out of scope here.</li>
-      <li><strong>Two trees back this page.</strong> The Commit field pins
-        both. The constitution, templates and components sit in
-        <code>~/.claude</code> at <code>e19479b</code>; <code>docs/</code>
-        sits in the workspace worktree at <code>26b5274</code>.</li>
-      <li><strong>Both trees were dirty elsewhere.</strong> Every source of
-        this document was clean at render time. Around them,
+      <li><strong>The rubric items are counted, not listed.</strong> The
+        table gives each template's item count; what a single item asks is
+        not on this page.</li>
+      <li><strong>The style rules are located, not quoted.</strong> The
+        Constitution table says which section fixes language, colour and
+        figures. It does not say what those rules require.</li>
+      <li><strong>The spec side stops at the template.</strong> The five
+        spec section shapes are named; how to fill one is out of scope.</li>
+      <li><strong>Two trees back this page.</strong> The constitution,
+        templates and components sit in <code>~/.claude</code> at
+        <code>e19479b</code>; <code>docs/</code> sits in the workspace
+        worktree at <code>803540c</code>.</li>
+      <li><strong>One tree was dirty elsewhere.</strong> Every source of this
+        document was clean at render time. Around them,
         <code>~/.claude</code> carried edits to its own
-        <code>CLAUDE.md</code>, settings and hooks, and the workspace
-        worktree carried the in-flight change that retires the old
-        proposal.</li>
+        <code>CLAUDE.md</code> and <code>settings.json</code> and an
+        untracked hook script; the workspace worktree was clean.</li>
     </ul>
 
   </section>
@@ -436,8 +502,8 @@
     <h2 id="sources">Sources</h2>
     <ul>
       <li><code>~/.claude/agents/document-writer.md</code> — the constitution</li>
-      <li><code>~/.claude/agents/document-writer/templates/</code> — four templates: explanation, guide, proposal, spec</li>
-      <li><code>~/.claude/agents/document-writer/components/</code> — five components: base, provenance, callout, figure, disclosure</li>
+      <li><code>~/.claude/agents/document-writer/templates/</code> — explanation, guide, proposal, spec</li>
+      <li><code>~/.claude/agents/document-writer/components/</code> — base, provenance, callout, figure, disclosure</li>
       <li><code>~/workspace/docs/README.md</code> — the two-kinds table and the docs machine contract</li>
       <li><code>~/workspace/docs/agent-document-system.md</code> — the 2026-08-04 decision that put the rules in the agent's own files</li>
     </ul>
