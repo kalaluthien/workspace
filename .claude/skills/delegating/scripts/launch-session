@@ -86,6 +86,15 @@ tab=$(printf '%s' "$created" | jq -r '.result.tab.tab_id // empty')
 pane=$(printf '%s' "$created" | jq -r '.result.root_pane.pane_id // empty')
 [ -n "$pane" ] || die "could not obtain a shell pane in $ws"
 
+# Label the tab at claim time, so a delegated tab is never left with its
+# default numeric label even when the naming hook's own tab-title call fails.
+# The hook retitles it from the session's first prompt seconds later.
+# The label is cosmetic and _lib.sh sets -e, so a failed rename must not
+# take the launch down with it.
+if [ -n "$tab" ]; then
+  herdr tab rename "$tab" "$name" >/dev/null 2>&1 || true
+fi
+
 # A fresh pane's shell takes a moment to reach its prompt, and agent start
 # refuses a pane that is not an available shell (agent_pane_busy) — retry.
 attempts=0 started=
