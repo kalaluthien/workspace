@@ -25,7 +25,7 @@ context and returns one message.
 The workspace is a control plane over **agents** — the entries above and the
 sessions that work them — and over **services**, the long-running things those
 entries expose. A `docs/` filename carries a plane prefix (naming: the
-writer constitution), and the plane's own rules load from `.claude/rules/`
+`writing` skill's `references/doctypes.md`), and the plane's own rules load from `.claude/rules/`
 when a matching document is read.
 
 **Project entries** are independent git repositories, each with its own
