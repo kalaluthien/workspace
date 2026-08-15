@@ -27,10 +27,6 @@ Template: `~/.claude/agents/document-writer/templates/explanation.html`
 - [`agent-hooks.html`](agent-hooks.html) — the hooks that fire around a
   working session, split by the layer that owns them: four Claude Code
   hooks in one settings file, and the git guard every repository runs.
-- [`agent-document-writer.html`](agent-document-writer.html) — how the
-  document-writer subagent is put together — what its constitution, templates,
-  and components each hold inside, with specimens and quoted lines — and how
-  one view goes from request to delivered file.
 
 ## Guides
 

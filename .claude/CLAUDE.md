@@ -15,11 +15,12 @@ these. A change here is committed to the root repository:
 
 A document request whose topic belongs to no project entry lands in `docs/`,
 as a spec (`.md`) or a view (`.html`) — never in a project entry it does not
-fit, and never in chat alone. The document system's rules live in the writer
-constitution, `~/.claude/agents/document-writer.md`, with its templates and
-components beside it; a document about one project entry still belongs in
-that entry's own document store, which follows the same system; view writing
-is delegated to the `document-writer` subagent.
+fit, and never in chat alone. The document system's rules live in the
+`writing` skill, `.claude/skills/writing/` (`SKILL.md` with `references/`,
+`scripts/`, and `evals/` beside it); a document about one project entry
+still belongs in that entry's own document store, which follows the same
+system; view writing runs through the `writing` skill, which forks its own
+context and returns one message.
 
 The workspace is a control plane over **agents** — the entries above and the
 sessions that work them — and over **services**, the long-running things those

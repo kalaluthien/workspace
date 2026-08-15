@@ -12,7 +12,35 @@ file to edit, and a reader who wants to reverse that arrangement needs the
 reason it was chosen. This spec records the decision; the rules themselves
 live in the file the decision names.
 
+## Decision: the writing skill replaces the writer subagent (2026-08-15, owner)
+
+The normative site moved from the `document-writer` subagent's constitution
+to the `writing` skill, `~/workspace/.claude/skills/writing/`: `SKILL.md`
+with `references/` (doctypes, components, svg-rules, draft-rules,
+plain-writing, page-html), `scripts/render-check`, and
+`evals/trigger-cases.md`. The skill runs in a forked context
+(`context: fork`, `model: opus`): a five-field brief goes in, one HTML view
+and a five-section return message come out. The structural baseline is the
+`documenting` skill recipe the owner supplied on 2026-08-15 (a saved page,
+extracted to plain HTML); the constitution was quarried for what the recipe
+missed — the phone-width figure rules, the docs contract's provenance
+fields, the `Reviewed` semantics — and then retired, together with its
+`templates/` and `components/` directories, which the skill's `references/`
+replace. Acceptance: a separate evaluator scored the skill 86/100 on
+simplicity, completeness, and modularity against a 50-point first-version
+anchor, and its render script was proved able to fail before being trusted.
+
+What the 2026-08-04 decision bought is kept: one normative site, loaded by
+the one actor that writes views. What changes: the site now lives inside
+the workspace repository, so a rule change and the workspace documents that
+follow it land in one commit — the cost that decision accepted (rules in
+`~/.claude`, documents in the entries) is retired with it. The half of that
+decision that still stands, re-verified today: every other site holds at
+most a pointer plus the machine contract its own tools parse.
+
 ## Decision: the writer constitution is the one normative site (2026-08-04, owner)
+
+Superseded 2026-08-15 by the decision above; kept with its reasons.
 
 `~/.claude/agents/document-writer.md` holds the whole normative description of
 the document system — the two-kinds split, the doctypes, naming and catalogue,

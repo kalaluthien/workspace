@@ -3,11 +3,10 @@
 This directory holds the workspace's own specs (`.md`) and views
 (`.html`), over both planes (`agent-` and `service-` filename prefixes),
 catalogued in `INDEX.md`. The document system that governs this and every
-entry's `docs/` — doctypes, templates, components, style, naming, and the
-writing pipeline — is defined once in the `document-writer` agent's own
-files: the constitution `~/.claude/agents/document-writer.md`, with
-`templates/` and `components/` beside it in
-`~/.claude/agents/document-writer/` (the decision and its losing
+entry's `docs/` — doctypes, components, style, naming, and the
+writing pipeline — is defined once in the `writing` skill's own files:
+`~/workspace/.claude/skills/writing/SKILL.md`, with `references/` and
+`scripts/` beside it (the decision and its losing
 alternatives: `agent-document-system.md`). This
 file keeps only the two-kinds table and the machine contract below, which
 `scripts/check-docs` and the board service parse at this path.
@@ -17,7 +16,7 @@ file keeps only the two-kinds table and the machine contract below, which
 | kind | extension | authority | written by | read by |
 |---|---|---|---|---|
 | **specification** | `.md` | normative — when spec and artifact disagree, one of them is wrong | the main or project agent | agents |
-| **view** | `.html` | derived — pinned to a commit, expected to go stale | the `document-writer` subagent | the owner |
+| **view** | `.html` | derived — pinned to a commit, expected to go stale | the `writing` skill | the owner |
 
 ## The docs contract
 
@@ -42,9 +41,9 @@ valid everywhere, and it means the document has never been reviewed — not
 that the review is missing. That is also what a re-render leaves behind: the
 writer fills the provenance block from its template, which carries no
 `Reviewed` term, so a rewritten document reads as never reviewed again. The
-rule and its reason are the writer constitution's
-(`~/.claude/agents/document-writer.md`); this is only where the term is
-declared. A reader comparing the two dates compares *authored* dates: file
+rule and its reason are the `writing` skill's
+(`~/workspace/.claude/skills/writing/references/doctypes.md`); this is only
+where the term is declared. A reader comparing the two dates compares *authored* dates: file
 mtime is a checkout timestamp, not a written time.
 
 ```json contract=docs
