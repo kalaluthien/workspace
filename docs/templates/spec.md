@@ -1,8 +1,8 @@
 # <Title>
 
 <!--
-  Specification. The system's rules are in the constitution,
-  ~/.claude/agents/document-writer.md; this file adds only what is
+  Specification. The system's rules are in the writing skill,
+  ~/workspace/.claude/skills/writing/SKILL.md; this file adds only what is
   particular to the .md kind. The .md extension is the kind — a spec
   carries no Doctype field, and it is written by the agent doing the work.
 
