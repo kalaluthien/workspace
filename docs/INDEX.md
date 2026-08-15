@@ -49,3 +49,9 @@ Template: `~/.claude/agents/document-writer/templates/proposal.html`
   should structure a backlog row's text, and where that rule and its guard
   should live: three structuring options, three homes, and the reach
   argument that picks one of each; Accepted 2026-08-12.
+- [`agent-development-cycle.html`](agent-development-cycle.html) — what
+  directory contract and work cycle agent sessions should follow in a
+  program-building project entry: one checked chain from use case to
+  settling test, four entrypoints, models as red-twice-proven evidence,
+  and a recovery path for code-first patches; garden is the testbed;
+  Proposed 2026-08-15.

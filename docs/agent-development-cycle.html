@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Development cycle — workspace</title>
+<style>
+  html { font-size: 16px; }
+  body {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 8rem;
+    background: #ffffff;
+    color: #111;
+    font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.55;
+    overflow-wrap: break-word;
+  }
+  h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 .6rem; font-weight: 700; letter-spacing: -.01em; }
+  h2 { font-size: 1.25rem; margin: 3rem 0 .5rem; font-weight: 700; }
+  h3 { font-size: 1rem; margin: 2rem 0 .3rem; font-weight: 700; }
+  p, li { margin: .6rem 0; }
+  ul, ol { padding-left: 1.2rem; }
+  a { color: #14459b; text-decoration-color: #9bb0d8; }
+  strong { font-weight: 700; }
+  code, pre, .provenance dd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85em;
+  }
+  code { color: #14459b; }
+  pre { overflow-x: auto; background: #f4f4f4; padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
+  pre code { color: inherit; }
+  table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
+  th { font-weight: 700; }
+  @media (max-width: 42rem) {
+    table { display: block; overflow-x: auto; }
+    th, td { min-width: 9rem; }
+    /* Stacked rows: a table over three columns keeps every cell on screen.
+       Each row becomes a block titled by its first cell; the other cells
+       print their column name from data-label. */
+    table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; }
+    table.stack thead { display: none; }
+    table.stack tr { border-bottom: 1px solid #e4e4e4; padding: .5rem 0; }
+    table.stack td { min-width: 0; border-bottom: none; padding: .12rem 0; }
+    table.stack td:first-child { font-weight: 700; }
+    table.stack td[data-label]::before {
+      content: attr(data-label);
+      display: inline-block;
+      width: 7.5rem;
+      color: #555;
+      font-size: .82em;
+    }
+  }
+  .kicker { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: #666; margin: 0 0 .6rem; }
+  .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
+  .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
+  .provenance dd { margin: 0; }
+  .box { border: 1px solid #111; padding: .85rem 1.1rem; margin: 1.3rem 0; }
+  .box .label { display: block; font-variant: small-caps; letter-spacing: .1em; font-size: .74rem; font-weight: 700; color: #666; margin-bottom: .35rem; }
+  .box ol { list-style: none; padding-left: 0; margin: 0; }
+  .box li { margin: .5rem 0; font-size: .95rem; }
+  .box .n { display: inline-block; min-width: 1.2rem; height: 1.2rem; line-height: 1.2rem; text-align: center; background: #ffffff; border: 1px solid #111; border-radius: 50%; font-size: .74rem; font-weight: 700; color: #111; margin-right: .4rem; }
+  mark { background: #fdf0a0; color: inherit; padding: 0 .1em; }
+  .red { color: #a33; }
+  ol.steps { padding-left: 1.6rem; }
+  ol.steps > li { margin: 1.1rem 0; }
+  ol.steps > li::marker { font-weight: 700; }
+  .callout { border: 1px solid #ccc; border-left-width: 4px; padding: .55rem .9rem; margin: 1.2rem 0; font-size: .88rem; line-height: 1.5; }
+  .callout .tag { font-variant: small-caps; letter-spacing: .06em; font-weight: 600; margin-right: .45rem; }
+  .callout.notice   { border-left-color: #556; }
+  .callout.gap      { border-left-color: #8a5a00; }
+  .callout.warning  { border-left-color: #a33; }
+  .callout ul { margin: .3rem 0; }
+  details { border: 1px solid #e4e4e4; padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
+  details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
+  details[open] summary { margin-bottom: .5rem; }
+  figure { margin: 2.2rem 0; }
+  figure svg { display: block; width: 100%; height: auto; }
+  figcaption { margin-top: .7rem; font-size: .85rem; color: #555; line-height: 1.5; }
+  figure.pan { overflow-x: auto; }
+  figure pre { margin: 0; }
+  footer.sources { margin-top: 4rem; border-top: 1px solid #e4e4e4; padding-top: 1rem; font-size: .85rem; color: #555; }
+  footer.sources h2 { font-size: .8rem; margin: 0 0 .3rem; font-variant: small-caps; letter-spacing: .06em; font-weight: 600; }
+  footer.sources ul { margin: 0; padding-left: 1.1rem; }
+  footer.sources li { margin: .2rem 0; }
+</style>
+</head>
+<body>
+<article>
+
+  <header>
+    <p class="kicker">workspace &middot; agents &middot; development cycle</p>
+    <h1>Development cycle</h1>
+    <dl class="provenance">
+      <dt>Doctype</dt>  <dd>proposal</dd>
+      <dt>Status</dt>   <dd>Proposed</dd>
+      <dt>Question</dt> <dd>What fixed directory contract and work cycle should agent sessions follow to develop a workspace project that builds a program, so the specification is one machine-checkable source of truth that survives code-first patches?</dd>
+      <dt>Updated</dt>  <dd>2026-08-15</dd>
+      <dt>Commit</dt>   <dd>8fd13c1</dd>
+    </dl>
+  </header>
+
+  <section>
+
+    <p>Garden&rsquo;s 14 specs are prose that nothing refutes, and their one
+    link to the tests names a whole test class, so no machine ever sees the
+    drift; make every behaviour one checked chain instead &mdash; a use case,
+    its scenario rows, and each row&rsquo;s settling test method.</p>
+
+    <h2 id="answer">Answer</h2>
+
+    <div class="box">
+      <span class="label">Conclusion</span>
+      <ol>
+        <li><span class="n">1</span><strong>Contract.</strong> Five fixed
+          directory names &mdash; <code>README.md</code>, <code>spec/</code>,
+          <code>docs/</code>, <code>scripts/</code>, <code>hooks/</code> &mdash;
+          and <mark>four entrypoints: <code>spec</code>, <code>code</code>,
+          <code>test</code>, <code>eval</code></mark>. Everything else stays
+          the framework&rsquo;s.</li>
+        <li><span class="n">2</span><strong>Chain.</strong> One concept carries
+          consistency: <mark>a use case, its scenario rows, and each row&rsquo;s
+          settling check</mark>, named method by method, with the test carrying
+          the row&rsquo;s id back.</li>
+        <li><span class="n">3</span><strong>Checks.</strong> Two checks gate a
+          commit (resolution, model lint) and three only inform (staleness,
+          vocabulary, Analyzer runs). <mark>A green licenses resolution and
+          nothing more.</mark></li>
+        <li><span class="n">4</span><strong>Code first.</strong> No gate needs
+          a spec edit, so a hotfix lands. <mark>The staleness list is the
+          recovery worklist</mark>, and recovery is three steps an agent runs
+          cold.</li>
+        <li><span class="n">5</span><strong>Models.</strong> An Alloy model is
+          optional evidence attached to one use case. It never gates, and
+          <mark>it is trusted only after it has been made red twice</mark>.</li>
+      </ol>
+    </div>
+
+    <h3 id="vetoes">Vetoes</h3>
+
+    <p>Six decisions this proposal takes on its own. One line from the owner
+    reverses any row.</p>
+
+    <table>
+      <thead><tr><th>#</th><th>Decision</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>The cycle order is spec &rarr; code &rarr; test &rarr; eval</td><td>tests gate, evals inform; an eval reads a passing build</td></tr>
+        <tr><td>2</td><td>A fourth entrypoint <code>scripts/spec</code> joins the named three</td><td>the spec stage needs a runner for its own checks</td></tr>
+        <tr><td>3</td><td>Analyzer runs never gate; only resolution and the model lint gate commits</td><td>a model forced green converges on unfalsifiable assertions, and the recorded evidence rejects a maintained model in CI</td></tr>
+        <tr><td>4</td><td>No <code>eval/</code> directory: rubrics are spec files (<code>spec/rubric-&lt;name&gt;.md</code>), runners live in <code>scripts/</code></td><td>a rubric is a specification of quality; one directory fewer</td></tr>
+        <tr><td>5</td><td><code>hooks/</code> stays top-level and unchanged; <code>scripts/</code> holds what the hooks call</td><td>three repositories already run a working chained <code>hooks/</code></td></tr>
+        <tr><td>6</td><td>Instrumented (device) tests stay out of the routine gate</td><td>one hardcoded emulator serial, no lock, concurrent agents</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="problem">Problem</h2>
+
+    <div class="box">
+      <span class="label">Conclusion</span>
+      <ol>
+        <li><span class="n">1</span><strong>Nothing refutes a spec.</strong>
+          Garden holds 14 normative subject specs. They are prose predicates,
+          so <mark>only a human read finds a disagreement</mark> with the
+          code.</li>
+        <li><span class="n">2</span><strong>The one link is too coarse, and
+          unchecked.</strong> Eight acceptance items name one test class;
+          <mark>seven of its eight methods could vanish</mark> and every link
+          would still resolve. No hook looks at the link at all.</li>
+        <li><span class="n">3</span><strong>No uniform entrypoints.</strong>
+          Garden has one script plus raw Gradle, camera has thirteen, so
+          <mark>every session re-learns each project from prose</mark>.</li>
+      </ol>
+    </div>
+
+    <ul>
+      <li><strong>The spec corpus is prose.</strong> 14 normative <code>.md</code>
+        subject specs sit in <code>garden/docs/</code> (counted 2026-08-15,
+        garden <code>22a3d5a</code>). The rule &ldquo;when spec and artifact
+        disagree, one of them is wrong&rdquo; has no reader but a person.</li>
+      <li><strong>The link names a class, not a behaviour.</strong>
+        <code>garden/docs/feature-interval-override.md</code> lines 88&ndash;103
+        name <code>IntervalOverrideTest</code> on eight acceptance items; the
+        file holds eight <code>@Test</code> methods, and one surviving method
+        satisfies all eight links.</li>
+      <li><strong>Garden&rsquo;s hook works and never looks.</strong>
+        <code>garden/hooks/pre-commit</code> checks comment style and the
+        release APK, and ordinary commits pass unblocked. It reads nothing
+        about the spec-to-test link.</li>
+      <li><strong>Entrypoints differ per project.</strong> Garden exposes
+        <code>script/run-e2e.sh</code> and <code>script/release-app.sh</code>;
+        camera exposes thirteen entries in its own <code>script/</code>.</li>
+    </ul>
+
+    <figure id="fig-link">
+      <svg viewBox="0 0 320 214" role="img">
+        <title>Eight acceptance items resolve through one class name to eight test methods, leaving seven of them unpinned</title>
+        <defs>
+          <marker id="arrow-link" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <rect x="20" y="12" width="190" height="46" fill="none" stroke="currentColor"/>
+        <text x="30" y="34" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">8 acceptance items</text>
+        <text x="30" y="50" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">one feature document</text>
+        <line x1="115" y1="58" x2="115" y2="86" stroke="currentColor" marker-end="url(#arrow-link)"/>
+        <text x="124" y="77" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">names</text>
+        <rect x="20" y="88" width="190" height="46" fill="none" stroke="currentColor"/>
+        <text x="30" y="110" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">IntervalOverrideTest</text>
+        <text x="30" y="126" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">one class name</text>
+        <line x1="115" y1="134" x2="115" y2="162" stroke="currentColor" marker-end="url(#arrow-link)"/>
+        <text x="124" y="153" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">resolves</text>
+        <rect x="20" y="164" width="190" height="42" fill="none" stroke="currentColor"/>
+        <text x="30" y="190" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">8 test methods</text>
+        <text x="220" y="190" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="#a33">7 unpinned</text>
+        <line x1="220" y1="200" x2="280" y2="200" stroke="#a33" stroke-dasharray="4 3"/>
+      </svg>
+      <figcaption>
+        Fan-in of the one spec-to-test link today, read at garden
+        <code>22a3d5a</code>. Key: box &mdash; a set of things that exist;
+        arrow &mdash; a resolution step, labelled with what it does; red dashed
+        annotation &mdash; what the resolution fails to pin. Because the link
+        names the class, one surviving method keeps all eight items green.
+      </figcaption>
+    </figure>
+
+    <div class="callout gap">
+      <span class="tag">gap</span>
+      <code>garden/docs/README.md</code> line 143 reads &ldquo;Nothing yet:
+      garden has no <code>hooks/pre-commit</code>&rdquo;. The hook exists and
+      runs (garden <code>22a3d5a</code>). Phase 1 below corrects the line.
+    </div>
+
+    <h2 id="options">Options</h2>
+
+    <div class="box">
+      <span class="label">Conclusion</span>
+      <ol>
+        <li><span class="n">1</span><strong>Axes.</strong> Three, named before
+          any option is judged: <mark>can it refute a design before code
+          exists</mark>; what does it cost to keep true; does an unspecced patch
+          break it.</li>
+        <li><span class="n">2</span><strong>Winner.</strong> The structured
+          shell with attached models &mdash; <mark>the only option that refutes
+          early without maintaining a second description of the whole
+          system</mark>.</li>
+        <li><span class="n">3</span><strong>Losers.</strong> One is killed on
+          reach, one on the defect class it cannot catch, and
+          <mark>one is absorbed rather than killed</mark>: it needs code, so it
+          belongs at the test stage.</li>
+      </ol>
+    </div>
+
+    <table class="stack">
+      <thead><tr><th>Option</th><th>Refutes before code</th><th>Maintenance</th><th>Code-first</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Alloy everywhere</td>
+          <td data-label="Refutes">yes, on every artifact</td>
+          <td data-label="Maintenance">a model per artifact, drifting</td>
+          <td data-label="Code-first">every patch dates the corpus</td>
+          <td data-label="Verdict">Killed &mdash; rich data is out of the logic&rsquo;s reach, rationale stays prose, and the corpus becomes a second description of the system</td>
+        </tr>
+        <tr>
+          <td>Markdown and scripts</td>
+          <td data-label="Refutes">no</td>
+          <td data-label="Maintenance">a few dozen lines of Python per rule</td>
+          <td data-label="Code-first">survives; checks are syntactic</td>
+          <td data-label="Verdict">Killed &mdash; a wrong relational shape reaches code unchallenged; its ids and link checks survive inside the winner</td>
+        </tr>
+        <tr>
+          <td>Structured shell with attached models</td>
+          <td data-label="Refutes">yes, where the design is relational</td>
+          <td data-label="Maintenance">one directory, four shims, two gates</td>
+          <td data-label="Code-first">survives; no gate needs a spec edit</td>
+          <td data-label="Verdict">Recommended &mdash; gives up spec-first as a hard rule</td>
+        </tr>
+        <tr>
+          <td>Kotlin reference model</td>
+          <td data-label="Refutes">no &mdash; it needs the code to exist</td>
+          <td data-label="Maintenance">ordinary test-suite upkeep</td>
+          <td data-label="Code-first">survives</td>
+          <td data-label="Verdict">Absorbed &mdash; the strongest instrument for verifying code, so it lives at the test stage, not the spec stage</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <details>
+      <summary>The tool lost twice at AWS, and that is why no option keeps a model corpus</summary>
+      <ul>
+        <li><strong>Expressiveness, 2015.</strong> AWS rejected Alloy because
+          it could find no practical way to represent rich data structures;
+          Alloy 6 closes only the temporal half of that gap.</li>
+        <li><strong>Maintainability, 2021.</strong> S3&rsquo;s ShardStore team
+          wrote early models in Alloy and dropped them once they discussed
+          long-term maintenance, moving the reference model into Rust.</li>
+        <li><strong>The recorded verdict, quoted.</strong> Alloy &ldquo;does
+          <strong>not</strong> earn its cost as a maintained CI artifact: the
+          model is a second description of the code and drifts like one.&rdquo;
+          It pays where the structure is relational and the failure is a shape
+          you would not think to test.</li>
+        <li><strong>Much of the value is in the writing.</strong>
+          Jackson&rsquo;s own finding: &ldquo;a high proportion of the flaws
+          were detected before the tools were even run.&rdquo; A separate
+          controlled study (n=30) found writers at all levels struggled to
+          write a model from scratch.</li>
+        <li><strong>Source.</strong>
+          <code>notes/wiki/alloy-specification-language.md</code> lines
+          270&ndash;350 (notes <code>9e2a365</code>).</li>
+      </ul>
+    </details>
+
+    <details>
+      <summary>Judges inform and never gate: agreement on rule-following runs 13&ndash;39%</summary>
+      <ul>
+        <li><strong>The validated method</strong> is a binary checklist with
+          quoted evidence per answer, not a 1&ndash;10 score.</li>
+        <li><strong>The measured ceiling.</strong> Agreement with humans on
+          <em>constraint satisfaction</em> runs 13&ndash;39% depending on the
+          judge, and no judge should be asked to count anything.</li>
+        <li><strong>The same page draws this design&rsquo;s boundary:</strong>
+          script the cross-checks, model-check the one genuine state machine as
+          a design check, prove nothing.</li>
+        <li><strong>Source.</strong>
+          <code>notes/wiki/code-simplicity-metrics.md</code> lines 86&ndash;180
+          (notes <code>9e2a365</code>).</li>
+      </ul>
+    </details>
+
+    <h2 id="recommendation">Recommendation</h2>
+
+    <div class="box">
+      <span class="label">Conclusion</span>
+      <ol>
+        <li><span class="n">1</span><strong>Why it wins.</strong> It is the only
+          option that can refute a design before code exists while
+          <mark>keeping models optional, small, and attached to single use
+          cases</mark> &mdash; the shape the recorded evidence allows.</li>
+        <li><span class="n">2</span><strong>Flip condition.</strong> Each
+          loser&rsquo;s kill reason is what holds this up. If no model ever
+          refutes a design garden would have shipped, <mark>the design collapses
+          to markdown and scripts</mark>; if the model corpus outgrows the use
+          cases that pay, the ShardStore reason kills it.</li>
+        <li><span class="n">3</span><strong>Accepting costs one commit.</strong>
+          A workspace spec, <code>docs/agent-development-cycle.md</code>,
+          records the decision and <mark>carries the machine contract</mark> the
+          <code>scripts/spec</code> implementations parse.</li>
+      </ol>
+    </div>
+
+    <h3 id="directories">Directories</h3>
+
+    <table>
+      <thead><tr><th>Name</th><th>Holds</th><th>State in garden</th></tr></thead>
+      <tbody>
+        <tr><td><code>README.md</code></td><td>build and run, plus one short section naming this system</td><td>exists; gains the section</td></tr>
+        <tr><td><code>spec/</code></td><td>the source of truth: shell <code>.md</code> (specs, scenario rows, rubrics) and attached <code>.als</code> models</td><td>new</td></tr>
+        <tr><td><code>docs/</code></td><td>views (<code>.html</code>) only, derived, pinned to commits</td><td>exists; loses its <code>.md</code> specs</td></tr>
+        <tr><td><code>scripts/</code></td><td>the four entrypoints, cron jobs, and the scripts the hooks call</td><td>renamed from <code>script/</code></td></tr>
+        <tr><td><code>hooks/</code></td><td>the repository&rsquo;s own git hooks</td><td>exists, unchanged</td></tr>
+      </tbody>
+    </table>
+
+    <ul>
+      <li><strong>Scope is program-building entries.</strong> Garden first, then
+        camera (same stack, the cheapest confirmation) and board (different
+        stack: <code>src/</code> and <code>tests/</code> stay, and the
+        entrypoints delegate to its own tools).</li>
+      <li><strong>Out of scope.</strong> <code>notes/</code> and the Jekyll
+        site. The workspace root is the control plane and keeps its own
+        arrangement, including the docs contract&rsquo;s <code>spec</code>
+        doctype, which this proposal does not touch
+        (<code>~/workspace/docs/README.md</code>, workspace
+        <code>8fd13c1</code>).</li>
+    </ul>
+
+    <h3 id="cycle">Cycle</h3>
+
+    <table class="stack">
+      <thead><tr><th>Stage</th><th>Entrypoint</th><th>Runs</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td>spec</td><td data-label="Entrypoint"><code>scripts/spec</code></td><td data-label="Runs">resolution and model lint; staleness and vocabulary reports; Analyzer on demand</td><td data-label="Verdict">gates and informs, per check</td></tr>
+        <tr><td>code</td><td data-label="Entrypoint"><code>scripts/code</code></td><td data-label="Runs">build, lint, format &mdash; delegated to the framework</td><td data-label="Verdict">gates; run by the agent, never inside a commit hook</td></tr>
+        <tr><td>test</td><td data-label="Entrypoint"><code>scripts/test</code></td><td data-label="Runs">unit suites; instrumented tests stay a separate explicit invocation</td><td data-label="Verdict">gates</td></tr>
+        <tr><td>eval</td><td data-label="Entrypoint"><code>scripts/eval</code></td><td data-label="Runs">static metrics (detekt cognitive complexity, module graph) and rubric judges</td><td data-label="Verdict">informs</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout notice">
+      <span class="tag">notice</span>
+      The judged code is model-written and the available judges are the same
+      model family, so self-preference bias is live. The mitigations are
+      quoted-evidence rubrics and owner spot-checks.
+    </div>
+
+    <h3 id="chain">Chain</h3>
+
+    <p>One concept answers consistency: a use case, its scenario rows, and each
+    row&rsquo;s settling check.</p>
+
+    <figure id="fig-chain">
+      <svg viewBox="0 0 320 232" role="img">
+        <title>The proposed chain: a use case names scenario rows, each row is settled by a test method, and the test carries the row's id back</title>
+        <defs>
+          <marker id="arrow-chain" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <rect x="20" y="12" width="180" height="48" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="30" y="34" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">use case</text>
+        <text x="30" y="50" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">uc-pin-interval</text>
+        <line x1="110" y1="60" x2="110" y2="86" stroke="currentColor" stroke-dasharray="5 4" marker-end="url(#arrow-chain)"/>
+        <text x="119" y="77" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">names</text>
+        <rect x="20" y="88" width="180" height="48" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="30" y="110" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">scenario row</text>
+        <text x="30" y="126" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">sc-name</text>
+        <line x1="110" y1="136" x2="110" y2="162" stroke="currentColor" stroke-dasharray="5 4" marker-end="url(#arrow-chain)"/>
+        <text x="119" y="153" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">settled by</text>
+        <rect x="20" y="164" width="180" height="48" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="30" y="186" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">settling test</text>
+        <text x="30" y="202" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">Class#method</text>
+        <path d="M200,188 H272 V116 H202" fill="none" stroke="currentColor" stroke-dasharray="5 4" marker-end="url(#arrow-chain)"/>
+        <text x="236" y="146" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">carries</text>
+        <text x="236" y="160" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">the id</text>
+      </svg>
+      <figcaption>
+        The proposed chain, one behaviour. Every element is dashed because
+        nothing here exists at the pinned commit. Key: dashed box &mdash; a
+        proposed artifact; dashed arrow &mdash; a proposed link, labelled with
+        what it does; the returning arrow &mdash; the id the test carries back,
+        which makes a rename break visibly in both directions.
+      </figcaption>
+    </figure>
+
+    <ul>
+      <li><strong>A use case</strong> is a shell entry <code>uc-&lt;kebab-name&gt;</code>
+        with a one-line purpose and its predicates in prose. The unit is
+        borrowed from concept design
+        (<code>notes/wiki/concept-design.md</code>, notes
+        <code>9e2a365</code>).</li>
+      <li><strong>A scenario row</strong> lives in the document it belongs to,
+        so acceptance sections stay where they are and no second central table
+        appears.</li>
+      <li><strong>The row names a method,</strong> not a class, because the
+        class-level link measured meaningless above.</li>
+      <li><strong>The settling test carries the <code>sc-</code> id</strong> at
+        its own end, in its name or a comment.</li>
+      <li><strong>A model is optional.</strong> Registering a plant and the
+        widget stay prose-only use cases with no model, and that is normal.</li>
+    </ul>
+
+<pre>- sc-&lt;kebab-name&gt; (uc-&lt;name&gt;) &mdash; settled by &lt;TestClass#method | rubric-&lt;name&gt; | manual(reason)&gt;</pre>
+
+    <h3 id="checks">Checks</h3>
+
+    <table class="stack">
+      <thead><tr><th>Check</th><th>Group</th><th>Catches</th><th>A green licenses</th></tr></thead>
+      <tbody>
+        <tr><td>Resolution</td><td data-label="Group">gate</td><td data-label="Catches">a <code>uc-</code> with no row, a row naming no real use case, a settling reference that does not exist, an <code>sc-</code> id in test code with no row</td><td data-label="Licenses">resolution, and nothing more &mdash; never that the test tests the scenario</td></tr>
+        <tr><td>Model lint</td><td data-label="Group">gate</td><td data-label="Catches">any <code>Int</code>, arithmetic, <code>#</code> or <code>open</code> in an <code>.als</code> file, and any command without explicit scopes and step bounds</td><td data-label="Licenses">the file compiles under the real Alloy jar and stays inside the safe fragment</td></tr>
+        <tr><td>Staleness</td><td data-label="Group">informs</td><td data-label="Catches">a spec whose settling tests&rsquo; files changed after its <code>Last verified</code> date</td><td data-label="Licenses">nothing; the list is a worklist</td></tr>
+        <tr><td>Vocabulary</td><td data-label="Group">informs</td><td data-label="Catches">a canonical term with no code identifier, and a bold new spec term missing from the table</td><td data-label="Licenses">nothing; ambiguity beyond vocabulary is a rubric question</td></tr>
+        <tr><td>Analyzer run</td><td data-label="Group">informs</td><td data-label="Catches">a design defect, delivered as a counterexample that seeds a regression test</td><td data-label="Licenses">no counterexample within the stated bounds</td></tr>
+      </tbody>
+    </table>
+
+    <ul>
+      <li><strong>Both gates chain into the existing hook.</strong> They are
+        deterministic and run in seconds, so they join
+        <code>garden/hooks/pre-commit</code> rather than replacing it.</li>
+      <li><strong>The lint compiles the file.</strong> A grep alone can be
+        fooled; the ban on integers kills Alloy&rsquo;s silent overflow trap by
+        construction, and day arithmetic belongs in Kotlin tests.</li>
+      <li><strong>Analyzer runs happen when the design is worked,</strong> never
+        per commit.</li>
+    </ul>
+
+    <div class="callout warning">
+      <span class="tag">warning</span>
+      A behaviour change that no test observed is invisible to every mechanical
+      check here.
+      <ul>
+        <li>Consequence: the chain stays green while the spec is wrong.</li>
+        <li>Avoidance: the eval stage and the owner&rsquo;s own read. The
+          staleness list only sees files a settling test touched.</li>
+      </ul>
+    </div>
+
+    <h3 id="recovery">Recovery</h3>
+
+    <p>No gate above requires a spec edit, so a code-first patch lands: code and
+    tests move, and the change gates on build and tests as always. What lags
+    appears on the staleness list, and recovery is three steps an agent runs
+    cold.</p>
+
+    <ol class="steps">
+      <li><strong>Read the flagged spec&rsquo;s scenario rows.</strong> The
+        staleness report names the spec.</li>
+      <li><strong>Diff the code since the spec&rsquo;s <code>Last verified</code>
+        date.</strong></li>
+      <li><strong>Rewrite the predicates and the rows to match.</strong> The
+        tests still carry their <code>sc-</code> ids, so the chain survives the
+        patch.</li>
+    </ol>
+
+    <p>Spec-first stays the preference. It is a check&rsquo;s warning, promoted
+    to a hook only after it catches something.</p>
+
+    <h3 id="migration">Migration</h3>
+
+    <ul>
+      <li><strong>Phase 1 is the first step, and it lands value alone.</strong>
+        Rename <code>script/</code> to <code>scripts/</code>, add the four
+        shims, correct the stale enforcement line, and give
+        <code>README.md</code> its overview section.</li>
+      <li><strong>Exactly five tracked files reference <code>script/</code></strong>
+        (grep, 2026-08-15, garden <code>22a3d5a</code>):
+        <code>README.md</code>, <code>.claude/CLAUDE.md</code>,
+        <code>docs/release.md</code>, <code>docs/verification.md</code>, and
+        <code>run-e2e.sh</code>&rsquo;s own header. The camera citation in
+        <code>docs/README.md</code> is excluded.</li>
+      <li><strong>Survey the worktrees first,</strong> and run
+        <code>run-e2e.sh</code> once against a device before the docs edit
+        lands.</li>
+    </ul>
+
+    <details>
+      <summary>Phases 2 and 3 need no docs-contract edit, and phase 2 is verified contract-free</summary>
+      <ul>
+        <li><strong>Phase 2 &mdash; the chain.</strong> Create
+          <code>spec/</code> with the first models and the scenario-row grammar,
+          upgrade acceptance items to method-level rows, and chain
+          <code>scripts/spec</code>&rsquo;s gates into the existing
+          <code>hooks/pre-commit</code>.</li>
+        <li><strong>Verified: nothing breaks.</strong>
+          <code>~/workspace/scripts/check-docs</code> reads only
+          <code>.html</code> files and <code>INDEX.md</code>, so
+          <code>spec/</code> beside an untouched <code>docs/</code> breaks no
+          reader, the board container included.</li>
+        <li><strong>Phase 3 &mdash; shell migration and eval.</strong> Move
+          <code>docs/*.md</code> specs into <code>spec/</code>, split
+          <code>docs/README.md</code> into a spec-rules
+          <code>spec/README.md</code> and a views-only
+          <code>docs/README.md</code>, rewrite <code>docs/INDEX.md</code>, and
+          update the two pointer files.</li>
+        <li><strong>Eval, priced honestly.</strong> detekt (net-new to garden)
+          with <code>CognitiveComplexMethod</code> on, plus
+          <code>modules-graph-assert</code>. The judge harness is a spike,
+          deferred until one rubric run by hand has changed a decision &mdash;
+          garden&rsquo;s own Kover test.</li>
+      </ul>
+    </details>
+
+    <details>
+      <summary>All nine requirements map to a named part of the design</summary>
+      <table class="stack">
+        <thead><tr><th>Requirement</th><th>Where it is satisfied</th></tr></thead>
+        <tbody>
+          <tr><td>R1 machine-checkable spec</td><td data-label="Satisfied by">the chain; models with the red-twice rule; scenario rows enumerated in <code>spec/</code></td></tr>
+          <tr><td>R2 docs views-only</td><td data-label="Satisfied by">phase 3, work list enumerated, no contract edit</td></tr>
+          <tr><td>R3 scripts</td><td data-label="Satisfied by">four entrypoints plus maintenance; hooks keep <code>hooks/</code></td></tr>
+          <tr><td>R4 framework best practice</td><td data-label="Satisfied by">entrypoints delegate; code and test trees untouched; property laws welcome at the test stage</td></tr>
+          <tr><td>R5 README overview</td><td data-label="Satisfied by">phase 1</td></tr>
+          <tr><td>R6 generalizes</td><td data-label="Satisfied by">scope named; camera and board walked</td></tr>
+          <tr><td>R7 minimal</td><td data-label="Satisfied by">one chain concept, five directories, no <code>eval/</code>, no tiers; every mechanism cites the failure it prevents</td></tr>
+          <tr><td>R8 consistency answered</td><td data-label="Satisfied by">the checks: orphan detection both ways as gates, staleness and vocabulary as reports, ambiguity to rubrics, one honest limit stated</td></tr>
+          <tr><td>R9 code-first robust</td><td data-label="Satisfied by">no gate needs a spec edit; staleness is the recovery worklist; three-step recovery</td></tr>
+        </tbody>
+      </table>
+    </details>
+
+    <div class="callout gap">
+      <span class="tag">gap</span>
+      Four things this proposal leaves open.
+      <ul>
+        <li>Which of camera and board adopts second, and when.</li>
+        <li>Whether eval reports are ever persisted (the Kover precedent).</li>
+        <li>A different-family judge.</li>
+        <li>The scenario-row and id grammar in final detail. Phase 2 hardens it
+          after one recorded research pass &mdash; a survey, delegated to
+          <code>notes</code>, of what requirements-traceability and doc-lint
+          tools check mechanically and which checks pay at hobby scale. The
+          vault does not hold this page yet.</li>
+      </ul>
+    </div>
+
+    <h2 id="evidence">Evidence</h2>
+
+    <div class="box">
+      <span class="label">Conclusion</span>
+      <ol>
+        <li><span class="n">1</span><strong>One model was written and run.</strong>
+          It states garden&rsquo;s pinned-interval rule &mdash;
+          <mark>only the owner ever changes a pinned plant</mark> &mdash; in 41
+          lines, and its assertion is anchored on the use case&rsquo;s declared
+          name.</li>
+        <li><span class="n">2</span><strong>Five runs, measured 2026-08-15.</strong>
+          Green, non-vacuous, <mark>red with the frame fact disabled, red with
+          the design rule broken, green again restored</mark>. That sequence is
+          the red-twice record this proposal requires.</li>
+        <li><span class="n">3</span><strong>Two earlier attempts could not be
+          made red.</strong> <mark>Both were invisible to any syntactic
+          lint</mark>, which is why the rule is a measured protocol and not a
+          checker.</li>
+      </ol>
+    </div>
+
+    <figure id="fig-anchor">
+<pre>one sig Trail { var actor: lone Actor }   // who acted this step; none on stutter
+
+// The guarantee: only the owner ever changes a pinned plant.
+assert uc_pin_interval {
+  always all p: Plant |
+    (some p.pinned and not unchanged[p]) implies Trail.actor' = Owner
+}
+check uc_pin_interval for 4 but 1..8 steps</pre>
+      <figcaption>
+        Quoted verbatim from the model run on 2026-08-15, lines 6 and
+        34&ndash;39. Key: <code>Trail.actor</code> is the observable actor every
+        event sets, so the assertion reads who acted rather than what changed;
+        <code>uc_pin_interval</code> is the declared name the Alloy compiler
+        sees, which anchors the check to the use case; the
+        <code>check</code> line states both bounds explicitly.
+      </figcaption>
+    </figure>
+
+    <figure id="fig-redtwice">
+      <svg viewBox="0 0 300 220" role="img">
+        <title>The red-twice protocol: a green baseline, two mutations that each turn the check red, and the restore that returns it to green</title>
+        <defs>
+          <marker id="arrow-red" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <rect x="20" y="12" width="170" height="44" fill="none" stroke="currentColor"/>
+        <text x="30" y="34" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">baseline</text>
+        <text x="180" y="34" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">UNSAT</text>
+        <text x="30" y="50" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">as written</text>
+        <line x1="105" y1="56" x2="105" y2="84" stroke="currentColor" marker-end="url(#arrow-red)"/>
+        <text x="114" y="75" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">disable frame fact</text>
+        <rect x="20" y="86" width="170" height="44" fill="none" stroke="currentColor"/>
+        <text x="30" y="108" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">frame off</text>
+        <text x="180" y="108" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="#a33">SAT</text>
+        <text x="30" y="124" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">events unconstrained</text>
+        <line x1="105" y1="130" x2="105" y2="158" stroke="currentColor" marker-end="url(#arrow-red)"/>
+        <text x="114" y="149" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">break the guard</text>
+        <rect x="20" y="160" width="170" height="44" fill="none" stroke="currentColor"/>
+        <text x="30" y="182" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="currentColor">guard gone</text>
+        <text x="180" y="182" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="bold" fill="#a33">SAT</text>
+        <text x="30" y="198" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">learner moves a pin</text>
+        <path d="M190,182 H270 V34 H192" fill="none" stroke="currentColor" marker-end="url(#arrow-red)"/>
+        <text x="230" y="102" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">restore</text>
+      </svg>
+      <figcaption>
+        The red-twice protocol as it was run on 2026-08-15; all three states
+        were executed, so nothing here is speculative. Key: box &mdash; one
+        state of the model file; the word at its right &mdash; the verdict the
+        Analyzer printed, red where the check found a counterexample; arrow
+        &mdash; the edit made between two runs.
+      </figcaption>
+    </figure>
+
+    <table class="stack">
+      <thead><tr><th>Run</th><th>What changed</th><th>Result</th><th>What it proves</th></tr></thead>
+      <tbody>
+        <tr><td><code>check uc_pin_interval</code></td><td data-label="Changed">nothing</td><td data-label="Result">UNSAT</td><td data-label="Proves">no counterexample within 4 objects and 1&ndash;8 steps</td></tr>
+        <tr><td><code>run somePinnedTrace</code></td><td data-label="Changed">nothing</td><td data-label="Result">SAT</td><td data-label="Proves">the model is not vacuous &mdash; a pinned plant is reachable</td></tr>
+        <tr><td><code>check</code>, first mutation</td><td data-label="Changed">the frame fact disabled</td><td data-label="Result"><span class="red">SAT</span></td><td data-label="Proves">the assertion reads the transition system at all</td></tr>
+        <tr><td><code>check</code>, second mutation</td><td data-label="Changed">the learner guard deleted</td><td data-label="Result"><span class="red">SAT</span></td><td data-label="Proves">it reads the right part &mdash; the design bug the guarantee exists to prevent</td></tr>
+        <tr><td><code>check</code>, restored</td><td data-label="Changed">both mutations undone</td><td data-label="Result">UNSAT</td><td data-label="Proves">the mutations, not the model, caused the red</td></tr>
+      </tbody>
+    </table>
+
+    <ul>
+      <li><strong>The rule this buys.</strong> A model&rsquo;s check earns trust
+        only after it has been observed red twice, with both mutations and both
+        results recorded beside the model. Settling tests obey the same
+        fail-first rule.</li>
+      <li><strong>The two attempts that were discarded.</strong> An assertion
+        over events defined only by their state effect cannot go red, and an
+        assertion built from an event&rsquo;s own guard stays green even with
+        the whole transition system deleted.</li>
+      <li><strong>Garden&rsquo;s model candidates, by payoff.</strong> Interval
+        precedence, the check-event lifecycle with corrections, and the
+        notification re-arm paths. The schedule arithmetic is a pure function
+        already pinned by table tests, so it gets no model.</li>
+    </ul>
+
+<pre>export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+"$JAVA_HOME/bin/java" -Djava.awt.headless=true -jar alloy.jar exec -f -c 'uc_pin_interval' interval.als</pre>
+
+    <div class="callout warning">
+      <span class="tag">warning</span>
+      A bare <code>java -jar alloy.jar</code> opens the Analyzer window and
+      blocks forever.
+      <ul>
+        <li>Consequence: an agent session hangs with no output and no error.</li>
+        <li>Avoidance: always pass the <code>exec</code> subcommand and
+          <code>-Djava.awt.headless=true</code>, and read the SAT/UNSAT column
+          rather than the exit code, which is 0 either way.</li>
+      </ul>
+    </div>
+
+    <details>
+      <summary>The whole 41-line model, quoted so this document carries its own evidence</summary>
+<pre>// uc-pin-interval — the owner types an interval; nothing in the app may move it.
+// A design check: run when this design changes, recorded, never a commit gate.
+
+sig Days {}
+enum Actor { Owner, Learner }
+one sig Trail { var actor: lone Actor }   // who acted this step; none on stutter
+
+sig Plant {
+  var pinned: lone Days,   // the interval the owner typed
+  var learned: lone Days   // the learner's current target
+}
+
+pred ownerPins[p: Plant, d: Days] {
+  Trail.actor' = Owner
+  p.pinned' = d
+  p.learned' = none        // an owner edit resets the learner
+  all q: Plant - p | unchanged[q]
+}
+pred learnerAdjusts[p: Plant, d: Days] {
+  no p.pinned              // the learner may act only on an unpinned plant
+  Trail.actor' = Learner
+  p.learned' = d
+  p.pinned' = p.pinned
+  all q: Plant - p | unchanged[q]
+}
+pred unchanged[p: Plant] { p.pinned' = p.pinned and p.learned' = p.learned }
+pred stutter { no Trail.actor' and all p: Plant | unchanged[p] }
+
+fact events {
+  always (stutter
+    or (some p: Plant, d: Days | ownerPins[p, d] or learnerAdjusts[p, d]))
+}
+
+// The guarantee: only the owner ever changes a pinned plant.
+assert uc_pin_interval {
+  always all p: Plant |
+    (some p.pinned and not unchanged[p]) implies Trail.actor' = Owner
+}
+check uc_pin_interval for 4 but 1..8 steps
+
+run somePinnedTrace { eventually some p: Plant | some p.pinned } for 4 but 1..8 steps</pre>
+    </details>
+
+  </section>
+
+  <footer class="sources">
+    <h2 id="sources">Sources</h2>
+    <ul>
+      <li><code>garden/docs/</code> &mdash; the 14 normative subject specs, and <code>feature-interval-override.md</code> lines 88&ndash;103, the eight acceptance items naming one class (garden <code>22a3d5a</code>)</li>
+      <li><code>garden/docs/README.md</code> &mdash; the acceptance-naming rule, the &ldquo;Last verified&rdquo; meaning, the canonical vocabulary table, and the stale enforcement line at 143 (garden <code>22a3d5a</code>)</li>
+      <li><code>garden/docs/verification.md</code>, <code>garden/hooks/pre-commit</code>, <code>garden/script/run-e2e.sh</code> &mdash; the three test layers, what the hook checks, and the hardcoded emulator serial at line 15 (garden <code>22a3d5a</code>)</li>
+      <li><code>notes/wiki/alloy-specification-language.md</code> &mdash; where Alloy pays, the AWS 2015 and ShardStore 2021 rejections, and the maintained-CI-artifact verdict (notes <code>9e2a365</code>)</li>
+      <li><code>notes/wiki/code-simplicity-metrics.md</code> &mdash; binary judge rubrics, the 13&ndash;39% agreement figure, self-preference bias, and the script / model-check / prove-nothing boundary (notes <code>9e2a365</code>)</li>
+      <li><code>notes/wiki/concept-design.md</code> &mdash; the concept as the unit a use case borrows (notes <code>9e2a365</code>)</li>
+      <li><code>~/workspace/docs/README.md</code> and <code>~/workspace/scripts/check-docs</code> &mdash; the docs contract this proposal does not edit, and the reader that sees only <code>.html</code> and <code>INDEX.md</code> (workspace <code>8fd13c1</code>)</li>
+      <li><code>~/.claude/projects/-Users-hyungmokim--claude/memory/setup-alloy.md</code> &mdash; the verified headless command form, the GUI trap, and the two measured ways a green check is worthless</li>
+      <li>The <code>interval.als</code> probe, written and run 2026-08-15 &mdash; the specimen and its five results; the model text is quoted in full above, so this document carries its own evidence</li>
+    </ul>
+  </footer>
+
+</article>
+</body>
+</html>
