@@ -136,6 +136,12 @@ every cell after each row's first, which is the row's title. Columns past the
 third must never sit off-screen. Panning stays for `pre`, for a pan figure,
 and for tables of three columns or fewer.
 
+Reach this rule only after `components.md` says the content is a table at
+all. A stacked row prints one label above each value, so stacking a
+comparison whose cells hold sentences produces exactly the repeated
+label-value form that file rules out. A three-column table whose last cell is
+a sentence pans instead, and the sentence leaves the screen.
+
 A group header row replaces a yes-or-no column. Nine flat rows with a
 yes-or-no column make a reader sort them; three groups of three state the
 sorting as the answer.
@@ -160,9 +166,9 @@ it again.
 
 ## Count badge and human-action badge
 
-`<span class="ct">6&times; page-level figure</span>` states the size of a
-complete set, against a group of files and against each side of a mapping. A
-reader then knows what a complete set looks like before reading the members.
+`<span class="ct">4&times; entrypoint</span>` states the size of a complete
+set, against a group of files and against each side of a mapping. A reader
+then knows what a complete set looks like before reading the members.
 
 `<span class="hum">a person writes the brief</span>` marks the one transition
 no code performs, and marks nothing else.

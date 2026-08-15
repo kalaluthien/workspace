@@ -85,11 +85,15 @@ two sections means the split is wrong. The reader field sets the depth: a
 section the named reader cannot use is one section too deep, and a
 non-engineer reader collapses two mechanism sections into one.
 
-An explanation and a proposal each hold one section of negative space: what
-does not start the subject, and what the subject does not change. Nothing on
-the page may let a reader infer a trigger or an effect the code does not
-have. Rule L never trims this section. A guide walks one procedure and owes
-no such section.
+An explanation and a proposal each hold negative space: what does not start
+the subject, and what the subject does not change. Nothing on the page may
+let a reader infer a trigger or an effect the code does not have. Rule L
+never trims it. An explanation gives it its own section. A proposal carries
+it in the Domain section its section order already requires, and a guide
+walks one procedure and owes none.
+
+A proposal takes its whole section order from `references/doctypes.md`, which
+fixes what comes first and what comes last.
 
 **3 · Route each question.** Each section question routes to one component
 from the vocabulary in `references/components.md`. Never draw two components

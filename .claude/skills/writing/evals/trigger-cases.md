@@ -1,6 +1,6 @@
 # Trigger cases
 
-Twelve requests that reach the skill, and eighteen rubric lines for a
+Twelve requests that reach the skill, and nineteen rubric lines for a
 delivered run. Six requests start a run, and six do not. Every subject is a
 repository this workspace holds.
 
@@ -12,7 +12,7 @@ repository this workspace holds.
 | delegating 스킬의 세션 수명주기를 IKEA 매뉴얼처럼 한 페이지로 · the delegating session lifecycle, on one page like an IKEA manual | An explanation. A keyed step chain for the order, and a state machine for the states, sharing one numeral set. |
 | garden 릴리스 APK 설치 절차 html로 만들어서 열어줘 · make the garden release APK install procedure an HTML page and open it | A guide. `Goal` replaces `Question`, the steps are `ol.steps`, and step 8 runs `open`. |
 | pre-commit 훅들이 뭘 막고 뭘 안 막는지 정리해줘 · write up what the pre-commit hooks block and what they do not | An explanation. A grouped table, and the negative-space section carries the request itself. |
-| camera 프리뷰가 느린 원인은 아는데, 어떻게 바꿀지 제안서로 정리해줘 · the camera preview is slow for a known reason; lay the change out as a proposal | A proposal. AS-IS carries the cited facts, TO-BE carries the change and draws what does not exist yet. |
+| camera 프리뷰가 느린 원인은 아는데, 어떻게 바꿀지 제안서로 정리해줘 · the camera preview is slow for a known reason; lay the change out as a proposal | A proposal in the fixed section order. The options become keyed panels with numbered prose, and the decisions sit after the recommendation. |
 | 새 board 화면이 어떻게 생기면 좋을지 그려서 보여줘 · draw what the new board screen could look like | A proposal. The drawing is the TO-BE half, and the AS-IS half still needs a readable source. |
 
 ## Must not fire, 6
@@ -34,7 +34,7 @@ carries no established cause, it is the first one.
 A request that must not fire and still reaches the skill ends the run: return
 `STATUS: INSUFFICIENT-INPUT`, name the route, and write no HTML.
 
-## Rubric, 18 lines
+## Rubric, 19 lines
 
 **Structure**
 
@@ -48,40 +48,46 @@ A request that must not fire and still reaches the skill ends the run: return
 4. The title is a noun phrase of one to three words. A rewrite keeps the
    title and the path the document already had, and a derived path that holds
    a different subject ended the run instead.
-5. The subject is split into 4 to 7 sections, and on an explanation or a
-   proposal one of them states the negative space.
+5. The subject is split into 4 to 7 sections. An explanation gives the
+   negative space its own section, and a proposal carries it in Domain.
+6. A proposal runs the six sections in the fixed order: the change in one
+   plain sentence, Domain with what each term is and is not, the AS-IS
+   problem, the options, the recommendation, and the decisions last. No
+   decision or veto row appears before the recommendation.
 
 **Figures**
 
-6. Every section whose subject is a relation carries one component, and no
-   section carries two components of one kind.
-7. Every `<svg>` inside a `<figure>` is at most 620 viewBox units wide, and
+7. Every section whose subject is a relation carries one component, and no
+   section carries two components of one kind. No page carries a summary box
+   labelled with its genre, or a comparison drawn as repeated label-value
+   rows.
+8. Every `<svg>` inside a `<figure>` is at most 620 viewBox units wide, and
    every one over 360 units carries `class="pan"` plus an inline `min-width`
    equal to its viewBox width.
-8. Every annotation is at least 10 viewBox units of font size.
-9. Every marker id is suffixed per figure and defined inside the same `<svg>`
-   that points at it.
-10. Every table wider than three columns carries `class="stack"` and a
+9. Every annotation is at least 10 viewBox units of font size.
+10. Every marker id is suffixed per figure and defined inside the same `<svg>`
+    that points at it.
+11. Every table wider than three columns carries `class="stack"` and a
     `data-label` on every cell after the row's first.
-11. `scripts/render-check <output>` exits 0.
+12. `scripts/render-check <output>` exits 0.
 
 **Language**
 
-12. No sentence carries a contraction, an idiom, or a word from the drop
+13. No sentence carries a contraction, an idiom, or a word from the drop
     lists in `references/plain-writing.md`.
-13. Every section heading is a bare noun phrase that names its object.
-14. Every caption states a fact about the system, not a fact about the
+14. Every section heading is a bare noun phrase that names its object.
+15. Every caption states a fact about the system, not a fact about the
     drawing.
-15. No sentence addresses the person who asked, and no count true only on the
+16. No sentence addresses the person who asked, and no count true only on the
     day of the read appears on the page.
 
 **Grounding**
 
-16. Every claim is observable in a file the run read, and each citation
+17. Every claim is observable in a file the run read, and each citation
     carries the commit of the repository its file sits in.
-17. The page carries no external asset, no script, and no build step, and it
+18. The page carries no external asset, no script, and no build step, and it
     opens from `file://` complete.
-18. The run wrote exactly one file, at the output path, and changed nothing
+19. The run wrote exactly one file, at the output path, and changed nothing
     else: no spec, no `INDEX.md` line, no commit. The return message carries
     the status line and the five sections, and `## Grounding` is a superset
     of every file the message names.

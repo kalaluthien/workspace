@@ -6,7 +6,7 @@ proposal additions, and the exits.
 - [Three doctypes](#three-doctypes)
 - [The page opening](#the-page-opening)
 - [Title and file name](#title-and-file-name)
-- [Proposal mode](#proposal-mode)
+- [Proposal mode](#proposal-mode) — [section order](#section-order)
 - [Requests this skill does not serve](#requests-this-skill-does-not-serve)
 - [What the run never writes](#what-the-run-never-writes)
 
@@ -73,11 +73,50 @@ entry's file follows that entry's own naming, read from its `docs/INDEX.md`.
 
 ## Proposal mode
 
-Three additions, on top of every other rule.
+### Section order
 
-1. **Two halves, in this order.** AS-IS states the problem, and a file backs
-   every claim in it. TO-BE states the change, and it is the one half allowed
-   to describe what does not exist.
+A proposal runs its sections in one fixed order. The reader meets the change
+first, then the words it uses, then the facts, then the argument, and the
+decisions last.
+
+| # | section | what it holds |
+|---|---|---|
+| 1 | the change, named | one plain sentence stating what is proposed |
+| 2 | Domain | every term of art, what it is and what it is not |
+| 3 | the problem, AS-IS | today's facts, each backed by a file |
+| 4 | the options, TO-BE | the candidates, and what each gives up |
+| 5 | the recommendation, TO-BE | the one option taken, and why it wins |
+| 6 | the decisions | rows the proposal settled on its own |
+
+Sections 1, 3, 4, and 5 take names from the subject, not from this table.
+Rule C in `draft-rules.md` holds: a section name is a bare noun phrase, so
+the first section is named after the change and never "Answer", "Summary", or
+"Proposal".
+
+**The first section states the change in one sentence a reader can repeat.**
+It sits inside that section, under its heading, and never above the first
+heading, which the page opening rule keeps clear. A reader who stops after
+that sentence can still say what the proposal wants.
+
+**Section 2 is Domain.** It defines every term of art the proposal
+manipulates: what each one is, and what each one is not. A proposal that
+moves `spec`, `code`, `test`, and `eval` around says what each of those four
+is, and what it is not, before any AS-IS fact. The negative half is not
+optional, and it is what a reader uses to check whether the proposal means
+the same words they do. On a proposal this section carries the page's
+negative space, so a proposal owes no separate negative-space section.
+
+**The decisions come last.** A decision list placed before the argument asks
+the reader to accept rulings on a change nobody has explained yet, and it
+reads as a page of verdicts. Each decision names its consequence and points
+at the section that argues it. Six decisions after a recommendation are six
+things to veto; the same six before it are six things to distrust.
+
+### Three additions on top of every other rule
+
+1. **Two halves.** AS-IS states the problem, and a file backs every claim in
+   it. TO-BE states the change, and it is the one half allowed to describe
+   what does not exist.
 2. **The halves are marked in the section names.** An AS-IS section names the
    system as it runs today. A TO-BE section names the change it proposes. A
    reader must never guess which half a figure belongs to.

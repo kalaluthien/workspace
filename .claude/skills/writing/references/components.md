@@ -8,6 +8,8 @@ each component must show.
 - [The elements carrier](#the-elements-carrier)
 - [File map](#file-map)
 - [Specimen anatomy](#specimen-anatomy)
+- [Keyed option panels](#keyed-option-panels)
+- [Not in this vocabulary](#not-in-this-vocabulary)
 
 ## The vocabulary
 
@@ -16,8 +18,9 @@ components of one kind for one content.
 
 | the reader's question | component | its mission | its form |
 |---|---|---|---|
-| **Page-level figures, 6** | | | |
+| **Page-level figures, 7** | | | |
 | Which parts exist, and where? | File map | Locate each part, and state its role in six words | below |
+| Which option wins, and why? | Keyed option panels | One panel per option, and the verdict in the prose | below |
 | What happens in one run? | Keyed step chain | The order, and the two ends | `svg-rules.md` |
 | Which states exist, and how does it move? | State machine | The legal transitions, and their writers | `svg-rules.md` |
 | Which input produces which output? | Three-column mapping | The count on each side | `svg-rules.md` |
@@ -38,7 +41,9 @@ the item count and the task first.
 
 - A relation that is not genuinely two-dimensional is a table or a list, and
   the section owes no drawing. A list drawn as boxes is worse than a list.
-- Three or more parallel facts are a table, never prose.
+- Three or more parallel facts are a table, never prose. The facts must be
+  short values a reader compares at a glance. A cell holding a sentence, a
+  rationale, or a verdict means the content is not a table.
 - A straight-line sequence with no branch and no loop is `<ol class="steps">`.
 - One figure carries one relation and at most seven elements. A denser
   subject becomes a row of small panels in a `div.figure-row`, each panel
@@ -109,3 +114,39 @@ agent-config-scopes.html
 
 An artifact whose fields name themselves, such as JSON or `key=value`, is a
 table and not a specimen.
+
+## Keyed option panels
+
+A comparison across options is a drawing plus numbered prose, never a matrix.
+One `div.figure-row` holds one small panel per option, each panel keyed with
+a circled numeral and carrying the shape of that option. Under the row, one
+numbered paragraph per key opens with the option's name in bold, states what
+the option gives up, and ends with its verdict.
+
+The numerals in the panels and the numerals in the prose are one set, per
+rule D. Four options are four panels and four paragraphs. An option killed by
+an earlier decision keeps its panel, drawn dashed, and its paragraph carries
+the reason it lost.
+
+A reader on a phone reads a paragraph. The same content as a matrix becomes
+one stacked block of repeated labels per option, which is the shape this
+component exists to replace.
+
+## Not in this vocabulary
+
+Two shapes look like components and are not. Neither has a question in the
+table above, so neither has a mission.
+
+**A labelled summary box.** A bordered block may open a section. It carries
+no genre label above its content — no `CONCLUSION`, no `SUMMARY`, no `NOTE`,
+in any case or size. The section heading already says what the block is, so
+the label states the genre twice and states the content zero times. The
+bordered blocks this skill does draw, the do-and-do-not panels, take headings
+naming their own content.
+
+**Label-value definition rows.** A row that repeats one label set under every
+item is a form, not a comparison: `Refutes / Maintenance / Verdict` under
+option one, then again under option two, then again. A reader compares
+nothing, because the values never sit side by side. Route the content to
+keyed option panels above, or to a grouped table when the values really are
+short and flat.
