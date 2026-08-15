@@ -20,6 +20,13 @@
   ol.steps { padding-left: 1.6rem; }
   ol.steps > li { margin: 1.3rem 0; }
   ol.steps > li::marker { font-weight: 700; }
+  ol.keys { list-style: none; padding-left: 0; margin: 1rem 0; }
+  ol.keys > li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .6rem; margin: .8rem 0; }
+  /* A grid track sizes to its longest unbreakable token, so a citation path
+     would push the legend past the narrow measure without this. */
+  ol.keys > li > p { min-width: 0; }
+  .k { display: inline-flex; align-items: center; justify-content: center; width: 1.45rem; height: 1.45rem;
+    border: 1px solid var(--ink); border-radius: 50%; font-size: .72rem; font-weight: 700; }
   a { color: #14459b; text-decoration-color: #9bb0d8; }
   code, pre, .provenance dd, .src { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
   pre { overflow-x: auto; background: var(--wash); padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
@@ -28,16 +35,12 @@
   th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid var(--hair); }
   th { font-weight: 700; }
   tr.grp td { background: var(--wash); font-weight: 700; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; }
+  /* Three columns of short values fit the narrow measure, so no table stacks
+     into label-value rows and none pans out of view. A table that would need
+     either is the wrong component. */
   @media (max-width: 42rem) {
-    table { display: block; overflow-x: auto; }
-    th, td { min-width: 9rem; }
-    table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; }
-    table.stack thead { display: none; }
-    table.stack tr { border-bottom: 1px solid var(--hair); padding: .5rem 0; }
-    table.stack td { min-width: 0; border-bottom: none; padding: .12rem 0; }
-    table.stack td:first-child { font-weight: 700; }
-    table.stack td[data-label]::before { content: attr(data-label); display: inline-block;
-      width: 7.5rem; color: var(--mute); font-size: .82em; }
+    table { font-size: .85rem; }
+    th, td { padding-right: .5rem; }
   }
   .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem;
     margin: 0 0 2.4rem; font-size: .85rem; color: var(--mute); }
@@ -60,11 +63,22 @@
   .do h4::before { content: "\2713\00a0"; }
   .dont h4::before { content: "\2715\00a0"; }
   .ct { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem;
-    border: 1px solid var(--ink); border-radius: 3px; padding: 1px 4px; }
+    border: 1px solid var(--ink); border-radius: 3px; padding: 1px 4px; white-space: nowrap; }
   .hum { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem;
     border: 1px solid var(--ink); border-radius: 11px; padding: 1px 8px; }
-  details { border: 1px solid var(--hair); padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
-  details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
+  .chip { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem;
+    background: var(--wash); border-radius: 3px; padding: 1px 5px; white-space: nowrap; }
+  .callout { display: grid; grid-template-columns: 1.5rem 1fr; gap: .7rem; align-items: start;
+    background: var(--wash); border-left: 3px solid var(--hair); padding: .8rem 1rem; margin: 1.4rem 0; }
+  .callout .g { font-size: 1.05rem; line-height: 1.35; }
+  .callout p { margin: 0; font-size: .92rem; }
+  .callout strong { font-weight: 700; }
+  details { border: 1px solid var(--hair); border-radius: 3px; padding: .45rem .9rem;
+    margin: 1.2rem 0; font-size: .92rem; }
+  details summary { cursor: pointer; font-weight: 600; font-size: .92rem; list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: "\25B8\00a0\00a0"; color: var(--mute); }
+  details[open] summary::before { content: "\25BE\00a0\00a0"; }
   details[open] summary { margin-bottom: .5rem; }
   /* Last, so it wins over the two-column .pair declared above. */
   @media (max-width: 42rem) { .pair { grid-template-columns: 1fr; } }
@@ -77,21 +91,19 @@
   <dl class="provenance">
     <dt>Doctype</dt>  <dd>proposal</dd>
     <dt>Status</dt>   <dd>Open</dd>
-    <dt>Question</dt> <dd>What directory contract and work cycle should agent sessions follow in a program-building project entry, so a spec becomes machine-checkable and survives a code-first patch?</dd>
+    <dt>Question</dt> <dd>What directory contract and work cycle should agent sessions follow in a program-building project entry, so that a spec&rsquo;s domain and its use cases both become machine-checkable and both survive a code-first patch?</dd>
     <dt>Updated</dt>  <dd>2026-08-15</dd>
   </dl>
 
-  <h2>One checked chain from use case to test</h2>
+  <h2>One checked chain from spec to settling test</h2>
 
-  <p>Every behaviour in a program-building entry becomes one checked chain: a
-  use case, its scenario rows, and the test method that settles each row.</p>
-
-  <p>Five fixed directory names hold the chain. Four entrypoints run it. A
-  machine reads every link in it.</p>
+  <p>A spec states two things. It states the domain the program is about, and
+  it states the use cases the program serves. Every leaf of both halves becomes
+  one checked chain down to the test method that settles it.</p>
 
   <figure id="fig-chain">
-    <svg viewBox="0 0 320 280" role="img" aria-labelledby="f-chain-t">
-      <title id="f-chain-t">A use case names scenario rows, each row is settled by one test method, and the test carries the row identifier back</title>
+    <svg viewBox="0 0 320 322" role="img" aria-labelledby="f-chain-t">
+      <title id="f-chain-t">One spec file declares a domain half and a behaviour half, and every leaf of both halves resolves to one settling reference</title>
       <defs>
         <marker id="arrow-chain" viewBox="0 0 8 8" refX="7" refY="4"
                 markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -100,59 +112,81 @@
       </defs>
 
       <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="5 4">
-        <rect x="40" y="16" width="170" height="54"/>
-        <rect x="40" y="110" width="170" height="54"/>
-        <rect x="40" y="204" width="170" height="54"/>
-        <path d="M125,70 L125,110" marker-end="url(#arrow-chain)"/>
-        <path d="M125,164 L125,204" marker-end="url(#arrow-chain)"/>
-        <path d="M210,231 L286,231 L286,137 L212,137" marker-end="url(#arrow-chain)"/>
+        <rect x="36" y="16" width="248" height="58"/>
+        <rect x="12" y="124" width="138" height="76"/>
+        <rect x="172" y="124" width="138" height="76"/>
+        <rect x="36" y="232" width="248" height="78"/>
+        <path d="M95,74 L81,124" marker-end="url(#arrow-chain)"/>
+        <path d="M225,74 L241,124" marker-end="url(#arrow-chain)"/>
+        <path d="M81,200 L95,232" marker-end="url(#arrow-chain)"/>
+        <path d="M241,200 L225,232" marker-end="url(#arrow-chain)"/>
       </g>
 
       <g font-size="13" font-weight="bold">
-        <text x="58" y="40">Use case</text>
-        <text x="58" y="134">Scenario row</text>
-        <text x="58" y="228">Settling test</text>
+        <text x="48" y="46">Spec file</text>
+        <text x="48" y="262">Settling reference</text>
+      </g>
+      <g font-size="12" font-weight="bold">
+        <text x="24" y="154">Domain half</text>
+        <text x="184" y="154">Behaviour half</text>
       </g>
       <g font-size="11" font-family="ui-monospace, Menlo, monospace" opacity=".65">
-        <text x="58" y="60">uc-pin-interval</text>
-        <text x="58" y="154">sc-pin-wins</text>
-        <text x="58" y="248">Class#method</text>
+        <text x="48" y="64">spec/feature-*.md</text>
+        <text x="48" y="282">IntervalOverrideTest</text>
+        <text x="48" y="300">#pinHeld / #pinWins</text>
+      </g>
+      <g font-size="10" font-family="ui-monospace, Menlo, monospace" opacity=".65">
+        <text x="24" y="174">tm-pinned-interval</text>
+        <text x="24" y="192">inv-pin-immutable</text>
+        <text x="184" y="174">uc-pin-interval</text>
+        <text x="184" y="192">sc-pin-wins</text>
       </g>
 
       <g font-size="11">
-        <text x="134" y="94">names</text>
-        <text x="134" y="188">settled by</text>
-        <text x="248" y="178" text-anchor="middle">carries</text>
-        <text x="248" y="192" text-anchor="middle">the id</text>
+        <text x="78" y="101" text-anchor="end">names terms</text>
+        <text x="222" y="101" text-anchor="end">names cases</text>
+        <text x="161" y="219" text-anchor="middle">each settled by</text>
       </g>
 
       <g fill="#ffffff" stroke="currentColor" stroke-width="1.2">
-        <circle cx="40" cy="16" r="11"/>
-        <circle cx="40" cy="110" r="11"/>
-        <circle cx="40" cy="204" r="11"/>
+        <circle cx="36" cy="16" r="11"/>
+        <circle cx="12" cy="124" r="11"/>
+        <circle cx="172" cy="124" r="11"/>
+        <circle cx="36" cy="232" r="11"/>
       </g>
       <g font-size="11" font-weight="bold" text-anchor="middle">
-        <text x="40" y="16" dy=".35em">1</text>
-        <text x="40" y="110" dy=".35em">2</text>
-        <text x="40" y="204" dy=".35em">3</text>
+        <text x="36" y="16" dy=".35em">1</text>
+        <text x="12" y="124" dy=".35em">2</text>
+        <text x="172" y="124" dy=".35em">3</text>
+        <text x="36" y="232" dy=".35em">4</text>
       </g>
     </svg>
     <figcaption>Keyed step chain, one behaviour of the proposed cycle. Key:
       circled numeral &mdash; one link of the chain; dashed box &mdash; an
       artifact garden does not hold at garden <code>cdaf951</code>; dashed
-      arrow &mdash; a proposed link, labelled with what it does. The identifier
-      travels in both directions, so a rename at either end breaks the chain
-      visibly.</figcaption>
-    <ol class="steps">
-      <li><strong>Use case</strong> &mdash; a named unit of behaviour, written
-        <code>uc-&lt;kebab-name&gt;</code>. It carries a one-line purpose and
-        its predicates in prose.</li>
-      <li><strong>Scenario row</strong> &mdash; one observable case of that use
-        case, written <code>sc-&lt;kebab-name&gt;</code>. It lives in the
-        document that already owns the behaviour.</li>
-      <li><strong>Settling test</strong> &mdash; the one test method that
-        decides the row. The method carries the <code>sc-</code> identifier at
-        its own end.</li>
+      arrow &mdash; a proposed link, labelled with what it does. The class name
+      is read from that commit; every identifier around it is proposed. The
+      identifier travels in both directions, so a rename at either end breaks
+      the chain visibly.</figcaption>
+    <ol class="keys">
+      <li><span class="k">1</span><p><strong>Spec file</strong> &mdash; one
+        normative <code>.md</code> under <code>spec/</code>. It carries both
+        halves, so a reader finds the vocabulary and the behaviour in one
+        file.</p></li>
+      <li><span class="k">2</span><p><strong>Domain half</strong> &mdash; the
+        entities and the vocabulary, written <code>tm-&lt;kebab-name&gt;</code>,
+        and the invariants over them, written
+        <code>inv-&lt;kebab-name&gt;</code>. <code>tm-pinned-interval</code>
+        is garden&rsquo;s term &ldquo;the interval the owner typed&rdquo;.
+        <span class="src">garden/docs/README.md:125 @ cdaf951</span></p></li>
+      <li><span class="k">3</span><p><strong>Behaviour half</strong> &mdash; the
+        use cases, written <code>uc-&lt;kebab-name&gt;</code>, and their
+        observable cases, written <code>sc-&lt;kebab-name&gt;</code>. One
+        scenario row is one case a reader can watch happen.</p></li>
+      <li><span class="k">4</span><p><strong>Settling reference</strong>
+        &mdash; the one thing that decides a leaf. A test method is the
+        commonest form. The method carries the leaf identifier at its own
+        end.</p></li>
     </ol>
   </figure>
 
@@ -160,47 +194,82 @@
   with its own tools. The <code>notes</code> entry and the Jekyll site stay out
   of scope. The workspace root keeps its own arrangement. This proposal does not
   edit the docs contract.
-  <span class="src">docs/README.md:49-83 @ 8c58061</span></p>
+  <span class="src">docs/README.md:49-84 @ ce32188</span></p>
 
   <h2>Domain</h2>
 
-  <p>The cycle moves four words around. Each one gets a fixed meaning below.
-  The set is complete at <span class="ct">4&times; stage</span>.</p>
+  <p>The cycle moves four stages around, and it splits a spec into four parts.
+  The stage set is complete at <span class="ct">4&times; stage</span>.</p>
 
   <ul>
     <li><strong>Spec</strong> &mdash; the normative <code>.md</code> text that
       states what the program must do. Every sentence in it is a predicate, a
-      generating rule, or a decision with its reason. A spec is not a view. A view
-      is the derived <code>.html</code> page that goes stale. A spec is not a
-      description of what the code already does. A spec is not a commit
-      gate, because no check in this cycle demands a spec edit.
-      <span class="src">docs/templates/spec.md:9-13 @ 8c58061</span></li>
+      generating rule, or a decision with its reason. It states the domain and
+      the use cases: <code>garden/docs/feature-interval-override.md</code>
+      carries the invariant &ldquo;There is no path in the app that writes a
+      pinned interval except the owner typing one&rdquo; and the observable case
+      &ldquo;A dormant regime multiplies a pinned interval&rdquo;. A spec is not
+      a view. <code>garden/docs/overview.html</code> is the derived page that
+      goes stale by design. A spec is not a description of what the code already
+      does. A spec is not a commit gate, because no check in this cycle demands
+      a spec edit.
+      <span class="src">docs/templates/spec.md:9-13 @ ce32188</span> &middot;
+      <span class="src">garden/docs/feature-interval-override.md:46,96 @ cdaf951</span></li>
     <li><strong>Code</strong> &mdash; the program a machine runs, plus the
-      configuration it reads. Code is not evidence that a spec is true. Code
-      does not record a design decision, because a reader cannot tell a decision
-      from an accident there.</li>
-    <li><strong>Test</strong> &mdash; an executable check that settles one
-      scenario row with a pass or a fail. A red test blocks the commit. A test
-      is not a design check, because a test needs the code to exist first. A
-      test is not a measure of quality.</li>
+      configuration it reads. <code>SchedulePolicy.effectiveInterval</code> is
+      code. Code is not evidence that a spec is true. Code does not record a
+      design decision: the reason a pin survives a species change lives in a
+      spec section, and a reader of the policy cannot tell that decision from an
+      accident.
+      <span class="src">garden/domain/src/main/kotlin/com/kalaluthien/garden/domain/policy/SchedulePolicy.kt:67 @ cdaf951</span></li>
+    <li><strong>Test</strong> &mdash; an executable check that settles one leaf
+      with a pass or a fail. <code>IntervalOverrideTest</code> holds the method
+      &ldquo;a dormant regime multiplies a pinned interval&rdquo;. A red test
+      blocks the commit. A test is not a design check, because a test needs the
+      code to exist first. A test is not a measure of quality: a detekt
+      complexity threshold measures and settles nothing.
+      <span class="src">garden/domain/src/test/kotlin/com/kalaluthien/garden/domain/policy/IntervalOverrideTest.kt:75 @ cdaf951</span></li>
     <li><strong>Eval</strong> &mdash; a measurement of quality that informs and
-      never blocks. It is a static metric, or a rubric judged with quoted
-      evidence. An eval is not a gate. An eval is not a proof. A person still
-      reads its verdict.</li>
+      never blocks. It runs a static metric or a rubric. Its target is a
+      software system or a machine-learning model. Camera&rsquo;s gap
+      rubric is the software case, with detekt
+      <code>CognitiveComplexMethod</code> against 15 on one rung and a small
+      model on the next. SRCC and PLCC against a human opinion score are the
+      model case. An eval is not a gate. An eval is not a proof, because a
+      person still reads its verdict.
+      <span class="src">camera/docs/simplicity-measurement.html:249-250 @ 65b8c5f</span> &middot;
+      <span class="src">notes/wiki/iqa-iaa-evaluation-metrics.md:54-62 @ 9e2a365</span></li>
   </ul>
+
+  <p>A spec has <span class="ct">4&times; leaf kind</span>, two per half. Each
+  row below names one real instance in garden and the nearest thing that kind is
+  not.</p>
+
+  <table>
+    <thead><tr><th>Leaf kind</th><th>One instance in garden</th><th>What it is not</th></tr></thead>
+    <tbody>
+      <tr class="grp"><td colspan="3">Domain half</td></tr>
+      <tr><td>term</td><td>&ldquo;balance&rdquo;, how much water a plant still holds</td><td>a code identifier; <code>PlantStatus.balance</code> is the identifier the term claims</td></tr>
+      <tr><td>invariant</td><td>only the owner ever writes a pinned interval</td><td>one observable case, which holds on one run</td></tr>
+      <tr class="grp"><td colspan="3">Behaviour half</td></tr>
+      <tr><td>use case</td><td>the owner pins an interval by hand</td><td>a screen; the plant screen carries several use cases</td></tr>
+      <tr><td>scenario</td><td>a pin outranks a learned offset</td><td>a test method, which is what settles it</td></tr>
+    </tbody>
+  </table>
+
+  <p>A use case borrows its unit from concept design: a reusable unit of
+  user-facing behaviour with a purpose of its own.
+  <span class="src">notes/wiki/concept-design.md:33-56 @ 9e2a365</span></p>
 
   <h2>Spec-to-test links in garden today</h2>
 
-  <p>Garden holds 14 normative subject specs. They are prose predicates, so
-  only a human read finds a disagreement with the code.
-  <span class="src">garden/docs/*.md @ cdaf951</span></p>
-
-  <p>One rule links a spec to the suite. An <code>## Acceptance</code> section
-  names the test that automates each check, or marks the check manual on
-  device.
+  <p>Garden holds <span class="ct">14&times; subject spec</span> as normative
+  <code>.md</code> files. They are prose predicates, so only a human read finds
+  a disagreement with the code. One rule links a spec to the suite. An
+  <code>## Acceptance</code> section names the test class that automates each
+  check, or marks the check manual on device. A class is coarser than a
+  behaviour.
   <span class="src">garden/docs/README.md:84-87 @ cdaf951</span></p>
-
-  <p>The rule names a class, and a class is coarser than a behaviour.</p>
 
   <figure id="fig-link">
     <svg viewBox="0 0 320 280" role="img" aria-labelledby="f-link-t">
@@ -255,38 +324,53 @@
       exists at that commit; solid arrow &mdash; a resolution step, labelled
       with what it does. Eight items enter and eight methods leave, and the
       class name in the middle pins one of them.</figcaption>
-    <ol class="steps">
-      <li><strong>8 acceptance items</strong> &mdash; the automated checks in
-        one feature document. Each names the same class.
-        <span class="src">garden/docs/feature-interval-override.md:85-100 @ cdaf951</span></li>
-      <li><strong>One class name</strong> &mdash; the whole of the link. No
-        item names a method.</li>
-      <li><strong>8 test methods</strong> &mdash; the methods the class holds.
-        Seven could vanish and every link would still resolve.
-        <span class="src">garden/domain/src/test/kotlin/com/kalaluthien/garden/domain/policy/IntervalOverrideTest.kt @ cdaf951</span></li>
+    <ol class="keys">
+      <li><span class="k">1</span><p><strong>8 acceptance items</strong>
+        &mdash; the automated checks in one feature document. Each names the
+        same class.
+        <span class="src">garden/docs/feature-interval-override.md:87-104 @ cdaf951</span></p></li>
+      <li><span class="k">2</span><p><strong>One class name</strong> &mdash;
+        the whole of the link. No item names a method.</p></li>
+      <li><span class="k">3</span><p><strong>8 test methods</strong> &mdash;
+        the methods the class holds. Seven could vanish and every link would
+        still resolve.
+        <span class="src">garden/domain/src/test/kotlin/com/kalaluthien/garden/domain/policy/IntervalOverrideTest.kt @ cdaf951</span></p></li>
     </ol>
   </figure>
 
-  <p>No machine reads that link. Garden runs its own <code>hooks/pre-commit</code>.
-  The hook checks comment style and the release build. It runs its checks only
-  on a commit that stages a release package.
-  <span class="src">garden/hooks/pre-commit:1-11 @ cdaf951</span></p>
+  <p>The domain half has no link at all. Garden&rsquo;s canonical vocabulary is
+  one prose table of <span class="ct">17&times; term</span>, and no machine
+  reads it. Two terms in it carry no code identifier at garden
+  <code>cdaf951</code>: <code>overdue depth</code> is named only in a comment,
+  and <code>today list</code> is named nowhere. Invariants live in a
+  <code>## Behavior</code> bullet and are restated in an
+  <code>## Acceptance</code> row, and neither text carries an identifier.
+  <span class="src">garden/docs/README.md:115-134 @ cdaf951</span> &middot;
+  <span class="src">garden/core/designsystem/src/main/kotlin/com/kalaluthien/garden/core/designsystem/component/LevelRing.kt:34 @ cdaf951</span></p>
 
-  <p>The document that describes enforcement disagrees with the tree. It says
-  garden has no <code>hooks/pre-commit</code>. The hook is there.
-  <span class="src">garden/docs/README.md:144 @ cdaf951</span></p>
+  <div class="callout">
+    <span class="g" aria-hidden="true">&#9888;&#65039;</span>
+    <p><strong>The document that describes enforcement disagrees with the
+    tree.</strong> It says garden has no <code>hooks/pre-commit</code>. The hook
+    is there, at 90 lines, and it runs its release checks only on a commit that
+    stages an APK under <code>dist/</code>.
+    <span class="src">garden/docs/README.md:144 @ cdaf951</span> &middot;
+    <span class="src">garden/hooks/pre-commit:6-7,34-35 @ cdaf951</span></p>
+  </div>
 
   <p>Entrypoints differ per entry, so every session re-learns an entry from
-  prose. Garden exposes two shell scripts under <code>script/</code>. Camera
-  exposes 13 files under its own <code>script/</code>.
+  prose. Garden exposes <span class="ct">2&times; script</span> under
+  <code>script/</code>. Camera exposes <span class="ct">13&times; file</span>
+  under its own <code>script/</code>.
   <span class="src">garden/script/ @ cdaf951</span> &middot;
   <span class="src">camera/script/ @ 65b8c5f</span></p>
 
   <h2>Options for a machine-checked spec</h2>
 
-  <p>Three axes judge the four candidates. Can the option refute a design before
+  <p>Four axes judge the four candidates. Can the option refute a design before
   code exists? What does the option cost to keep true? Does a patch that skips
-  the spec break the option?</p>
+  the spec break the option? Does the option reach the domain half as well as
+  the behaviour half?</p>
 
   <div class="figure-row">
     <figure id="fig-opt1">
@@ -370,8 +454,8 @@
           <path d="M28,96 L92,96"/>
         </g>
         <g font-size="11" font-family="ui-monospace, Menlo, monospace">
-          <text x="26" y="58">uc row</text>
-          <text x="26" y="86">sc row</text>
+          <text x="26" y="58">tm row</text>
+          <text x="26" y="86">uc row</text>
           <text x="26" y="114">sc row</text>
           <text x="136" y="56">.als</text>
         </g>
@@ -414,30 +498,32 @@
   <p>Key for the four panels: circled numeral &mdash; one option; dashed box
   &mdash; an artifact no entry holds at garden <code>cdaf951</code>; dashed
   arrow &mdash; a proposed link. Every option is unbuilt, so every panel is
-  dashed. The verdict on each option is the paragraph that carries its
-  numeral.</p>
+  dashed.</p>
 
-  <ol class="steps">
-    <li><strong>Alloy everywhere</strong> &mdash; a model per artifact, checked
-      on every commit. It refutes early. It gives up a bounded maintenance
-      cost, because the corpus becomes a second description of every
-      artifact. AWS rejected Alloy in 2015 on reach, after failing to represent
-      rich data structures. Killed on reach and on drift.
-      <span class="src">notes/wiki/alloy-specification-language.md:274-282 @ 9e2a365</span></li>
-    <li><strong>Markdown and scripts</strong> &mdash; identifiers in Markdown,
-      and a few dozen lines of Python per rule. It survives a code-first patch,
-      because its checks are syntactic. It gives up any design check, so a
-      wrong relational shape reaches code unchallenged. Killed on the defect
-      class it cannot catch. Its identifiers and its link checks survive inside
-      option 3.</li>
-    <li><strong>Structured shell with attached models</strong> &mdash; one
-      <code>spec/</code> directory, four entrypoints, two gates. A model is
-      optional, small, and attached to one use case. It gives up spec-first as
-      a hard rule. Recommended.</li>
-    <li><strong>Kotlin reference model</strong> &mdash; a reference
-      implementation in the test tree, run against the real code. It gives up
-      early refutation, because it needs the code to exist. Absorbed rather
-      than killed: it is a strong instrument at the test stage.</li>
+  <ol class="keys">
+    <li><span class="k">1</span><p><strong>Alloy everywhere</strong> &mdash; a
+      model per artifact, checked on every commit. It refutes early. It gives up
+      a bounded maintenance cost, because the corpus becomes a second
+      description of every artifact. AWS rejected Alloy in 2015 on reach, after
+      failing to represent rich data structures. Killed on reach and on drift.
+      <span class="src">notes/wiki/alloy-specification-language.md:274-282 @ 9e2a365</span></p></li>
+    <li><span class="k">2</span><p><strong>Markdown and scripts</strong> &mdash;
+      identifiers in Markdown, and a few dozen lines of Python per rule. It
+      survives a code-first patch, because its checks are syntactic. It reaches
+      both halves, because a term resolves to a code identifier by the same
+      search that resolves a scenario to a method. It gives up any design check,
+      so a wrong relational shape reaches code unchallenged. Killed on the
+      defect class it cannot catch. Its identifiers and its link checks survive
+      inside option 3.</p></li>
+    <li><span class="k">3</span><p><strong>Structured shell with attached
+      models</strong> &mdash; one <code>spec/</code> directory, four
+      entrypoints, two gates. A model is optional, small, and attached to one
+      use case. It gives up spec-first as a hard rule. Recommended.</p></li>
+    <li><span class="k">4</span><p><strong>Kotlin reference model</strong>
+      &mdash; a reference implementation in the test tree, run against the real
+      code. It gives up early refutation, because it needs the code to exist.
+      Absorbed rather than killed: it is a strong instrument at the test
+      stage.</p></li>
   </ol>
 
   <details>
@@ -477,16 +563,16 @@
   <h3>Directories of an entry</h3>
 
   <p>The contract fixes <span class="ct">5&times; directory name</span>.
-  Everything else stays the framework's.</p>
+  Everything else stays the framework&rsquo;s.</p>
 
   <table>
     <thead><tr><th>Name</th><th>Holds</th><th>State in garden</th></tr></thead>
     <tbody>
       <tr><td><code>README.md</code></td><td>build and run, plus one section naming this system</td><td>exists; gains the section</td></tr>
-      <tr><td><code>spec/</code></td><td>the source of truth: shell <code>.md</code> and attached <code>.als</code> models</td><td>new</td></tr>
+      <tr><td><code>spec/</code></td><td>the source of truth: both halves, and attached <code>.als</code> models</td><td>new</td></tr>
       <tr><td><code>docs/</code></td><td>views only, derived, pinned to commits</td><td>exists; loses its <code>.md</code> specs</td></tr>
       <tr><td><code>scripts/</code></td><td>the four entrypoints, and what the hooks call</td><td>renamed from <code>script/</code></td></tr>
-      <tr><td><code>hooks/</code></td><td>the entry's own git hooks</td><td>exists, unchanged</td></tr>
+      <tr><td><code>hooks/</code></td><td>the entry&rsquo;s own git hooks</td><td>exists, unchanged</td></tr>
     </tbody>
   </table>
 
@@ -496,13 +582,13 @@
 
   <h3>Stages and their entrypoints</h3>
 
-  <table class="stack">
-    <thead><tr><th>Stage</th><th>Entrypoint</th><th>Runs</th><th>Verdict</th></tr></thead>
+  <table>
+    <thead><tr><th>Entrypoint</th><th>Runs</th><th>Verdict</th></tr></thead>
     <tbody>
-      <tr><td>spec</td><td data-label="Entrypoint"><code>scripts/spec</code></td><td data-label="Runs">resolution, model lint, staleness, vocabulary</td><td data-label="Verdict">gates and informs, per check</td></tr>
-      <tr><td>code</td><td data-label="Entrypoint"><code>scripts/code</code></td><td data-label="Runs">build, lint, format, delegated to the framework</td><td data-label="Verdict">gates, run by the agent</td></tr>
-      <tr><td>test</td><td data-label="Entrypoint"><code>scripts/test</code></td><td data-label="Runs">unit suites</td><td data-label="Verdict">gates</td></tr>
-      <tr><td>eval</td><td data-label="Entrypoint"><code>scripts/eval</code></td><td data-label="Runs">static metrics, and rubric judges</td><td data-label="Verdict">informs</td></tr>
+      <tr><td><code>scripts/spec</code></td><td>resolution, model lint, staleness, vocabulary</td><td>gates and informs, per check</td></tr>
+      <tr><td><code>scripts/code</code></td><td>build, lint, format, delegated to the framework</td><td>gates</td></tr>
+      <tr><td><code>scripts/test</code></td><td>unit suites</td><td>gates</td></tr>
+      <tr><td><code>scripts/eval</code></td><td>static metrics, and rubric judges</td><td>informs</td></tr>
     </tbody>
   </table>
 
@@ -512,15 +598,104 @@
   it. Several agents work the entry at once.
   <span class="src">garden/script/run-e2e.sh:15 @ cdaf951</span></p>
 
-  <p>Three recorded findings bound what the eval stage may claim.</p>
+  <h3>Spec leaves and their settling reference</h3>
+
+  <figure id="fig-row" class="pan">
+<pre>- inv-pin-immutable (tm-pinned-interval) - settled by IntervalOverrideTest#pinHeld
+- sc-pin-wins       (uc-pin-interval)    - settled by IntervalOverrideTest#pinWins
+  &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496; &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;              &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496; &#9492;&#9472;&#9472;&#9516;&#9472;&#9472;&#9496;
+          &#9474;                   &#9474;                                 &#9474;             &#9474;
+          &#9474;                   &#9474;                                 &#9474;             &#9492;&#9472;&#9472; settling method
+          &#9474;                   &#9474;                                 &#9492;&#9472;&#9472; settling test class
+          &#9474;                   &#9492;&#9472;&#9472; owner &mdash; a term or a use case
+          &#9492;&#9472;&#9472; leaf &mdash; an invariant or a scenario</pre>
+    <figcaption>Specimen of two spec rows in the proposed grammar, one per half.
+      No row of this form exists at garden <code>cdaf951</code>: the class name
+      is read from that commit, and every identifier around it is proposed. Both
+      halves share one grammar, so one resolution check reads both. A row sits
+      in the document that already owns the subject, so no second central table
+      appears. A row names a method, because a class name pins one method out of
+      eight.</figcaption>
+  </figure>
+
+  <p>A settling reference takes <span class="ct">5&times; form</span>. Each form
+  below carries one instance.</p>
+
+  <ul>
+    <li><strong>A test method</strong> &mdash;
+      <code>IntervalOverrideTest#pinWins</code>, for a scenario or an
+      invariant.</li>
+    <li><strong>A code identifier</strong> &mdash;
+      <code>PlantStatus.balance</code>, for the term &ldquo;balance&rdquo;.
+      <span class="src">garden/domain/src/main/kotlin/com/kalaluthien/garden/domain/model/PlantStatus.kt:44 @ cdaf951</span></li>
+    <li><strong>A rubric name</strong> &mdash;
+      <code>spec/rubric-comment-style.md</code>, for a leaf that no test
+      settles.</li>
+    <li><strong>A model</strong> &mdash; <code>interval.als</code>, for an
+      invariant over a relational design.</li>
+    <li><strong>The word <code>manual</code></strong> &mdash; with its reason.
+      Garden already marks one check that way: the schedule panel names the
+      regime in force, and a person reads it on a device.
+      <span class="src">garden/docs/feature-interval-override.md:105-107 @ cdaf951</span></li>
+  </ul>
+
+  <p>A model stays optional. Registering a plant and the home-screen widget stay
+  prose-only use cases with no model.</p>
+
+  <h3>Checks and what a green licenses</h3>
+
+  <table>
+    <thead><tr><th>Check</th><th>Catches</th><th>A green licenses</th></tr></thead>
+    <tbody>
+      <tr class="grp"><td colspan="3">Gate a commit</td></tr>
+      <tr><td>Resolution</td><td>a leaf, an owner, or an identifier that names nothing real</td><td>resolution, never that the test tests the leaf</td></tr>
+      <tr><td>Model lint</td><td>an integer, arithmetic, or a command without explicit bounds</td><td>the file compiles inside the safe fragment</td></tr>
+      <tr class="grp"><td colspan="3">Inform only</td></tr>
+      <tr><td>Staleness</td><td>a spec whose settling tests moved after its verified date</td><td>nothing; the list is a worklist</td></tr>
+      <tr><td>Vocabulary</td><td>a term with no code identifier, such as <code>today list</code></td><td>nothing; wider ambiguity is a rubric question</td></tr>
+      <tr><td>Analyzer run</td><td>a design defect, as a counterexample that seeds a test</td><td>no counterexample inside the stated bounds</td></tr>
+    </tbody>
+  </table>
+
+  <p>Both gates are deterministic and run in seconds, so they chain into the
+  hook the entry already has. The lint compiles the file, because a comment
+  fools a text search. The ban on integers removes Alloy&rsquo;s silent overflow
+  trap by construction. An Analyzer run happens when the design is worked, and
+  never on a commit.</p>
+
+  <p>One limit has no mechanical cover. A behaviour change that no test observed
+  stays invisible to every check above. The chain then stays green while the
+  spec is wrong. The eval stage and the owner&rsquo;s own read cover it.</p>
+
+  <h3>What the eval stage measures</h3>
+
+  <p>An eval reads a build and reports a number or a verdict. Its target is a
+  software system or a machine-learning model, and its instrument is a static
+  metric or a rubric.</p>
+
+  <table>
+    <thead><tr><th>Target</th><th>Instrument</th><th>One instance</th></tr></thead>
+    <tbody>
+      <tr class="grp"><td colspan="3">Software system</td></tr>
+      <tr><td>function complexity</td><td>static metric</td><td>detekt <code>CognitiveComplexMethod</code> against 15</td></tr>
+      <tr><td>rule compliance</td><td>rubric, judged by a model</td><td>&ldquo;is this comment a why&rdquo;, one item per call</td></tr>
+      <tr class="grp"><td colspan="3">Machine-learning model</td></tr>
+      <tr><td>score agreement</td><td>static metric</td><td>SRCC and PLCC against a human opinion score</td></tr>
+      <tr><td>output quality</td><td>rubric, judged by a model</td><td>a binary criterion, scored with its evidence quoted</td></tr>
+    </tbody>
+  </table>
+
+  <p>Three recorded findings bound what a judged rubric may claim, on either
+  target.</p>
 
   <ul>
     <li>The judged code is model-written. The available judges share its model
       family, so self-preference bias is live.
       <span class="src">notes/wiki/code-simplicity-metrics.md:105-109 @ 9e2a365</span></li>
     <li>A judge answers a binary checklist. It quotes its evidence for every
-      failure.
-      <span class="src">notes/wiki/code-simplicity-metrics.md:110-118 @ 9e2a365</span></li>
+      failure, and a judge that cannot quote the offending text is discarded.
+      <span class="src">notes/wiki/code-simplicity-metrics.md:110-118 @ 9e2a365</span> &middot;
+      <span class="src">camera/docs/simplicity-measurement.html:351-353 @ 65b8c5f</span></li>
     <li>Agreement with humans on constraint satisfaction runs 13&ndash;39
       percent, so a judge gates nothing and counts nothing.
       <span class="src">notes/wiki/code-simplicity-metrics.md:119-125 @ 9e2a365</span></li>
@@ -529,58 +704,6 @@
   <p>The second mitigation is a person:
   <span class="hum">the owner spot-checks a judged sample</span>.</p>
 
-  <h3>Scenario row</h3>
-
-  <figure id="fig-row" class="pan">
-<pre>- sc-pin-wins (uc-pin-interval) — settled by IntervalOverrideTest#pinWins
-  └────┬────┘  └──────┬──────┘               └────────┬─────────┘ └──┬──┘
-       │              │                               │              │
-       │              │                               │              └── method
-       │              │                               └── test class
-       │              └── owning use case
-       └── scenario id</pre>
-    <figcaption>Specimen of one scenario row in the proposed grammar. No row of
-      this form exists at garden <code>cdaf951</code>: the class name is read
-      from that commit, and the two identifiers are proposed. The row sits in
-      the document that already owns the behaviour, so no second central table
-      appears. The row names a method, because a class name pins one method out
-      of eight.</figcaption>
-  </figure>
-
-  <p>A use case borrows its unit from concept design: a reusable unit of
-  user-facing behaviour with a purpose of its own.
-  <span class="src">notes/wiki/concept-design.md:33-56 @ 9e2a365</span></p>
-
-  <p>A settling reference takes one of three forms: a test method, a rubric
-  name, or the word <code>manual</code> with its reason. A model stays
-  optional. Registering a plant and the home-screen widget stay prose-only use
-  cases with no model.</p>
-
-  <h3>Checks and what a green licenses</h3>
-
-  <table class="stack">
-    <thead><tr><th>Check</th><th>Catches</th><th>A green licenses</th></tr></thead>
-    <tbody>
-      <tr class="grp"><td colspan="3">Gate a commit</td></tr>
-      <tr><td>Resolution</td><td data-label="Catches">a row, a use case, or an identifier that names nothing real</td><td data-label="Licenses">resolution, never that the test tests the row</td></tr>
-      <tr><td>Model lint</td><td data-label="Catches">an integer, arithmetic, or a command without explicit bounds</td><td data-label="Licenses">the file compiles inside the safe fragment</td></tr>
-      <tr class="grp"><td colspan="3">Inform only</td></tr>
-      <tr><td>Staleness</td><td data-label="Catches">a spec whose settling tests moved after its verified date</td><td data-label="Licenses">nothing; the list is a worklist</td></tr>
-      <tr><td>Vocabulary</td><td data-label="Catches">a canonical term with no code identifier</td><td data-label="Licenses">nothing; wider ambiguity is a rubric question</td></tr>
-      <tr><td>Analyzer run</td><td data-label="Catches">a design defect, as a counterexample that seeds a test</td><td data-label="Licenses">no counterexample inside the stated bounds</td></tr>
-    </tbody>
-  </table>
-
-  <p>Both gates are deterministic and run in seconds, so they chain into the
-  hook the entry already has. The lint compiles the file, because a comment fools a
-  text search. The ban on integers removes Alloy's silent
-  overflow trap by construction. An Analyzer run happens when the design is
-  worked, and never on a commit.</p>
-
-  <p>One limit has no mechanical cover. A behaviour change that no test observed
-  stays invisible to every check above. The chain then stays green while the
-  spec is wrong. The eval stage and the owner's own read cover it.</p>
-
   <h3>Recovery after a code-first patch</h3>
 
   <p>No gate above demands a spec edit, so a hotfix lands. Code and tests move.
@@ -588,12 +711,12 @@
   staleness list. An agent then runs three steps cold.</p>
 
   <ol class="steps">
-    <li><strong>Read the flagged spec's scenario rows.</strong> The staleness
-      report names the spec.</li>
-    <li><strong>Diff the code since the spec's verified date.</strong></li>
-    <li><strong>Rewrite the predicates and the rows to match.</strong> The
-      tests still carry their <code>sc-</code> identifiers, so the chain
-      survives the patch.</li>
+    <li><strong>Read the flagged spec&rsquo;s leaves.</strong> The staleness
+      report names the spec, and both halves of it.</li>
+    <li><strong>Diff the code since the spec&rsquo;s verified date.</strong></li>
+    <li><strong>Rewrite the terms, the invariants, and the rows to match.</strong>
+      The tests still carry their leaf identifiers, so the chain survives the
+      patch.</li>
   </ol>
 
   <p>Spec-first stays the preference. It is a warning from a check. It becomes a
@@ -601,20 +724,21 @@
 
   <h3>Model evidence</h3>
 
-  <p>One model was written and run on 2026-08-15. It states garden's
+  <p>One model was written and run on 2026-08-15. It states garden&rsquo;s
   pinned-interval rule in 41 lines: only the owner ever changes a pinned plant.
-  Its assertion is anchored on the use case's declared name, so the Alloy
-  compiler sees the link.</p>
+  That rule is an invariant of the domain half, so the model settles
+  <code>inv-pin-immutable</code>. Its assertion is anchored on the use
+  case&rsquo;s declared name, so the Alloy compiler sees the link.</p>
 
   <p>The check was made red twice and green again. The first mutation disabled
-  the frame fact, which proved the assertion reads the transition system at
-  all. The second mutation deleted the learner guard, which proved the
-  assertion reads the right part of it. Two earlier attempts could never be
-  made red. No text search would have found either one.</p>
+  the frame fact, which proved the assertion reads the transition system at all.
+  The second mutation deleted the learner guard, which proved the assertion
+  reads the right part of it. Two earlier attempts could never be made red. No
+  text search would have found either one.</p>
 
-  <p>The rule this buys: a model's check earns trust only after it has been
-  observed red twice. Both mutations and both results sit beside the model. A
-  settling test obeys the same fail-first rule.</p>
+  <p>The rule this buys: a model&rsquo;s check earns trust only after it has
+  been observed red twice. Both mutations and both results sit beside the model.
+  A settling test obeys the same fail-first rule.</p>
 
   <details>
     <summary>Five runs, the anchored assertion, and the 41-line model in full</summary>
@@ -636,7 +760,7 @@
     than the exit code, which is 0 either way.</p>
 <pre>export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 "$JAVA_HOME/bin/java" -Djava.awt.headless=true -jar alloy.jar exec -f -c 'uc_pin_interval' interval.als</pre>
-<pre>// uc-pin-interval — the owner types an interval; nothing in the app may move it.
+<pre>// uc-pin-interval &mdash; the owner types an interval; nothing in the app may move it.
 // A design check: run when this design changes, recorded, never a commit gate.
 
 sig Days {}
@@ -696,13 +820,13 @@ run somePinnedTrace { eventually some p: Plant | some p.pinned } for 4 but 1..8 
         <code>run-e2e.sh</code> once against a device before the edit lands.
         <span class="src">garden/ @ cdaf951</span></li>
       <li><strong>Phase 2, the chain.</strong> Create <code>spec/</code> with
-        the first models and the row grammar, upgrade acceptance items to
-        method-level rows, and chain the two gates into
-        <code>hooks/pre-commit</code>. Nothing breaks.
-        <code>scripts/check-docs</code> reads <code>.html</code> files and
-        <code>INDEX.md</code> only, so a new <code>spec/</code> beside an
+        the first models and the row grammar, lift the canonical vocabulary into
+        <code>tm-</code> rows, upgrade acceptance items to method-level rows,
+        and chain the two gates into <code>hooks/pre-commit</code>. Nothing
+        breaks. <code>scripts/check-docs</code> reads <code>.html</code> files
+        and <code>INDEX.md</code> only, so a new <code>spec/</code> beside an
         untouched <code>docs/</code> breaks no reader.
-        <span class="src">scripts/check-docs @ 8c58061</span></li>
+        <span class="src">scripts/check-docs @ ce32188</span></li>
       <li><strong>Phase 3, the migration and the eval stage.</strong> Move
         <code>docs/*.md</code> specs into <code>spec/</code>, split
         <code>docs/README.md</code> into a spec-rules file and a views-only
@@ -715,21 +839,23 @@ run somePinnedTrace { eventually some p: Plant | some p.pinned } for 4 but 1..8 
 
   <h2>Decisions of the proposed cycle</h2>
 
-  <p>Seven rows this proposal settled on its own. One line from the owner
+  <p>Nine rows this proposal settled on its own. One line from the owner
   reverses any row.</p>
 
-  <table class="stack">
-    <thead><tr><th>#</th><th>Decision</th><th>Consequence</th><th>Argued in</th></tr></thead>
+  <table>
+    <thead><tr><th>Decision</th><th>Consequence</th><th>Argued in</th></tr></thead>
     <tbody>
-      <tr class="grp"><td colspan="4">Contract</td></tr>
-      <tr><td>1</td><td data-label="Decision">The stage order is spec, code, test, eval</td><td data-label="Consequence">an eval reads a build that already passed its tests</td><td data-label="Argued in">Stages and their entrypoints</td></tr>
-      <tr><td>2</td><td data-label="Decision"><code>scripts/spec</code> joins the other three entrypoints</td><td data-label="Consequence">a session runs one command instead of reading prose</td><td data-label="Argued in">Stages and their entrypoints</td></tr>
-      <tr><td>3</td><td data-label="Decision">No <code>eval/</code> directory; a rubric is a spec file</td><td data-label="Consequence">one directory fewer, and a rubric is versioned as a specification</td><td data-label="Argued in">Directories of an entry</td></tr>
-      <tr><td>4</td><td data-label="Decision"><code>hooks/</code> stays top-level and unchanged</td><td data-label="Consequence">three entries keep a chained hook that already works</td><td data-label="Argued in">Directories of an entry</td></tr>
-      <tr class="grp"><td colspan="4">Gates</td></tr>
-      <tr><td>5</td><td data-label="Decision">Only resolution and the model lint gate a commit</td><td data-label="Consequence">a model forced green never blocks anybody</td><td data-label="Argued in">Checks and what a green licenses</td></tr>
-      <tr><td>6</td><td data-label="Decision">A model's check is trusted only after two observed reds</td><td data-label="Consequence">a green model earns no trust on its own</td><td data-label="Argued in">Model evidence</td></tr>
-      <tr><td>7</td><td data-label="Decision">Instrumented tests stay out of the routine gate</td><td data-label="Consequence">a commit never waits on the one emulator serial</td><td data-label="Argued in">Stages and their entrypoints</td></tr>
+      <tr class="grp"><td colspan="3">Contract</td></tr>
+      <tr><td>1 &middot; A spec carries a domain half and a behaviour half</td><td>a term and an invariant get identifiers, as a scenario does</td><td>Spec leaves and their settling reference</td></tr>
+      <tr><td>2 &middot; The stage order is spec, code, test, eval</td><td>an eval reads a build that already passed its tests</td><td>Stages and their entrypoints</td></tr>
+      <tr><td>3 &middot; <code>scripts/spec</code> joins the other three entrypoints</td><td>a session runs one command instead of reading prose</td><td>Stages and their entrypoints</td></tr>
+      <tr><td>4 &middot; No <code>eval/</code> directory; a rubric is a spec file</td><td>one directory fewer, and a rubric is versioned as a specification</td><td>Directories of an entry</td></tr>
+      <tr><td>5 &middot; <code>hooks/</code> stays top-level and unchanged</td><td>three entries keep a chained hook that already works</td><td>Directories of an entry</td></tr>
+      <tr class="grp"><td colspan="3">Gates</td></tr>
+      <tr><td>6 &middot; Only resolution and the model lint gate a commit</td><td>a model forced green never blocks anybody</td><td>Checks and what a green licenses</td></tr>
+      <tr><td>7 &middot; A model's check is trusted only after two observed reds</td><td>a green model earns no trust on its own</td><td>Model evidence</td></tr>
+      <tr><td>8 &middot; An eval informs and never gates, on code or on a model</td><td>a judge at 13&ndash;39 percent agreement blocks nothing</td><td>What the eval stage measures</td></tr>
+      <tr><td>9 &middot; Instrumented tests stay out of the routine gate</td><td>a commit never waits on the one emulator serial</td><td>Stages and their entrypoints</td></tr>
     </tbody>
   </table>
 
@@ -739,9 +865,11 @@ run somePinnedTrace { eventually some p: Plant | some p.pinned } for 4 but 1..8 
     <li>Which of camera and board adopts second, and when.</li>
     <li>Whether an eval report is ever persisted.</li>
     <li>Where a judge from a different model family comes from.</li>
-    <li>The scenario row grammar in final detail. Phase 2 hardens it after one
-      survey of what traceability and document-lint tools check mechanically.
-      The <code>notes</code> vault does not hold that page.</li>
+    <li>Whether a term resolves to one code identifier or to several, when a
+      term names a quantity that several modules compute.</li>
+    <li>The row grammar in final detail. Phase 2 hardens it after one survey of
+      what traceability and document-lint tools check mechanically. The
+      <code>notes</code> vault does not hold that page.</li>
   </ul>
 
 </article>

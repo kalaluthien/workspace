@@ -43,6 +43,7 @@ Template: `templates/spec.md`
 
 - [`agent-development-cycle.html`](agent-development-cycle.html) — what
   directory contract and work cycle agent sessions should follow in a
-  program-building project entry: one checked chain from use case to
-  settling test, four entrypoints, models as red-twice-proven evidence,
-  and a recovery path for code-first patches; garden is the testbed; Open.
+  program-building project entry: one checked chain from a spec's domain
+  and behaviour halves down to a settling test, four entrypoints, an
+  eval stage over code and models, and a recovery path for code-first
+  patches; garden is the testbed; Open.
