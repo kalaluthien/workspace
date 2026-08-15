@@ -105,8 +105,10 @@ Each drawing carries its numbered circles and its legend inside the same
 one paragraph per legend key. Markers, geometry, and label placement:
 `references/svg-rules.md`.
 
-**5 · Draft the prose.** The draft passes rules A to L, one worked example
-per rule: `references/draft-rules.md`. Every sentence obeys the caps and the
+**5 · Draft the prose.** The draft passes rules A to O, one worked example
+per rule: `references/draft-rules.md`. The section leads with its figure, the
+prose follows as keyed items, and every definition, rule, and mechanism shows
+one concrete instance from a file the run read. Every sentence obeys the caps and the
 word lists in `references/plain-writing.md`. The reader field sets the
 register: explain in plain words every term the named reader does not already
 use.

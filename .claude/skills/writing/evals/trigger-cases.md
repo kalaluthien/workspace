@@ -1,8 +1,12 @@
 # Trigger cases
 
-Twelve requests that reach the skill, and nineteen rubric lines for a
+Twelve requests that reach the skill, and twenty-two rubric lines for a
 delivered run. Six requests start a run, and six do not. Every subject is a
 repository this workspace holds.
+
+- [Must fire](#must-fire-6)
+- [Must not fire](#must-not-fire-6)
+- [Rubric](#rubric-22-lines)
 
 ## Must fire, 6
 
@@ -34,7 +38,7 @@ carries no established cause, it is the first one.
 A request that must not fire and still reaches the skill ends the run: return
 `STATUS: INSUFFICIENT-INPUT`, name the route, and write no HTML.
 
-## Rubric, 19 lines
+## Rubric, 22 lines
 
 **Structure**
 
@@ -67,27 +71,36 @@ A request that must not fire and still reaches the skill ends the run: return
 9. Every annotation is at least 10 viewBox units of font size.
 10. Every marker id is suffixed per figure and defined inside the same `<svg>`
     that points at it.
-11. Every table wider than three columns carries `class="stack"` and a
-    `data-label` on every cell after the row's first.
-12. `scripts/render-check <output>` exits 0.
+11. No table carries more than three columns, no cell holds a sentence, and
+    no page carries `class="stack"` or a `data-label`.
+12. Every section opens with its figure, file map, or keyed panels, and
+    carries at most two connective paragraphs beyond the caption, the legend,
+    and the keyed items.
+13. Every definition, rule, and mechanism shows one concrete instance from a
+    file the run read, and every Domain entry in a proposal shows an example
+    and a counter-example.
+14. Every stated count is a count chip, every path, state, and field value
+    inside a sentence is a value chip, and the one transition no code
+    performs carries the human badge.
+15. `scripts/render-check <output>` exits 0.
 
 **Language**
 
-13. No sentence carries a contraction, an idiom, or a word from the drop
+16. No sentence carries a contraction, an idiom, or a word from the drop
     lists in `references/plain-writing.md`.
-14. Every section heading is a bare noun phrase that names its object.
-15. Every caption states a fact about the system, not a fact about the
+17. Every section heading is a bare noun phrase that names its object.
+18. Every caption states a fact about the system, not a fact about the
     drawing.
-16. No sentence addresses the person who asked, and no count true only on the
+19. No sentence addresses the person who asked, and no count true only on the
     day of the read appears on the page.
 
 **Grounding**
 
-17. Every claim is observable in a file the run read, and each citation
+20. Every claim is observable in a file the run read, and each citation
     carries the commit of the repository its file sits in.
-18. The page carries no external asset, no script, and no build step, and it
+21. The page carries no external asset, no script, and no build step, and it
     opens from `file://` complete.
-19. The run wrote exactly one file, at the output path, and changed nothing
+22. The run wrote exactly one file, at the output path, and changed nothing
     else: no spec, no `INDEX.md` line, no commit. The return message carries
     the status line and the five sections, and `## Grounding` is a superset
     of every file the message names.

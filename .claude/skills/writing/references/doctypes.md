@@ -106,6 +106,17 @@ optional, and it is what a reader uses to check whether the proposal means
 the same words they do. On a proposal this section carries the page's
 negative space, so a proposal owes no separate negative-space section.
 
+Each definition carries one example and one counter-example, both from files
+the run read, per rule M in `draft-rules.md`. A definition of `spec` shows one
+real spec file, then the nearest file that is not one:
+
+> **Spec** — a normative `.md` a reader settles a dispute against, such as
+> `docs/README.md`. Not `docs/agent-hooks.html`, which is derived and goes
+> stale by design.
+
+A term defined in words alone is where two readers agree on a sentence and
+mean different files.
+
 **The decisions come last.** A decision list placed before the argument asks
 the reader to accept rulings on a change nobody has explained yet, and it
 reads as a page of verdicts. Each decision names its consequence and points

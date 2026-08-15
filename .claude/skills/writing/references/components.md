@@ -26,12 +26,15 @@ components of one kind for one content.
 | Which input produces which output? | Three-column mapping | The count on each side | `svg-rules.md` |
 | Who acts, in which order? | Sequence diagram | The channel between the actors | `svg-rules.md` |
 | Which items share a fault, and where do they sit? | Location map | The count per group, and the position of each item | `svg-rules.md` |
-| **Components below the figure level, 6** | | | |
+| **Components below the figure level, 9** | | | |
 | What triggers it, and what does not? | Grouped table | Coverage, sorted into named groups | `page-html.md` |
 | Which of two paths is right here? | Do and do-not pair | The path that looks legal and is not. Once per page | `page-html.md` |
 | Which fields does one record hold, and from where? | Specimen anatomy | Replaces a code sample plus a field table | below |
+| What must the reader not skim past? | Icon callout | One warning, tip, or aside, in one glyph and one sentence | `page-html.md` |
 | Which step does no code perform? | Human-action badge | That transition, and nothing else | `page-html.md` |
-| How many parts are in this set? | Count badge | The complete set | `page-html.md` |
+| How many parts are in this set? | Count chip | The complete set | `page-html.md` |
+| Which path, state, or value is this? | Value chip | One token, inline, at the size a reader can copy | `page-html.md` |
+| What backs this, for a reader who wants it? | Toggle | The evidence, under a summary that already states the finding | `page-html.md` |
 | Where did this claim come from? | Source citation | The file, the line, and the pinned commit | `page-html.md` |
 
 ## Choosing a form
@@ -41,10 +44,17 @@ the item count and the task first.
 
 - A relation that is not genuinely two-dimensional is a table or a list, and
   the section owes no drawing. A list drawn as boxes is worse than a list.
-- Three or more parallel facts are a table, never prose. The facts must be
-  short values a reader compares at a glance. A cell holding a sentence, a
-  rationale, or a verdict means the content is not a table.
+- Three or more parallel facts are a table, never prose. A table carries at
+  most three columns, and every cell is a short value a reader compares at a
+  glance. A fourth column, or a cell holding a sentence, a rationale, or a
+  verdict, means the content is not a table: route it to keyed option panels
+  or to a figure.
 - A straight-line sequence with no branch and no loop is `<ol class="steps">`.
+- Text with no shape at all still does not stay as running paragraphs. A
+  point a reader must not skim past is an icon callout, evidence a reader may
+  want is a toggle, and every count, path, state, and field value inside a
+  sentence is a chip. Prose then carries the connections between them and
+  nothing else.
 - One figure carries one relation and at most seven elements. A denser
   subject becomes a row of small panels in a `div.figure-row`, each panel
   with its own caption, read left to right, sharing one elements table under
@@ -119,9 +129,9 @@ table and not a specimen.
 
 A comparison across options is a drawing plus numbered prose, never a matrix.
 One `div.figure-row` holds one small panel per option, each panel keyed with
-a circled numeral and carrying the shape of that option. Under the row, one
-numbered paragraph per key opens with the option's name in bold, states what
-the option gives up, and ends with its verdict.
+a circled numeral and carrying the shape of that option. Under the row, an
+`ol.keys` legend carries one item per key: the option's name in bold, what
+the option gives up, and its verdict.
 
 The numerals in the panels and the numerals in the prose are one set, per
 rule D. Four options are four panels and four paragraphs. An option killed by
@@ -150,3 +160,8 @@ option one, then again under option two, then again. A reader compares
 nothing, because the values never sit side by side. Route the content to
 keyed option panels above, or to a grouped table when the values really are
 short and flat.
+
+The second shape has one entrance left, and `page-html.md` closes it: a wide
+table that turns itself into label-value rows at the narrow measure. There is
+no stacking mechanism to reach, and a table caps at three short columns, so a
+comparison cannot arrive at that shape by being wide.

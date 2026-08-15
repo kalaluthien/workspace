@@ -1,16 +1,18 @@
 # Page HTML
 
 Read at step 6, when the file is built. Fixes the page skeleton, the CSS
-baseline, the table rules, and the four components that are markup rather
-than drawing.
+baseline, the table rules, and every component that is markup rather than
+drawing.
 
 - [Skeleton](#skeleton)
 - [CSS baseline](#css-baseline)
 - [Tables](#tables)
 - [Do and do-not pair](#do-and-do-not-pair)
-- [Count badge and human-action badge](#count-badge-and-human-action-badge)
+- [Chips and badges](#chips-and-badges)
+- [Icon callout](#icon-callout)
 - [Source citation](#source-citation)
-- [Collapsed detail](#collapsed-detail)
+- [Toggle](#toggle)
+- [Keyed legend](#keyed-legend)
 
 ## Skeleton
 
@@ -72,6 +74,10 @@ ul, ol { padding-left: 1.2rem; }
 ol.steps { padding-left: 1.6rem; }
 ol.steps > li { margin: 1.3rem 0; }
 ol.steps > li::marker { font-weight: 700; }
+ol.keys { list-style: none; padding-left: 0; margin: 1rem 0; }
+ol.keys > li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .6rem; margin: .8rem 0; }
+.k { display: inline-flex; align-items: center; justify-content: center; width: 1.45rem; height: 1.45rem;
+  border: 1px solid var(--ink); border-radius: 50%; font-size: .72rem; font-weight: 700; }
 a { color: #14459b; text-decoration-color: #9bb0d8; }
 code, pre, .provenance dd, .src { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
 pre { overflow-x: auto; background: var(--wash); padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
@@ -80,16 +86,12 @@ table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9r
 th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid var(--hair); }
 th { font-weight: 700; }
 tr.grp td { background: var(--wash); font-weight: 700; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; }
+/* Three columns of short values fit the narrow measure, so no table stacks
+   into label-value rows and none pans out of view. A table that would need
+   either is the wrong component. */
 @media (max-width: 42rem) {
-  table { display: block; overflow-x: auto; }
-  th, td { min-width: 9rem; }
-  table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; }
-  table.stack thead { display: none; }
-  table.stack tr { border-bottom: 1px solid var(--hair); padding: .5rem 0; }
-  table.stack td { min-width: 0; border-bottom: none; padding: .12rem 0; }
-  table.stack td:first-child { font-weight: 700; }
-  table.stack td[data-label]::before { content: attr(data-label); display: inline-block;
-    width: 7.5rem; color: var(--mute); font-size: .82em; }
+  table { font-size: .85rem; }
+  th, td { padding-right: .5rem; }
 }
 .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem;
   margin: 0 0 2.4rem; font-size: .85rem; color: var(--mute); }
@@ -112,11 +114,22 @@ table.filemap td:first-child { font-family: ui-monospace, SFMono-Regular, Menlo,
 .do h4::before { content: "\2713\00a0"; }
 .dont h4::before { content: "\2715\00a0"; }
 .ct { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem;
-  border: 1px solid var(--ink); border-radius: 3px; padding: 1px 4px; }
+  border: 1px solid var(--ink); border-radius: 3px; padding: 1px 4px; white-space: nowrap; }
 .hum { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem;
   border: 1px solid var(--ink); border-radius: 11px; padding: 1px 8px; }
-details { border: 1px solid var(--hair); padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
-details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
+.chip { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem;
+  background: var(--wash); border-radius: 3px; padding: 1px 5px; white-space: nowrap; }
+.callout { display: grid; grid-template-columns: 1.5rem 1fr; gap: .7rem; align-items: start;
+  background: var(--wash); border-left: 3px solid var(--hair); padding: .8rem 1rem; margin: 1.4rem 0; }
+.callout .g { font-size: 1.05rem; line-height: 1.35; }
+.callout p { margin: 0; font-size: .92rem; }
+.callout strong { font-weight: 700; }
+details { border: 1px solid var(--hair); border-radius: 3px; padding: .45rem .9rem;
+  margin: 1.2rem 0; font-size: .92rem; }
+details summary { cursor: pointer; font-weight: 600; font-size: .92rem; list-style: none; }
+details summary::-webkit-details-marker { display: none; }
+details summary::before { content: "\25B8\00a0\00a0"; color: var(--mute); }
+details[open] summary::before { content: "\25BE\00a0\00a0"; }
 details[open] summary { margin-bottom: .5rem; }
 /* Last, so it wins over the two-column .pair declared above. */
 @media (max-width: 42rem) { .pair { grid-template-columns: 1fr; } }
@@ -130,25 +143,21 @@ ground under code and under a group header row.
 
 ## Tables
 
-A table wider than three columns stacks at the narrow measure instead of
-panning: `class="stack"` on the table, and `data-label` naming the column on
-every cell after each row's first, which is the row's title. Columns past the
-third must never sit off-screen. Panning stays for `pre`, for a pan figure,
-and for tables of three columns or fewer.
-
-Reach this rule only after `components.md` says the content is a table at
-all. A stacked row prints one label above each value, so stacking a
-comparison whose cells hold sentences produces exactly the repeated
-label-value form that file rules out. A three-column table whose last cell is
-a sentence pans instead, and the sentence leaves the screen.
+**A table carries at most three columns, and every cell is a short value.**
+Three short columns fit the narrow measure as a table, so nothing stacks and
+nothing pans. There is no `class="stack"` and no `data-label`: a stacked row
+prints one label above each value, and repeating that per item is the
+label-value form `components.md` rules out. Content that wants a fourth
+column, or a cell holding a sentence, is not a table — route it to keyed
+option panels or a figure.
 
 A group header row replaces a yes-or-no column. Nine flat rows with a
 yes-or-no column make a reader sort them; three groups of three state the
 sorting as the answer.
 
 ```html
-<tr class="grp"><td colspan="4">Settled by the repository</td></tr>
-<tr><td>explanation</td><td data-label="question">how does it work</td>…</tr>
+<tr class="grp"><td colspan="3">Settled by the repository</td></tr>
+<tr><td>explanation</td><td>how does it work</td><td>Question</td></tr>
 ```
 
 ## Do and do-not pair
@@ -164,14 +173,44 @@ it again.
 </div>
 ```
 
-## Count badge and human-action badge
+## Chips and badges
 
-`<span class="ct">4&times; entrypoint</span>` states the size of a complete
-set, against a group of files and against each side of a mapping. A reader
-then knows what a complete set looks like before reading the members.
+Three inline marks, each with its own job. Rule O in `draft-rules.md` says
+where each one is owed.
 
-`<span class="hum">a person writes the brief</span>` marks the one transition
-no code performs, and marks nothing else.
+```html
+<span class="ct">4&times; entrypoint</span>
+<span class="chip">spec/</span> <span class="chip">Open</span>
+<span class="hum">a person writes the brief</span>
+```
+
+- **Count chip**, bordered. A number and the noun it counts. It states the
+  size of a complete set, so a reader knows what a full set looks like before
+  reading the members.
+- **Value chip**, tinted and unbordered. One path, one state name, one field
+  value, inline in a sentence. The border is what separates a quantity from a
+  value at a glance, so the two never trade styles.
+- **Human badge**, rounded. The one transition no code performs, and nothing
+  else.
+
+## Icon callout
+
+One glyph, one short paragraph, on the wash ground. It carries a warning, a
+tip, or a definition aside that a reader must not skim past.
+
+```html
+<div class="callout">
+  <span class="g" aria-hidden="true">⚠️</span>
+  <p><strong>A pinned commit goes stale.</strong> A view describes the tree it
+  was read from, never the tree the reader has.</p>
+</div>
+```
+
+The block opens with a bold lead naming the point, then one sentence. The
+glyph is the one place a page shows colour, under the same exception a
+quoted system glyph takes: the emoji renders as the reader's system draws it.
+The ground stays `--wash` and the rule `--hair`, so the block survives a
+black-and-white print. A callout longer than three sentences is a section.
 
 ## Source citation
 
@@ -188,9 +227,31 @@ without a login. These repositories are private, so a file citation stays
 plain text. An `<a>` carries an anchor inside the page, or a sibling view in
 the same `docs/` directory.
 
-## Collapsed detail
+## Toggle
 
 `<details>` is the one carrier for evidence a reader may want and does not
-need: a raw command, a long enumeration, a transcript. Its summary states the
-conclusion, so a reader who never opens it loses nothing. A page with nothing
-to collapse writes none.
+need: a raw command, a long enumeration, a transcript.
+
+```html
+<details>
+  <summary>The tool lost twice on maintenance, which is why no option keeps a model</summary>
+  <ul>…</ul>
+</details>
+```
+
+**The summary line reads as a claim, never as a label.** "Evidence" and
+"Details" name a genre and say nothing; the sentence above says what a reader
+learns by opening it, so a reader who never opens it still gets the finding. A
+page with nothing to collapse writes none.
+
+## Keyed legend
+
+A figure's legend is `ol.keys`, whose circled numerals repeat the numerals
+drawn in the figure. A guide's procedure keeps `ol.steps`, whose plain
+numerals count actions a reader performs.
+
+```html
+<ol class="keys">
+  <li><span class="k">1</span><p><strong>Read the source</strong> — stage. One sentence.</p></li>
+</ol>
+```

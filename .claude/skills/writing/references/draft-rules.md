@@ -1,17 +1,17 @@
 # Draft rules
 
-Read at step 5. The draft passes all twelve. A to I are nine prohibitions, so
-a writer who obeys them writes boxes, arrows, and nothing else. J to L are the
-positive half.
+Read at step 5. The draft passes all fifteen. A to I are nine prohibitions,
+so a writer who obeys them writes boxes, arrows, and nothing else. J to O are
+the positive half, and they are what puts something on the page.
 
 | | prohibition | | positive |
 |---|---|---|---|
 | A | No prologue and no colophon | J | The glyph, not its name |
 | B | One block per set | K | Group a long enumeration |
 | C | Bare noun phrase for a section name | L | The fewest components |
-| D | One number set | | |
-| E | Plain English | | |
-| F | Exact scope in every name | | |
+| D | One number set | M | One example per claim |
+| E | Plain English | N | The figure leads, the prose follows |
+| F | Exact scope in every name | O | A chip or a badge where one is owed |
 | G | One component, one mission | | |
 | H | No sentence that expires | | |
 | I | No sentence about the document | | |
@@ -144,3 +144,57 @@ Use the fewest components that cover the subject. Five clauses:
    inputs does not have a shape.
 
 Rule L never trims the negative-space section.
+
+## M · One example per claim
+
+Every definition, every rule, and every mechanism is shown with one concrete
+instance: a real file snippet, a real command with its output, a real record,
+a real path. The instance comes from a file the run read, at the pinned
+commit. The prose then connects the instances and adds nothing a reader
+cannot check against one of them.
+
+A section that states a concept and shows no instance is a defect, however
+clear the sentence reads. A reader who does not already know the concept
+cannot tell a correct statement from a wrong one, and a reader who does know
+it learns nothing.
+
+- Rejected: "A runner never edits the tree it checks."
+- Accepted: the same sentence, then
+  `scripts/check-figures <view.html>` with its two output lines, showing a
+  run that reads and reports and writes nothing.
+
+Two instances beat one where a term has an edge: show what the term covers,
+then show the nearest thing it does not. A definition in a proposal's Domain
+section carries both, per `doctypes.md`.
+
+## N · The figure leads, the prose follows
+
+A section opens with its figure, its file map, or its keyed panels. The prose
+comes after, as keyed items tied to the numerals in the drawing, one item per
+numeral.
+
+Beyond the figure, its caption, its legend, and its keyed items, a section
+carries at most two connective paragraphs. A third paragraph means the
+section holds a second subject, or holds prose that a component should be
+carrying.
+
+- Rejected: four paragraphs describing a flow, then a drawing of the flow.
+- Accepted: the drawing, its caption, one keyed item per stage, and one
+  sentence connecting the section to the next.
+
+## O · A chip or a badge where one is owed
+
+A component no rule selects is never drawn, so three marks have a rule that
+selects them.
+
+- **A count chip** wherever the page states how many of something exist —
+  every group in a file map, every side of a mapping, every set a reader
+  might think is longer. Write `<span class="ct">4&times; entrypoint</span>`,
+  not "there are four entrypoints".
+- **A value chip** on every path, state name, and field value that sits
+  inside a sentence.
+- **A human badge** on the one transition no code performs. A page with no
+  such transition carries none.
+
+A page that states a number in words, or a state name in plain text, has
+skipped a mark a reader scans for.
