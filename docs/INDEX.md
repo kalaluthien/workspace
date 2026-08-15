@@ -41,10 +41,6 @@ Template: `templates/spec.md`
 
 ## Proposals
 
-- [`agent-backlog-writing.html`](agent-backlog-writing.html) — what rule
-  should structure a backlog row's text, and where that rule and its guard
-  should live: three structuring options, three homes, and the reach
-  argument that picks one of each; Accepted 2026-08-12.
 - [`agent-development-cycle.html`](agent-development-cycle.html) — what
   directory contract and work cycle agent sessions should follow in a
   program-building project entry: one checked chain from use case to
