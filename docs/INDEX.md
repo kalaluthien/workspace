@@ -22,8 +22,9 @@ Template: `templates/spec.md`
   across the global, workspace, and project scopes, and what routes it
   there.
 - [`agent-memtypes.html`](agent-memtypes.html) — the memory-file kinds
-  read from one question — what would make this file wrong — and the
-  three lifecycle classes and five filename prefixes that answer admits.
+  read from one question — which kind does a new fact take — and the
+  three lifecycle classes and six filename prefixes the live table
+  admits, with the guard that refuses the rest.
 - [`agent-hooks.html`](agent-hooks.html) — the hooks that fire around a
   working session, split by the layer that owns them: four Claude Code
   hooks in one settings file, and the git guard every repository runs.
