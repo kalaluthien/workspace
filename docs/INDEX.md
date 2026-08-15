@@ -45,5 +45,4 @@ Template: `templates/spec.md`
   directory contract and work cycle agent sessions should follow in a
   program-building project entry: one checked chain from use case to
   settling test, four entrypoints, models as red-twice-proven evidence,
-  and a recovery path for code-first patches; garden is the testbed;
-  Proposed 2026-08-15.
+  and a recovery path for code-first patches; garden is the testbed; Open.
