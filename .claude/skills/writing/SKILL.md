@@ -1,6 +1,6 @@
 ---
 name: writing
-description: Write one human-facing view document as a single self-contained HTML page under a repository's docs/ directory. Use when the request asks to explain how something works with diagrams (도식과 함께 설명해줘), to draw it like an IKEA manual (IKEA 매뉴얼처럼), to make it an HTML page and open it (html로 만들어서 열어줘), to write up how X works, or to lay a change out as a proposal page (제안서로 정리해줘). Not for a chart of measured data, a diagnosis, or a Markdown spec or report.
+description: Writes one human-facing view document as a single self-contained HTML page under a repository's docs/ directory. Use when the request asks to explain how something works with diagrams (도식과 함께 설명해줘), to draw it like an IKEA manual (IKEA 매뉴얼처럼), to make it an HTML page and open it (html로 만들어서 열어줘), to write up how X works, or to lay a change out as a proposal page (제안서로 정리해줘). Not for a chart of measured data, a diagnosis, or a Markdown spec or report.
 context: fork
 agent: general-purpose
 model: opus
