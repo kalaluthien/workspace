@@ -1,21 +1,21 @@
 # Index
 
 Every document in `docs/`, as the chapter list. A chapter is a `##`
-heading, a `Template:` line, and the documents that belong to it in
-reading order. Update in the same commit that adds, renames, or retires a
-document. The system's rules: `~/.claude/agents/document-writer.md`; the machine contract: `README.md`.
+heading and the documents that belong to it in reading order; the
+Specifications chapter also carries a `Template:` line. Update in the
+same commit that adds, renames, or retires a document. The system's
+rules: the `writing` skill (`~/workspace/.claude/skills/writing/SKILL.md`);
+the machine contract: `README.md`.
 
 ## Specifications
 
-Template: `~/.claude/agents/document-writer/templates/spec.md`
+Template: `templates/spec.md`
 
 - [`agent-document-system.md`](agent-document-system.md) — which file holds
   the document system's rules, the two arrangements that lost and why, and
   what the choice still owes.
 
 ## Explanations
-
-Template: `~/.claude/agents/document-writer/templates/explanation.html`
 
 - [`agent-config-scopes.html`](agent-config-scopes.html) — where each kind
   of Claude configuration (instruction, rule, skill, agent, memory) lives
@@ -27,10 +27,12 @@ Template: `~/.claude/agents/document-writer/templates/explanation.html`
 - [`agent-hooks.html`](agent-hooks.html) — the hooks that fire around a
   working session, split by the layer that owns them: four Claude Code
   hooks in one settings file, and the git guard every repository runs.
+- [`agent-writing.html`](agent-writing.html) — how the `writing` skill
+  turns a five-field brief into one delivered view: the fork contract,
+  the run steps from doctype to open, and the render check that can
+  fail.
 
 ## Guides
-
-Template: `~/.claude/agents/document-writer/templates/guide.html`
 
 - [`service-tailnet-hostname.html`](service-tailnet-hostname.html) —
   giving a service its own tailnet node and hostname with a
@@ -38,8 +40,6 @@ Template: `~/.claude/agents/document-writer/templates/guide.html`
   trap, and the recovery paths.
 
 ## Proposals
-
-Template: `~/.claude/agents/document-writer/templates/proposal.html`
 
 - [`agent-backlog-writing.html`](agent-backlog-writing.html) — what rule
   should structure a backlog row's text, and where that rule and its guard
