@@ -88,9 +88,9 @@
     <h1>Backlog rows</h1>
     <dl class="provenance">
       <dt>Doctype</dt>  <dd>proposal</dd>
-      <dt>Status</dt>   <dd>Accepted 2026-08-12 &rarr; <code>~/.claude/CLAUDE.md</code>, section &ldquo;Filing&rdquo;</dd>
+      <dt>Status</dt>   <dd>Accepted 2026-08-12 &rarr; <code>~/.claude/CLAUDE.md</code>, section &ldquo;Filing&rdquo;; body shape superseded 2026-08-15 (see the note under the decision)</dd>
       <dt>Question</dt> <dd>What rule should structure a backlog row&rsquo;s text, and where should that rule and its guard live?</dd>
-      <dt>Updated</dt>  <dd>2026-08-12</dd>
+      <dt>Updated</dt>  <dd>2026-08-15</dd>
       <dt>Commit</dt>   <dd>3ad5196</dd>
     </dl>
   </header>
@@ -117,6 +117,19 @@
           judged.</strong> Nothing argued above is rewritten. Each option keeps
           the reason it lost on the day it was judged.</li>
       </ol>
+    </div>
+
+    <div class="box" id="superseded">
+      <span class="label">Superseded in part &middot; 2026-08-15</span>
+      <p>The owner judged the rows still verbose after this rule shipped: the
+      single 300-character budget became a filling target (17 of 27 rows sat at
+      280&ndash;300 characters), and tag reasons grew unbounded. The body is now
+      indented labeled field bullets &mdash; <code>what:</code>,
+      <code>why:</code>, <code>next:</code>, optional <code>scope:</code> and
+      <code>evidence:</code>, 160 characters each, tag reasons bounded at 40
+      &mdash; serving the reviewing owner and the working session at once
+      (<code>~/.claude</code> commit <code>b28a4d5</code>). The rule&rsquo;s home
+      and the hook stand as decided here; only the body shape is replaced.</p>
     </div>
 
     <h2 id="answer">Answer</h2>
