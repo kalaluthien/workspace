@@ -76,6 +76,9 @@ ol.steps > li { margin: 1.3rem 0; }
 ol.steps > li::marker { font-weight: 700; }
 ol.keys { list-style: none; padding-left: 0; margin: 1rem 0; }
 ol.keys > li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .6rem; margin: .8rem 0; }
+/* A grid track sizes to its longest unbreakable token unless it may shrink,
+   so a legend item holding a citation path would push the page sideways. */
+ol.keys > li > p { min-width: 0; margin: 0; }
 .k { display: inline-flex; align-items: center; justify-content: center; width: 1.45rem; height: 1.45rem;
   border: 1px solid var(--ink); border-radius: 50%; font-size: .72rem; font-weight: 700; }
 a { color: #14459b; text-decoration-color: #9bb0d8; }
@@ -117,8 +120,11 @@ table.filemap td:first-child { font-family: ui-monospace, SFMono-Regular, Menlo,
   border: 1px solid var(--ink); border-radius: 3px; padding: 1px 4px; white-space: nowrap; }
 .hum { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem;
   border: 1px solid var(--ink); border-radius: 11px; padding: 1px 8px; }
+/* No nowrap here, unlike the count chip: a count is a numeral and one noun,
+   while a value long enough to wrap must wrap rather than push the page
+   sideways. */
 .chip { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem;
-  background: var(--wash); border-radius: 3px; padding: 1px 5px; white-space: nowrap; }
+  background: var(--wash); border-radius: 3px; padding: 1px 5px; }
 .callout { display: grid; grid-template-columns: 1.5rem 1fr; gap: .7rem; align-items: start;
   background: var(--wash); border-left: 3px solid var(--hair); padding: .8rem 1rem; margin: 1.4rem 0; }
 .callout .g { font-size: 1.05rem; line-height: 1.35; }
@@ -187,9 +193,10 @@ where each one is owed.
 - **Count chip**, bordered. A number and the noun it counts. It states the
   size of a complete set, so a reader knows what a full set looks like before
   reading the members.
-- **Value chip**, tinted and unbordered. One path, one state name, one field
-  value, inline in a sentence. The border is what separates a quantity from a
-  value at a glance, so the two never trade styles.
+- **Value chip**, tinted and unbordered. One state, status, mode, or doctype,
+  inline in a sentence. Rule O gives the test that keeps a copyable token in a
+  code span instead. The border is what separates a quantity from a value at a
+  glance, so the two never trade styles.
 - **Human badge**, rounded. The one transition no code performs, and nothing
   else.
 

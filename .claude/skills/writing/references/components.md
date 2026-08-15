@@ -33,7 +33,7 @@ components of one kind for one content.
 | What must the reader not skim past? | Icon callout | One warning, tip, or aside, in one glyph and one sentence | `page-html.md` |
 | Which step does no code perform? | Human-action badge | That transition, and nothing else | `page-html.md` |
 | How many parts are in this set? | Count chip | The complete set | `page-html.md` |
-| Which path, state, or value is this? | Value chip | One token, inline, at the size a reader can copy | `page-html.md` |
+| Which state or mode is this? | Value chip | One member of a named set, inline in a sentence | `page-html.md` |
 | What backs this, for a reader who wants it? | Toggle | The evidence, under a summary that already states the finding | `page-html.md` |
 | Where did this claim come from? | Source citation | The file, the line, and the pinned commit | `page-html.md` |
 

@@ -24,6 +24,9 @@ Two facts the caller cannot observe:
   * A screenshot captures exactly the window height, so a fixed height crops a
     longer page silently. This script captures far past any view and then
     trims the blank tail, so the image is the whole page.
+  * A screenshot also cannot show sideways overflow: content past the right
+    edge is cropped away and the image looks clean. This script compares the
+    document's scrollWidth against the viewport at each width instead.
 """
 
 import os
@@ -102,6 +105,31 @@ def layout_width(chrome, scratch, requested):
     out = run_chrome(chrome, ["--dump-dom", f"--window-size={requested},800", probe])
     match = re.search(r"IW=(\d+)", out)
     return int(match.group(1)) if match else None
+
+
+def sideways(chrome, scratch, source, width, label):
+    """(scrollWidth, innerWidth) of the page at one width, or (None, None).
+
+    The view carries no script of its own, so the measurement runs on a copy
+    with one probe appended. A copy is used rather than the view because this
+    script never edits what it checks, and one empty paragraph changes no
+    horizontal layout. The page is self-contained by rule, so the copy renders
+    the same wherever it sits.
+    """
+    probe = os.path.join(scratch, f"probe-{label}.html")
+    marker = (
+        '<p id="rc-probe"></p><script>document.getElementById("rc-probe")'
+        '.textContent="SW="+document.documentElement.scrollWidth'
+        '+" IW="+window.innerWidth;</script>'
+    )
+    body = source.replace("</body>", marker + "</body>", 1)
+    if body == source:
+        body = source + marker
+    with open(probe, "w", encoding="utf-8") as handle:
+        handle.write(body)
+    out = run_chrome(chrome, ["--dump-dom", f"--window-size={width},900", probe])
+    match = re.search(r"SW=(\d+) IW=(\d+)", out)
+    return (int(match.group(1)), int(match.group(2))) if match else (None, None)
 
 
 def shoot(chrome, view, png, width):
@@ -235,6 +263,8 @@ def main(argv):
 
     failures = []
     notes = []
+    with open(view, encoding="utf-8") as handle:
+        source = handle.read()
     measured = layout_width(chrome, scratch, NARROW)
     for label, width in (("wide", WIDE), ("narrow", NARROW)):
         png = os.path.join(scratch, f"{label}.png")
@@ -255,11 +285,20 @@ def main(argv):
         if not whole:
             failures.append(f"{label} render did not reach the end of the page")
 
+        scroll, inner = sideways(chrome, scratch, source, width, label)
+        if scroll is None:
+            notes.append(f"the {label} width carried no overflow measurement")
+        elif scroll > inner:
+            failures.append(
+                f"the page scrolls sideways at {inner} units: its content is "
+                f"{scroll} wide, so {scroll - inner} units sit off the right "
+                "edge. An unbreakable token in a grid or a table is the usual "
+                "cause"
+            )
+            print(f"        overflow: scrollWidth {scroll} over viewport {inner}")
+
     if measured and measured != NARROW:
         print(f"note    narrow render asked for {NARROW} and got {measured}")
-
-    with open(view, encoding="utf-8") as handle:
-        source = handle.read()
 
     page_findings = check_page(source)
     print(f"page    {'ok' if not page_findings else 'failed'}")

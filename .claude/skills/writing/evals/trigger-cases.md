@@ -79,9 +79,10 @@ A request that must not fire and still reaches the skill ends the run: return
 13. Every definition, rule, and mechanism shows one concrete instance from a
     file the run read, and every Domain entry in a proposal shows an example
     and a counter-example.
-14. Every stated count is a count chip, every path, state, and field value
-    inside a sentence is a value chip, and the one transition no code
-    performs carries the human badge.
+14. Every stated count is a count chip, every state, status, mode, and
+    doctype inside a sentence is a value chip, every token the reader would
+    run or open stays a code span, and the one transition no code performs
+    carries the human badge.
 15. `scripts/render-check <output>` exits 0.
 
 **Language**

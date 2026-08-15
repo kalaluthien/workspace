@@ -191,8 +191,12 @@ selects them.
   every group in a file map, every side of a mapping, every set a reader
   might think is longer. Write `<span class="ct">4&times; entrypoint</span>`,
   not "there are four entrypoints".
-- **A value chip** on every path, state name, and field value that sits
-  inside a sentence.
+- **A value chip** on every state name, status, mode, and doctype that sits
+  inside a sentence. The test is one question: could the reader run, open, or
+  paste this? A path, a command, an identifier, and a field name are things a
+  reader copies, so they stay code spans. A value drawn from a set the page
+  names elsewhere is a thing a reader scans for, so it takes the chip:
+  `<span class="chip">Open</span>`, not `<code>Open</code>`.
 - **A human badge** on the one transition no code performs. A page with no
   such transition carries none.
 
