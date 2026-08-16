@@ -14,7 +14,7 @@ charset, the viewport meta, an <h1> ahead of everything else in the body, and
 a provenance block carrying Doctype, Question or Goal, and Updated, and never
 Reviewed.
 
-Two facts the caller cannot observe:
+Three facts the caller cannot observe:
 
   * Headless Chrome on macOS does not lay out below 500 CSS units. A smaller
     --window-size still lays the page out at 500 and crops the image, which
