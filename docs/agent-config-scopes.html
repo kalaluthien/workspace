@@ -38,24 +38,17 @@
   table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
   th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid #e4e4e4; }
   th { font-weight: 700; }
+  /* A group header row states the sorting a yes-or-no column would make the
+     reader do, and it is what keeps a table inside three columns. */
+  tr.grp td { background: #f4f4f4; font-weight: 700; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; }
+  /* A path is case-sensitive, so the header's uppercasing stops at a code span. */
+  tr.grp td code { text-transform: none; }
+  /* Three columns of short values fit the narrow measure, so no table stacks
+     into label-value rows and none pans out of view. A table that would need
+     either is the wrong component. */
   @media (max-width: 42rem) {
-    table { display: block; overflow-x: auto; }
-    th, td { min-width: 9rem; }
-    /* Stacked rows: a table over three columns keeps every cell on screen.
-       Each row becomes a block titled by its first cell; the other cells
-       print their column name from data-label. */
-    table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; }
-    table.stack thead { display: none; }
-    table.stack tr { border-bottom: 1px solid #e4e4e4; padding: .5rem 0; }
-    table.stack td { min-width: 0; border-bottom: none; padding: .12rem 0; }
-    table.stack td:first-child { font-weight: 700; }
-    table.stack td[data-label]::before {
-      content: attr(data-label);
-      display: inline-block;
-      width: 7.5rem;
-      color: #555;
-      font-size: .82em;
-    }
+    table { font-size: .85rem; }
+    th, td { padding-right: .5rem; }
   }
   .kicker { font-variant: small-caps; letter-spacing: .16em; font-size: .75rem; font-weight: 600; color: #555; margin: 0 0 .4rem; }
   .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: 0; font-size: .85rem; color: #555; }
@@ -262,17 +255,44 @@
       </ol>
     </div>
 
-    <table class="stack">
-      <thead><tr><th>kind</th><th>global</th><th>workspace</th><th>project</th><th>format defined in</th></tr></thead>
+    <table>
+      <thead><tr><th>kind</th><th>what sits there</th></tr></thead>
       <tbody>
-        <tr><td>instruction</td><td data-label="global"><code>CLAUDE.md</code> + <code>RTK.md</code></td><td data-label="workspace"><code>CLAUDE.md</code></td><td data-label="project">4 of 5 entries</td><td data-label="format defined in">"Claude Code" item 1</td></tr>
-        <tr><td>rule</td><td data-label="global"><code>skill-authoring.md</code></td><td data-label="workspace"><code>services.md</code></td><td data-label="project"><code>camera/</code>: <code>engineering.md</code></td><td data-label="format defined in"><code>setup-claude-rules</code>, global pool</td></tr>
-        <tr><td>skill</td><td data-label="global">none</td><td data-label="workspace"><code>delegating/</code></td><td data-label="project"><code>notes/</code>: 6</td><td data-label="format defined in"><code>rules/skill-authoring.md</code>; naming, "Claude Code" item 2</td></tr>
-        <tr><td>agent</td><td data-label="global"><code>debugger.md</code>, <code>document-writer.md</code> + its reference directory</td><td data-label="workspace">none</td><td data-label="project"><code>notes/</code>: 3</td><td data-label="format defined in">none — by example only</td></tr>
-        <tr><td>output style</td><td data-label="global">none</td><td data-label="workspace"><code>simplified-technical.md</code></td><td data-label="project">none</td><td data-label="format defined in">none</td></tr>
-        <tr><td>memory pool</td><td data-label="global">18 <code>setup-*</code></td><td data-label="workspace">15 files</td><td data-label="project">4 of 5 entries</td><td data-label="format defined in">"Filing" table + pool contract</td></tr>
+        <tr class="grp"><td colspan="2"><span class="badge">1</span> Global — <code>~/.claude/</code></td></tr>
+        <tr><td>instruction</td><td><code>CLAUDE.md</code> + <code>RTK.md</code></td></tr>
+        <tr><td>rule</td><td><code>skill-authoring.md</code></td></tr>
+        <tr><td>skill</td><td>none</td></tr>
+        <tr><td>agent</td><td><code>debugger.md</code>, <code>document-writer.md</code> + its reference directory</td></tr>
+        <tr><td>output style</td><td>none</td></tr>
+        <tr><td>memory pool</td><td>18 <code>setup-*</code></td></tr>
+        <tr class="grp"><td colspan="2"><span class="badge">2</span> Workspace — <code>~/workspace/.claude/</code></td></tr>
+        <tr><td>instruction</td><td><code>CLAUDE.md</code></td></tr>
+        <tr><td>rule</td><td><code>services.md</code></td></tr>
+        <tr><td>skill</td><td><code>delegating/</code></td></tr>
+        <tr><td>agent</td><td>none</td></tr>
+        <tr><td>output style</td><td><code>simplified-technical.md</code></td></tr>
+        <tr><td>memory pool</td><td>15 files</td></tr>
+        <tr class="grp"><td colspan="2"><span class="badge">3</span> Project — <code>&lt;entry&gt;/.claude/</code></td></tr>
+        <tr><td>instruction</td><td>4 of 5 entries</td></tr>
+        <tr><td>rule</td><td><code>camera/</code>: <code>engineering.md</code></td></tr>
+        <tr><td>skill</td><td><code>notes/</code>: 6</td></tr>
+        <tr><td>agent</td><td><code>notes/</code>: 3</td></tr>
+        <tr><td>output style</td><td>none</td></tr>
+        <tr><td>memory pool</td><td>4 of 5 entries</td></tr>
       </tbody>
     </table>
+
+    <p>Where each kind's format is defined:</p>
+    <ul>
+      <li><strong>instruction</strong> — "Claude Code" item 1.</li>
+      <li><strong>rule</strong> — <code>setup-claude-rules</code>, global pool.</li>
+      <li><strong>skill</strong> — <code>rules/skill-authoring.md</code>; its
+        naming, "Claude Code" item 2.</li>
+      <li><strong>agent</strong> — none, by example only.</li>
+      <li><strong>output style</strong> — none.</li>
+      <li><strong>memory pool</strong> — the "Filing" table and the pool
+        contract.</li>
+    </ul>
 
     <div class="callout gap">
       <span class="tag">gap</span>
