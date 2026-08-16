@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Configuration scopes — workspace</title>
 <style>
+  :root { --ink:#111; --mute:#555; --hair:#e4e4e4; --wash:#f4f4f4; }
   html { font-size: 16px; }
   body {
     max-width: 42rem;
@@ -21,6 +22,10 @@
   h3 { font-size: 1rem; margin: 2rem 0 .3rem; font-weight: 700; }
   p, li { margin: .6rem 0; }
   ul, ol { padding-left: 1.2rem; }
+  /* A sub-bullet carries one statement of the item above it, so it sits
+     tighter than the items it hangs under. */
+  li > ul { margin: .3rem 0 0; padding-left: 1.05rem; }
+  li > ul > li { margin: .2rem 0; }
   a { color: #1a4f8a; text-decoration-color: #9bb6d1; }
   strong { font-weight: 700; }
   code, pre, .provenance dd {
@@ -57,9 +62,11 @@
   .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
   .provenance dd { margin: 0; }
   .conclusion { border: 1px solid #111; padding: .85rem 1rem .95rem; margin: 1.3rem 0 1.6rem; }
-  .conclusion .label { display: block; font-variant: small-caps; letter-spacing: .12em; font-size: .72rem; font-weight: 700; margin-bottom: .45rem; }
   .conclusion ol { list-style: none; margin: 0; padding: 0; }
   .conclusion li { margin: .5rem 0; }
+  /* The box list hides its own markers and starts at the left edge, so a
+     sub-bullet must clear the badge to read as a child, not as a sibling. */
+  .conclusion li > ul { padding-left: 2.7rem; }
   .badge {
     display: inline-block; width: 1.15rem; height: 1.15rem; line-height: 1.05rem;
     border: 1px solid #111; border-radius: 50%; background: #ffffff; color: #111;
@@ -86,6 +93,20 @@
   table.filemap td { border-bottom: none; padding: .12rem .8rem .12rem 0; }
   table.filemap td:first-child { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; white-space: pre; }
   figure pre { margin: 0; }
+  /* One typed record per term: a name bar, then a fixed field set. The field
+     column is the record's type, so every record of one kind repeats it. */
+  .recs { display: grid; gap: .9rem; margin: 1.4rem 0; }
+  .rec { border: 1px solid var(--ink); }
+  .rec-n { margin: 0; padding: .35rem .75rem; background: var(--wash);
+    border-bottom: 1px solid var(--ink); font-weight: 700; font-size: .92rem; }
+  .rec-t { font-weight: 400; color: var(--mute); font-size: .78rem; }
+  .rec dl { display: grid; grid-template-columns: max-content 1fr; gap: .25rem .8rem;
+    margin: 0; padding: .55rem .75rem .65rem; font-size: .9rem; }
+  .rec dt { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .74rem;
+    color: var(--mute); padding-top: .22rem; white-space: nowrap; }
+  .rec dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .rec dd ul { margin: .1rem 0 0; padding-left: 1.05rem; }
+  .rec dd li { margin: .15rem 0; }
   footer.sources { margin-top: 4rem; border-top: 1px solid #e4e4e4; padding-top: 1rem; font-size: .85rem; color: #555; }
   footer.sources h2 { font-size: .8rem; margin: 0 0 .3rem; font-variant: small-caps; letter-spacing: .06em; font-weight: 600; }
   footer.sources ul { margin: 0; padding-left: 1.1rem; }
@@ -101,7 +122,7 @@
     <dl class="provenance">
       <dt>Doctype</dt>  <dd>explanation</dd>
       <dt>Question</dt> <dd>where does each kind of Claude configuration — instruction, rule, skill, agent, memory — live? (concept view)</dd>
-      <dt>Updated</dt>  <dd>2026-08-11</dd>
+      <dt>Updated</dt>  <dd>2026-08-16</dd>
       <dt>Commit</dt>   <dd>c66bc5c</dd>
     </dl>
   </header>
@@ -113,20 +134,45 @@
     <p>A kind of configuration lives in the scope whose reach matches how far
     its claim holds.</p>
 
-    <div class="conclusion">
-      <span class="label">Conclusion</span>
-      <ol>
-        <li><span class="badge">1</span> <strong>Global.</strong> What holds
-          <mark>on any repository</mark> lives in <code>~/.claude/</code> — the
-          principles, the filing routes, the two agent definitions.</li>
-        <li><span class="badge">2</span> <strong>Workspace.</strong> What
-          <mark>coordinates the entries</mark> lives in
-          <code>~/workspace/.claude/</code> — the entry table, the output style,
-          the <code>delegating</code> skill.</li>
-        <li><span class="badge">3</span> <strong>Project.</strong> How to work
-          inside <mark>one entry</mark> lives in that entry's own
-          <code>.claude/</code>, and nothing there reaches a sibling.</li>
-      </ol>
+    <div class="recs">
+      <div class="rec">
+        <p class="rec-n"><span class="badge">1</span> Global <span class="rec-t">scope</span></p>
+        <dl>
+          <dt>is</dt>        <dd>the home of what holds <mark>on any repository</mark></dd>
+          <dt>directory</dt> <dd><code>~/.claude/</code></dd>
+          <dt>holds</dt>     <dd>
+            <ul>
+              <li>the principles</li>
+              <li>the filing routes</li>
+              <li>the two agent definitions</li>
+            </ul></dd>
+        </dl>
+      </div>
+      <div class="rec">
+        <p class="rec-n"><span class="badge">2</span> Workspace <span class="rec-t">scope</span></p>
+        <dl>
+          <dt>is</dt>        <dd>the home of what <mark>coordinates the entries</mark></dd>
+          <dt>directory</dt> <dd><code>~/workspace/.claude/</code></dd>
+          <dt>holds</dt>     <dd>
+            <ul>
+              <li>the entry table</li>
+              <li>the output style</li>
+              <li>the <code>delegating</code> skill</li>
+            </ul></dd>
+        </dl>
+      </div>
+      <div class="rec">
+        <p class="rec-n"><span class="badge">3</span> Project <span class="rec-t">scope</span></p>
+        <dl>
+          <dt>is</dt>        <dd>the home of how to work inside <mark>one entry</mark>, and nothing there reaches a sibling</dd>
+          <dt>directory</dt> <dd>that entry's own <code>.claude/</code></dd>
+          <dt>holds</dt>     <dd>
+            <ul>
+              <li>that entry's instruction file</li>
+              <li>the rules, skills, and agents the entry has</li>
+            </ul></dd>
+        </dl>
+      </div>
     </div>
 
     <figure id="fig-scopes">
@@ -165,11 +211,10 @@
         <text x="34" y="284" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor" opacity=".7">one entry</text>
       </svg>
       <figcaption>
-        Static structure, the three configuration scopes at 340 viewBox units.
-        Key: solid box — one scope's <code>.claude/</code> directory, under it
-        the reach its claims hold; circled numeral — the statement above and
-        the elements row below; arrow — one governing channel, labelled with
-        its intent. Nothing is dashed; every part exists.
+        The three configuration scopes, stacked by reach: global reaches any
+        repository, workspace reaches every entry, and project reaches one
+        entry. Each arrow carries what the scope above fixes for the scope
+        below, so the lower scope never restates it.
       </figcaption>
     </figure>
 
@@ -188,19 +233,32 @@
     <h2 id="placement">Placement</h2>
 
     <div class="conclusion">
-      <span class="label">Conclusion</span>
       <ol>
         <li><span class="badge">1</span> <strong>No scope holds every kind.</strong>
-          <mark>Global carries no skill and no output style</mark>, workspace
-          carries no agent, and only <code>notes/</code> among the five entries
-          carries a skill or an agent.</li>
+          Every scope leaves at least one kind empty.
+          <ul>
+            <li><mark>Global carries no skill and no output style</mark>.</li>
+            <li>Workspace carries no agent.</li>
+            <li>Only <code>notes/</code> among the five entries carries a skill
+              or an agent.</li>
+          </ul>
+        </li>
         <li><span class="badge">2</span> <strong>One entry has no directory.</strong>
-          <code>kalaluthien.github.io/</code> has none, and the entry table
-          sends its reader to <code>_config.yml</code> instead — the absence is
-          <mark>routing, not omission</mark>.</li>
+          <code>kalaluthien.github.io/</code> has no <code>.claude/</code>.
+          <ul>
+            <li>The entry table sends its reader to <code>_config.yml</code>
+              instead.</li>
+            <li>The absence is <mark>routing, not omission</mark>.</li>
+          </ul>
+        </li>
         <li><span class="badge">3</span> <strong>One kind has no format.</strong>
-          Five kinds cite a written definition; <mark>the agent kind cites
-          none</mark>, so an author copies one of its two worked examples.</li>
+          <mark>The agent kind cites no written definition</mark>.
+          <ul>
+            <li>The other five kinds each cite one.</li>
+            <li>An author copies one of the agent kind's two worked
+              examples.</li>
+          </ul>
+        </li>
       </ol>
     </div>
 
@@ -272,17 +330,27 @@ kalaluthien.github.io/.claude/       (no such directory)
     <h2 id="reach">Reach</h2>
 
     <div class="conclusion">
-      <span class="label">Conclusion</span>
       <ol>
         <li><span class="badge">1</span> <strong>Composition.</strong> A session
-          <mark>composes the three scopes</mark> instead of choosing one; the
-          working directory selects two of the four sources.</li>
+          <mark>composes the three scopes</mark> instead of choosing one.
+          <ul>
+            <li>The working directory selects two of the four sources.</li>
+          </ul>
+        </li>
         <li><span class="badge">2</span> <strong>Dormancy.</strong> A rule waits
           until the session <mark>reads a file its <code>paths</code> key
-          matches</mark> — never when it writes one.</li>
+          matches</mark>.
+          <ul>
+            <li>Writing such a file never fires it.</li>
+          </ul>
+        </li>
         <li><span class="badge">3</span> <strong>Snapshot.</strong> Subagents
           inherit the composition <mark>as it stood at session start</mark>.
-          Skills hot-reload; a new agent registers only on restart.</li>
+          <ul>
+            <li>Skills hot-reload.</li>
+            <li>A new agent registers only on restart.</li>
+          </ul>
+        </li>
       </ol>
     </div>
 
@@ -299,15 +367,23 @@ kalaluthien.github.io/.claude/       (no such directory)
     <h2 id="routing">Routing</h2>
 
     <div class="conclusion">
-      <span class="label">Conclusion</span>
       <ol>
         <li><span class="badge">1</span> <strong>No self-placement.</strong>
-          Each scope declares its predicate in its own CLAUDE.md, and a router
-          elsewhere assigns it — <mark>no file decides its own home</mark>.</li>
+          <mark>No file decides its own home</mark>.
+          <ul>
+            <li>Each scope declares its predicate in its own
+              <code>CLAUDE.md</code>.</li>
+            <li>A router elsewhere assigns it.</li>
+          </ul>
+        </li>
         <li><span class="badge">2</span> <strong>Router position.</strong> A
-          router sits at the <mark>outermost scope of its candidate set</mark>,
-          never below one of them, so a reader finds where a thing goes without
-          opening any candidate.</li>
+          router sits at the <mark>outermost scope of its candidate set</mark>.
+          <ul>
+            <li>It never sits below one of its candidates.</li>
+            <li>A reader finds where a thing goes without opening any
+              candidate.</li>
+          </ul>
+        </li>
       </ol>
     </div>
 
@@ -342,23 +418,37 @@ kalaluthien.github.io/.claude/       (no such directory)
 
     <h2 id="omissions">Omissions</h2>
     <ul>
-      <li><strong>Two trees.</strong> The Commit field pins
-        <code>~/workspace</code>. The configuration itself lives in
-        <code>~/.claude</code> at <code>a644f45</code>, and its memory pools are
-        in no repository.</li>
+      <li><strong>Two trees.</strong> The Commit field pins one of them.
+        <ul>
+          <li>It pins <code>~/workspace</code>.</li>
+          <li>The configuration itself lives in <code>~/.claude</code> at
+            <code>a644f45</code>.</li>
+          <li>Its memory pools are in no repository.</li>
+        </ul>
+      </li>
       <li><strong>File contents.</strong> The tables name files and kinds, never
         what a file says.</li>
       <li><strong>Harness machinery.</strong> Settings files, hooks, and
-        plugin-supplied skills sit over the kinds, not in them;
-        <code>agent-hooks.html</code> covers the hooks.</li>
+        plugin-supplied skills sit over the kinds, not in them.
+        <ul>
+          <li><code>agent-hooks.html</code> covers the hooks.</li>
+        </ul>
+      </li>
       <li><strong>Other project directories.</strong>
-        <code>~/.claude/projects/</code> holds 14 directories; 6 carry a
-        <code>memory/</code> pool, the rest hold session transcripts.</li>
+        <code>~/.claude/projects/</code> holds 14 directories.
+        <ul>
+          <li>6 carry a <code>memory/</code> pool.</li>
+          <li>The rest hold session transcripts.</li>
+        </ul>
+      </li>
       <li><strong>Load mechanics.</strong> Not the load order, the token budget,
         or what wins when two scopes disagree.</li>
-      <li><strong>History.</strong> Which scopes and entries existed before; that
-        log is the workspace pool's
-        <code>history-workspace-refactor</code>.</li>
+      <li><strong>History.</strong> Which scopes and entries existed before.
+        <ul>
+          <li>That log is the workspace pool's
+            <code>history-workspace-refactor</code>.</li>
+        </ul>
+      </li>
     </ul>
 
   </section>
@@ -373,9 +463,13 @@ kalaluthien.github.io/.claude/       (no such directory)
         <code>~/workspace/</code>, walked 2026-08-11 in the evidence listing
         above</li>
       <li><code>setup-claude-rules</code> and <code>setup-claude-subagents</code>,
-        global pool — the <code>paths</code> key, the read-not-write firing, the
-        subagent snapshot (2026-07-16), the recursive agent scan
-        (2026-08-04)</li>
+        global pool — the reach facts
+        <ul>
+          <li>the <code>paths</code> key and its read-not-write firing</li>
+          <li>the subagent snapshot (2026-07-16)</li>
+          <li>the recursive agent scan (2026-08-04)</li>
+        </ul>
+      </li>
       <li><code>~/.claude/rules/skill-authoring.md</code> and
         <code>~/workspace/.claude/rules/services.md</code> — the skill format and
         the services-plane rule</li>
