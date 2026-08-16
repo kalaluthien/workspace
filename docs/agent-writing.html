@@ -17,9 +17,25 @@
   h4 { font-size: .95rem; margin: 0 0 .4rem; font-weight: 700; }
   p, li { margin: .6rem 0; }
   ul, ol { padding-left: 1.2rem; }
+  /* A sub-bullet carries one statement of the item above it, so it sits
+     tighter than the items it hangs under. */
+  li > ul { margin: .3rem 0 0; padding-left: 1.05rem; }
+  li > ul > li { margin: .2rem 0; }
   ol.steps { padding-left: 1.6rem; }
   ol.steps > li { margin: 1.3rem 0; }
   ol.steps > li::marker { font-weight: 700; }
+  ol.keys { list-style: none; padding-left: 0; margin: 1rem 0; }
+  ol.keys > li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .6rem; margin: .8rem 0; }
+  /* A grid track sizes to its longest unbreakable token unless it may shrink,
+     so a legend item holding a path would push the page sideways. The <div> is
+     the wrapper a legend item takes when it separates its statements: two
+     children of the <li> would land the second one in the numeral column. */
+  ol.keys > li > p, ol.keys > li > div { min-width: 0; }
+  ol.keys > li > p, ol.keys > li > div > p { margin: 0; }
+  ol.keys ul { margin: .3rem 0 0; padding-left: 1.05rem; }
+  ol.keys ul li { margin: .2rem 0; }
+  .k { display: inline-flex; align-items: center; justify-content: center; width: 1.45rem; height: 1.45rem;
+    border: 1px solid var(--ink); border-radius: 50%; font-size: .72rem; font-weight: 700; }
   a { color: #14459b; text-decoration-color: #9bb0d8; }
   code, pre, .provenance dd, .src { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
   pre { overflow-x: auto; background: var(--wash); padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
@@ -28,16 +44,12 @@
   th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid var(--hair); }
   th { font-weight: 700; }
   tr.grp td { background: var(--wash); font-weight: 700; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; }
+  /* Three columns of short values fit the narrow measure, so no table stacks
+     into label-value rows and none pans out of view. A table that would need
+     either is the wrong component. */
   @media (max-width: 42rem) {
-    table { display: block; overflow-x: auto; }
-    th, td { min-width: 9rem; }
-    table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; }
-    table.stack thead { display: none; }
-    table.stack tr { border-bottom: 1px solid var(--hair); padding: .5rem 0; }
-    table.stack td { min-width: 0; border-bottom: none; padding: .12rem 0; }
-    table.stack td:first-child { font-weight: 700; }
-    table.stack td[data-label]::before { content: attr(data-label); display: inline-block;
-      width: 7.5rem; color: var(--mute); font-size: .82em; }
+    table { font-size: .85rem; }
+    th, td { padding-right: .5rem; }
   }
   .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem;
     margin: 0 0 2.4rem; font-size: .85rem; color: var(--mute); }
@@ -59,12 +71,40 @@
   .dont { border-style: dashed; }
   .do h4::before { content: "\2713\00a0"; }
   .dont h4::before { content: "\2715\00a0"; }
+  /* One typed record per term: a name bar, then a fixed field set. The field
+     column is the record's type, so every record of one kind repeats it. */
+  .recs { display: grid; gap: .9rem; margin: 1.4rem 0; }
+  .rec { border: 1px solid var(--ink); }
+  .rec-n { margin: 0; padding: .35rem .75rem; background: var(--wash);
+    border-bottom: 1px solid var(--ink); font-weight: 700; font-size: .92rem; }
+  .rec-t { font-weight: 400; color: var(--mute); font-size: .78rem; }
+  .rec dl { display: grid; grid-template-columns: max-content 1fr; gap: .25rem .8rem;
+    margin: 0; padding: .55rem .75rem .65rem; font-size: .9rem; }
+  .rec dt { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .74rem;
+    color: var(--mute); padding-top: .22rem; white-space: nowrap; }
+  .rec dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .rec dd ul { margin: .1rem 0 0; padding-left: 1.05rem; }
+  .rec dd li { margin: .15rem 0; }
   .ct { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem;
-    border: 1px solid var(--ink); border-radius: 3px; padding: 1px 4px; }
+    border: 1px solid var(--ink); border-radius: 3px; padding: 1px 4px; white-space: nowrap; }
   .hum { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem;
     border: 1px solid var(--ink); border-radius: 11px; padding: 1px 8px; }
-  details { border: 1px solid var(--hair); padding: .45rem .9rem; margin: 1.2rem 0; font-size: .92rem; }
-  details summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
+  /* No nowrap here, unlike the count chip: a count is a numeral and one noun,
+     while a value long enough to wrap must wrap rather than push the page
+     sideways. */
+  .chip { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem;
+    background: var(--wash); border-radius: 3px; padding: 1px 5px; }
+  .callout { display: grid; grid-template-columns: 1.5rem 1fr; gap: .7rem; align-items: start;
+    background: var(--wash); border-left: 3px solid var(--hair); padding: .8rem 1rem; margin: 1.4rem 0; }
+  .callout .g { font-size: 1.05rem; line-height: 1.35; }
+  .callout p { margin: 0; font-size: .92rem; }
+  .callout strong { font-weight: 700; }
+  details { border: 1px solid var(--hair); border-radius: 3px; padding: .45rem .9rem;
+    margin: 1.2rem 0; font-size: .92rem; }
+  details summary { cursor: pointer; font-weight: 600; font-size: .92rem; list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: "\25B8\00a0\00a0"; color: var(--mute); }
+  details[open] summary::before { content: "\25BE\00a0\00a0"; }
   details[open] summary { margin-bottom: .5rem; }
   /* Last, so it wins over the two-column .pair declared above. */
   @media (max-width: 42rem) { .pair { grid-template-columns: 1fr; } }
@@ -77,17 +117,10 @@
   <dl class="provenance">
     <dt>Doctype</dt>  <dd>explanation</dd>
     <dt>Question</dt> <dd>How does the writing skill turn one brief into one delivered view?</dd>
-    <dt>Updated</dt>  <dd>2026-08-15</dd>
+    <dt>Updated</dt>  <dd>2026-08-16</dd>
   </dl>
 
-  <h2>Files of the skill directory</h2>
-
-  <p>The skill is one directory under <code>~/workspace/.claude/skills/</code>.
-  <code>SKILL.md</code> holds the frontmatter and the nine steps. Each reference
-  file carries the detail of one step. <code>scripts/render-check</code> is the
-  one executable. <code>evals/trigger-cases.md</code> records the requests that
-  must reach the skill, and the eighteen rubric lines a delivered run answers.
-  <span class="src">.claude/skills/writing/SKILL.md:1-190 @ 1c7bffb</span></p>
+  <h2 id="files">Files of the skill directory</h2>
 
   <figure id="fig-map">
     <table class="filemap">
@@ -107,19 +140,21 @@
         <tr><td>    └── trigger-cases.md</td><td>twelve requests, eighteen rubric lines</td></tr>
       </tbody>
     </table>
-    <figcaption>File map of the writing skill at <code>1c7bffb</code>. Key:
-      indentation — directory nesting; right column — the part's role. One entry
-      point, six references, one script, one eval file.</figcaption>
+    <figcaption>One entry point, <span class="ct">6&times; reference</span>, one
+      script, and one eval file make the skill directory. Each reference carries
+      the detail of the step that names it.</figcaption>
   </figure>
 
-  <p>The reference set is complete at <span class="ct">6&times; reference file</span>.
+  <p><code>SKILL.md</code> holds the frontmatter and the nine steps.
+  <span class="src">.claude/skills/writing/SKILL.md:1-190 @ 1c7bffb</span>
   No step names <code>evals/trigger-cases.md</code>, so a run never reads it.
   <span class="src">.claude/skills/writing/SKILL.md:51-146 @ 1c7bffb</span></p>
 
-  <h2>Fields of the brief</h2>
+  <h2 id="brief">Fields of the brief</h2>
 
-  <p>The brief is the whole input to a run. It carries five fields. An unnamed
-  doctype defaults to <code>explanation</code>.
+  <p>The brief is the whole input to a run. It carries
+  <span class="ct">5&times; field</span>. An unnamed doctype defaults to
+  <span class="chip">explanation</span>.
   <span class="src">.claude/skills/writing/SKILL.md:41-53 @ 1c7bffb</span></p>
 
   <table>
@@ -137,14 +172,7 @@
     </tbody>
   </table>
 
-  <h2>Path of the delivered file</h2>
-
-  <p>Step 0 fixes the output path before any source is read. The path is
-  <code>&lt;target&gt;/docs/&lt;slice&gt;.html</code>. The brief may name the
-  slice. Otherwise the slice comes from the subject, in kebab-case. A file under
-  the workspace root carries a plane prefix, <code>agent-</code> or
-  <code>service-</code>.
-  <span class="src">.claude/skills/writing/references/doctypes.md:62-72 @ 1c7bffb</span></p>
+  <h2 id="path">Path of the delivered file</h2>
 
   <figure id="fig-path">
 <pre>docs/agent-writing.html
@@ -153,10 +181,41 @@
   │     │     └── slice
   │     └── plane
   └── directory</pre>
-    <figcaption>Specimen of the path this run wrote, read from the target root.
-      A project entry's own <code>docs/INDEX.md</code> fixes its naming, and the
-      plane prefix holds under the workspace root only.</figcaption>
+    <figcaption>The output path is
+      <code>&lt;target&gt;/docs/&lt;slice&gt;.html</code>, and step 0 fixes it
+      before any source is read. A project entry's own <code>docs/INDEX.md</code>
+      fixes that entry's naming, so the plane prefix holds under the workspace
+      root only.</figcaption>
   </figure>
+
+  <div class="recs">
+    <div class="rec">
+      <p class="rec-n"><code>&lt;plane&gt;</code> <span class="rec-t">path field</span></p>
+      <dl>
+        <dt>is</dt>        <dd>the prefix naming which plane the document is about</dd>
+        <dt>settled by</dt><dd>the store, because the workspace root is the one store whose
+          files carry a prefix</dd>
+        <dt>instance</dt>  <dd><code>agent-</code>, the prefix on this page's own path;
+          <code>service-</code> is the other member</dd>
+        <dt>not</dt>       <dd>a file in a project entry's <code>docs/</code>, which carries
+          no prefix at all</dd>
+      </dl>
+    </div>
+    <div class="rec">
+      <p class="rec-n"><code>&lt;slice&gt;</code> <span class="rec-t">path field</span></p>
+      <dl>
+        <dt>is</dt>        <dd>the subject of the view, in kebab-case</dd>
+        <dt>settled by</dt><dd>the brief when it names a slice, and the subject when it
+          does not</dd>
+        <dt>instance</dt>  <dd><code>writing</code>, the slice of this page</dd>
+        <dt>not</dt>       <dd>the doctype, which the provenance block carries instead</dd>
+      </dl>
+    </div>
+  </div>
+
+  <p>The title stays the same across re-renders. A rewrite never renames a
+  document on its own. One subject is one file.
+  <span class="src">.claude/skills/writing/references/doctypes.md:62-72 @ 1c7bffb</span></p>
 
   <p>Step 0 then reads <code>INDEX.md</code> and lists the views the store
   already holds. Three outcomes follow.
@@ -169,38 +228,62 @@
     <tbody>
       <tr><td>nothing</td><td>writes a new file at that path</td></tr>
       <tr><td>a document on this subject</td><td>rewrites it in place, and <code>INDEX.md</code> keeps its one line</td></tr>
-      <tr><td>a document whose <code>Question</code> or <code>Goal</code> names another subject</td><td>stops with <code>STATUS: INSUFFICIENT-INPUT</code>, and writes nothing</td></tr>
+      <tr><td>a document whose <code>Question</code> or <code>Goal</code> names another subject</td><td>stops with <span class="chip">INSUFFICIENT-INPUT</span>, and writes nothing</td></tr>
     </tbody>
   </table>
 
-  <p>The title stays the same across re-renders. A rewrite never renames a
-  document on its own. One subject is one file.
-  <span class="src">.claude/skills/writing/references/doctypes.md:62-68 @ 1c7bffb</span></p>
+  <h2 id="fork">Context inside the fork</h2>
 
-  <h2>Context inside the fork</h2>
+  <table>
+    <thead>
+      <tr><th>frontmatter key</th><th>what it pins</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>model</code></td><td><code>opus</code></td></tr>
+      <tr><td><code>background</code></td><td><code>false</code></td></tr>
+      <tr><td><code>allowed-tools</code></td><td><code>Read</code>, <code>Grep</code>, <code>Glob</code>, <code>Write</code>, <code>Edit</code>, <code>Bash</code></td></tr>
+    </tbody>
+  </table>
 
-  <p>The skill runs in a fork of its own. The frontmatter pins the model to
-  <code>opus</code>. <code>background: false</code> holds the invoking turn until
-  the fork returns. <code>allowed-tools</code> grants <code>Read</code>,
-  <code>Grep</code>, <code>Glob</code>, <code>Write</code>, <code>Edit</code>,
-  and <code>Bash</code>.
-  <span class="src">.claude/skills/writing/SKILL.md:1-10 @ 1c7bffb</span></p>
-
-  <p>The fork holds no conversation history. No user answers a question during
-  the run. Every claim on the page comes from a file the run read. Memory is not
-  a source. Only the return message reaches the main session. Every file read
-  and all tool output die with the fork context.
+  <p>The skill runs in a fork of its own.
+  <span class="src">.claude/skills/writing/SKILL.md:1-10 @ 1c7bffb</span>
+  <code>background: false</code> holds the invoking turn until the fork returns.
+  The fork holds no conversation history. No user answers a question during the
+  run. Memory is not a source. The return message carries a status line and
+  <span class="ct">5&times; section</span>.
   <span class="src">.claude/skills/writing/SKILL.md:28-39 @ 1c7bffb</span></p>
 
-  <p>The return message carries a status line and five sections.</p>
-
   <ul>
-    <li><code>## Output</code> — the absolute output path, then the section list.</li>
-    <li><code>## Findings the reader needs</code> — 3 to 6 facts, each with the file it came from.</li>
-    <li><code>## Grounding</code> — every file the run read. It is a superset of every file the message names elsewhere.</li>
-    <li><code>## Residual uncertainty</code> — the highest-risk claim on the page, and what would settle it.</li>
-    <li><code>## Next action</code> — the caller's work: the <code>INDEX.md</code> line, and the commit that lands both files.</li>
+    <li><code>## Output</code> — where the run left the file.
+      <ul>
+        <li>the absolute output path</li>
+        <li>the section list</li>
+      </ul></li>
+    <li><code>## Findings the reader needs</code> — the facts the caller carries forward.
+      <ul>
+        <li>3 to 6 of them</li>
+        <li>the file each one came from</li>
+      </ul></li>
+    <li><code>## Grounding</code> — every file the run read.
+      <ul>
+        <li>a superset of every file the message names elsewhere</li>
+      </ul></li>
+    <li><code>## Residual uncertainty</code> — the claim on the page most likely to be wrong.
+      <ul>
+        <li>what that claim is</li>
+        <li>what would settle it</li>
+      </ul></li>
+    <li><code>## Next action</code> — the caller's work.
+      <ul>
+        <li>the <code>INDEX.md</code> line</li>
+        <li>the commit that lands both files</li>
+      </ul></li>
   </ul>
+
+  <p>Every claim on the page comes from a file the run read. Only the return
+  message reaches the main session. Every file read and all tool output die with
+  the fork context.
+  <span class="src">.claude/skills/writing/SKILL.md:28-39 @ 1c7bffb</span></p>
 
   <div class="pair">
     <div class="do">
@@ -211,15 +294,14 @@
     </div>
     <div class="dont">
       <h4>Brief naming no readable source</h4>
-      <p>The run ends. It returns <code>STATUS: INSUFFICIENT-INPUT</code>, names
-      what is missing, and writes no HTML. A proposal brief takes no exemption
-      here, because its AS-IS half still needs a readable source.</p>
+      <p>The run ends. It returns
+      <span class="chip">INSUFFICIENT-INPUT</span>, names what is missing, and
+      writes no HTML. A proposal brief takes no exemption here, because its
+      AS-IS half still needs a readable source.</p>
     </div>
   </div>
 
-  <h2>Run sequence, brief to delivered file</h2>
-
-  <p>Nine steps make one run, in four stages.</p>
+  <h2 id="run">Run sequence, brief to delivered file</h2>
 
   <figure id="fig-run">
     <svg viewBox="0 0 360 420" role="img" aria-labelledby="f-run-t">
@@ -279,26 +361,55 @@
         <text x="344" y="278" dy=".35em">5</text>
       </g>
     </svg>
-    <figcaption>Keyed step chain, one run at <code>1c7bffb</code>. Key: circled
-      numeral — one stage or the fix edge; solid arrow — the forward path; bare
-      text at the margin — the status the run returns there.</figcaption>
-    <ol class="steps">
-      <li><strong>Route</strong> — step 0. Fix the doctype, then derive
-      <code>&lt;target&gt;/docs/&lt;slice&gt;.html</code>. A request that belongs
-      to another skill exits here with <code>STATUS: INSUFFICIENT-INPUT</code>.</li>
-      <li><strong>Read and split</strong> — steps 1 and 2. Read every named
-      source. Pin each repository once with
-      <code>git rev-parse --short HEAD</code>. Split the subject into 4 to 7
-      sections that neither overlap nor leave a gap.</li>
-      <li><strong>Draw and draft</strong> — steps 3 to 5. Route each section
-      question to one component. Draw each figure before its prose. Draft
-      against the twelve rules in <code>draft-rules.md</code>.</li>
-      <li><strong>Build and check</strong> — steps 6 to 8. Write one HTML file at
-      the output path. Run <code>render-check</code>, then read both images back.
-      Step 8 runs <code>open</code> when the brief asks for it.</li>
-      <li><strong>Fix edge</strong> — a failing figure returns to the drawing.
-      The loop runs at most three passes. After the third pass the run stops and
-      returns <code>STATUS: PARTIAL</code>, naming the figure that still fails.</li>
+    <figcaption>Nine steps make one run, in
+      <span class="ct">4&times; stage</span>. A figure that still fails sends the
+      run back to the drawing, which is the one edge that runs backwards.</figcaption>
+    <ol class="keys">
+      <li><span class="k">1</span><div>
+        <p><strong>Route</strong> — step 0 fixes the doctype and the output path.</p>
+        <ul>
+          <li>The path is <code>&lt;target&gt;/docs/&lt;slice&gt;.html</code>.</li>
+          <li>A request that belongs to another skill exits here with
+            <span class="chip">INSUFFICIENT-INPUT</span>.</li>
+        </ul>
+      </div></li>
+      <li><span class="k">2</span><div>
+        <p><strong>Read and split</strong> — steps 1 and 2 turn the sources into
+          a section plan.</p>
+        <ul>
+          <li>Read every named source.</li>
+          <li>Pin each repository once with
+            <code>git rev-parse --short HEAD</code>.</li>
+          <li>Split the subject into 4 to 7 sections that neither overlap nor
+            leave a gap.</li>
+        </ul>
+      </div></li>
+      <li><span class="k">3</span><div>
+        <p><strong>Draw and draft</strong> — steps 3 to 5 put the page together.</p>
+        <ul>
+          <li>Route each section question to one component.</li>
+          <li>Draw each figure before its prose.</li>
+          <li>Draft against the twelve rules in <code>draft-rules.md</code>.</li>
+        </ul>
+      </div></li>
+      <li><span class="k">4</span><div>
+        <p><strong>Build and check</strong> — steps 6 to 8 write the file and
+          check it.</p>
+        <ul>
+          <li>Write one HTML file at the output path.</li>
+          <li>Run <code>render-check</code>, then read both images back.</li>
+          <li>Step 8 runs <code>open</code> when the brief asks for it.</li>
+        </ul>
+      </div></li>
+      <li><span class="k">5</span><div>
+        <p><strong>Fix edge</strong> — a failing figure returns to the drawing.</p>
+        <ul>
+          <li>The loop runs at most three passes.</li>
+          <li>After the third pass the run stops and returns
+            <span class="chip">PARTIAL</span>, naming the figure that still
+            fails.</li>
+        </ul>
+      </div></li>
     </ol>
   </figure>
 
@@ -307,7 +418,7 @@
   for the fewest components. It never trims that section.
   <span class="src">.claude/skills/writing/references/draft-rules.md:135-146 @ 1c7bffb</span></p>
 
-  <h2>Render check of the built page</h2>
+  <h2 id="check">Render check of the built page</h2>
 
   <figure id="fig-check" class="pan">
     <svg viewBox="0 0 460 176" style="min-width:460px" role="img" aria-labelledby="f-check-t">
@@ -365,52 +476,93 @@
         <text x="444" y="126" dy=".35em">5</text>
       </g>
     </svg>
-    <figcaption>Three-column mapping of step 7 at <code>1c7bffb</code>. Key:
-      circled numeral — one input, the script, or one result; solid arrow — what
-      the script produces. One file goes in, and three results come out.</figcaption>
-    <ol class="steps">
-      <li><strong>View file</strong> — the one input, at the absolute output path
-      fixed in step 0. The script refuses a path that holds no file.</li>
-      <li><strong>render-check</strong> — the script under
-      <code>scripts/</code>. It drives headless Chrome, crops each image to the
-      drawn page, and runs the three checks below.</li>
-      <li><strong>Two images</strong> — the wide render at 1120 CSS units, and
-      the narrow render at 500 CSS units. The narrow one is the measure the
-      owner reads on a phone.</li>
-      <li><strong>Three verdicts</strong> — <code>page</code> covers the doctype,
-      <code>lang</code>, <code>charset</code>, the viewport meta, the
-      <code>&lt;h1&gt;</code> position, and the provenance terms.
-      <code>svg</code> covers well-formed markup and marker ids.
-      <code>figures</code> runs <code>check-figures</code>.</li>
-      <li><strong>One exit code</strong> — 0 when every check passes, 1 when one
-      check fails, and 2 when the machine cannot run the check at all.</li>
+    <figcaption>Step 7 turns <span class="ct">1&times; view file</span> into
+      <span class="ct">3&times; result</span>: two rendered images, three
+      verdicts, and one exit code.</figcaption>
+    <ol class="keys">
+      <li><span class="k">1</span><div>
+        <p><strong>View file</strong> — the one input, at the absolute output
+          path fixed in step 0.</p>
+        <ul>
+          <li>The script refuses a path that holds no file.</li>
+        </ul>
+      </div></li>
+      <li><span class="k">2</span><div>
+        <p><strong>render-check</strong> — the script under
+          <code>scripts/</code>.</p>
+        <ul>
+          <li>It drives headless Chrome and crops each image to the drawn page.</li>
+          <li>The run calls it by its installed path, because the fork inherits
+            the caller's working directory.</li>
+        </ul>
+      </div></li>
+      <li><span class="k">3</span><div>
+        <p><strong>Two images</strong> — one render at each measure.</p>
+        <ul>
+          <li>the wide render at 1120 CSS units</li>
+          <li>the narrow render at 500 CSS units, the measure the owner reads on
+            a phone</li>
+        </ul>
+      </div></li>
+      <li><span class="k">4</span><div>
+        <p><strong>Three verdicts</strong> — one line per check.</p>
+        <ul>
+          <li><code>page</code> covers the doctype, <code>lang</code>,
+            <code>charset</code>, the viewport meta, the
+            <code>&lt;h1&gt;</code> position, and the provenance terms</li>
+          <li><code>svg</code> covers well-formed markup and marker ids</li>
+          <li><code>figures</code> runs <code>check-figures</code></li>
+        </ul>
+      </div></li>
+      <li><span class="k">5</span><div>
+        <p><strong>One exit code</strong> — the shell reads the verdict from it.</p>
+        <ul>
+          <li><code>0</code> when every check passes</li>
+          <li><code>1</code> when one check fails</li>
+          <li><code>2</code> when the machine cannot run the check at all</li>
+        </ul>
+      </div></li>
     </ol>
   </figure>
 
-  <p>Step 7 calls the script by its installed path, because the fork inherits the
-  caller's working directory. Headless Chrome on macOS does not lay out below 500
-  CSS units. The script measures the width it received with
-  <code>window.innerWidth</code> and prints it beside each render. A narrow render
-  that reads as text cut off at the right edge is the instrument, not the page.
-  <span class="src">.claude/skills/writing/scripts/render-check:19-26 @ 1c7bffb</span></p>
+  <div class="callout">
+    <span class="g" aria-hidden="true">⚠️</span>
+    <p><strong>Headless Chrome does not lay out below 500 CSS units.</strong> The
+    script measures the width it received with <code>window.innerWidth</code> and
+    prints it beside each render. A narrow render that reads as text cut off at
+    the right edge is the instrument, not the page.
+    <span class="src">.claude/skills/writing/scripts/render-check:19-26 @ 1c7bffb</span></p>
+  </div>
 
-  <p><code>check-figures</code> holds three rules, and a figure passes all three.</p>
+  <p><code>check-figures</code> holds <span class="ct">3&times; rule</span>, and
+  a figure passes all three.</p>
 
   <ul>
-    <li>Annotation text is at least 10 viewBox units, which renders above the 8 px floor on a phone.</li>
-    <li>A figure over 360 viewBox units carries <code>class="pan"</code> and an inline <code>min-width</code> equal to its viewBox width.</li>
-    <li>A figure viewBox is at most 620 units wide, the desktop measure.</li>
+    <li><strong>Annotation floor</strong> — annotation text is at least 10 viewBox units.
+      <ul>
+        <li>A 10-unit label renders above the 8 px floor on a phone.</li>
+      </ul></li>
+    <li><strong>Pan threshold</strong> — a figure over 360 viewBox units carries <code>class="pan"</code>.
+      <ul>
+        <li>Its <code>&lt;svg&gt;</code> takes an inline <code>min-width</code> equal to the viewBox width.</li>
+      </ul></li>
+    <li><strong>Maximum width</strong> — a figure viewBox is at most 620 units wide.
+      <ul>
+        <li>620 units is the desktop measure.</li>
+      </ul></li>
   </ul>
 
   <p>The run then reads both images back. A label that touches another mark is
   invisible to the script, which reads markup only.
   <span class="src">~/.claude/git-hooks/check-figures:26-28 @ 98af604</span></p>
 
-  <h2>Requests and outputs outside the run</h2>
+  <h2 id="outside">Requests and outputs outside the run</h2>
 
-  <p>Six kinds of request reach the skill and start no run. Five outputs stay
-  outside every run. A request in the first group ends the run: it returns
-  <code>STATUS: INSUFFICIENT-INPUT</code>, names the route, and writes no HTML.
+  <p><span class="ct">6&times; request</span> reaches the skill and starts no
+  run. <span class="ct">5&times; output</span> stays outside every run. A request
+  in the first group ends the run: it returns
+  <span class="chip">INSUFFICIENT-INPUT</span>, names the route, and writes no
+  HTML.
   <span class="src">.claude/skills/writing/evals/trigger-cases.md:18-35 @ 1c7bffb</span></p>
 
   <table>
@@ -439,9 +591,13 @@
   a change whose cause is already established is a proposal. It starts a run.
   <span class="src">.claude/skills/writing/evals/trigger-cases.md:29-32 @ 1c7bffb</span></p>
 
-  <p>A view carries no script. A request that needs one moving part is the wrong
-  deliverable. The run says so instead of writing a page that cannot move.
-  <span class="src">.claude/skills/writing/SKILL.md:182-190 @ 1c7bffb</span></p>
+  <div class="callout">
+    <span class="g" aria-hidden="true">🚫</span>
+    <p><strong>A view carries no script.</strong> A request that needs one moving
+    part is the wrong deliverable. The run says so instead of writing a page that
+    cannot move.
+    <span class="src">.claude/skills/writing/SKILL.md:182-190 @ 1c7bffb</span></p>
+  </div>
 
 </article>
 </body>
