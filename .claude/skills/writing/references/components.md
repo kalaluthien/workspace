@@ -8,6 +8,7 @@ each component must show.
 - [The elements carrier](#the-elements-carrier)
 - [File map](#file-map)
 - [Specimen anatomy](#specimen-anatomy)
+- [Typed record](#typed-record)
 - [Keyed option panels](#keyed-option-panels)
 - [Not in this vocabulary](#not-in-this-vocabulary)
 
@@ -34,6 +35,7 @@ components of one kind for one content.
 | Which step does no code perform? | Human-action badge | That transition, and nothing else | `page-html.md` |
 | How many parts are in this set? | Count chip | The complete set | `page-html.md` |
 | Which state or mode is this? | Value chip | One member of a named set, inline in a sentence | `page-html.md` |
+| What is this term, field by field? | Typed record | One fixed field set, repeated across every member of the kind | below |
 | What backs this, for a reader who wants it? | Toggle | The evidence, under a summary that already states the finding | `page-html.md` |
 | Where did this claim come from? | Source citation | The file, the line, and the pinned commit | `page-html.md` |
 
@@ -75,10 +77,15 @@ names them in its role column, the do-and-do-not pair in its two headings,
 the grouped table in its group header rows, and the specimen anatomy on its
 leader lines. The five SVG figures all take numbered circles and a legend.
 
-The caption states the diagram type and its scope, and it carries the key.
-Rule G in `draft-rules.md` fixes what the caption says. A figure may carry
-invented illustrative values only when its caption says so. A file map and a
-specimen never invent.
+**The caption is one or two plain sentences saying what the figure shows, and
+it never carries the key.** A caption that spells out "circled numeral — one
+stage; dashed box — an artifact nobody has built" restates the carrier
+directly under it, and the reader pays for the same list twice. Write the
+caption a paper writes: what the drawing shows, then at most one sentence for
+a convention the drawing alone cannot state, such as what a dashed mark means.
+Rule G in `draft-rules.md` fixes the rest. A figure may carry invented
+illustrative values only when its caption says so. A file map and a specimen
+never invent.
 
 ## File map
 
@@ -95,9 +102,8 @@ table.
       <tr><td>└── references/</td><td>one file per step that needs one</td></tr>
     </tbody>
   </table>
-  <figcaption>File map of the skill directory at the pinned commit. Key:
-    indentation — directory nesting; right column — the part's role. One
-    entry point, five references.</figcaption>
+  <figcaption>The skill directory at the pinned commit: one entry point and
+    five references, with each part's role beside it.</figcaption>
 </figure>
 ```
 
@@ -124,6 +130,26 @@ agent-config-scopes.html
 
 An artifact whose fields name themselves, such as JSON or `key=value`, is a
 table and not a specimen.
+
+## Typed record
+
+A term of art whose parts a reader must hold at once: what it is, what it
+holds, one instance, one non-instance. One record per member of the kind, each
+with a name bar and the same field set under it. The markup and the CSS are in
+`page-html.md`.
+
+The field set is the record's type, so every member repeats it in the same
+order, and a member with nothing for a field still shows the field. A reader
+who has learned one record can then read the next by position. Two kinds on
+one page take two field sets: the members of a kind share theirs, and nothing
+forces one set across kinds.
+
+This is the one place a repeated label set is right, and `page-html.md` keeps
+the shape out of tables. A definition is not a comparison, so the labels are
+what the reader navigates by rather than a column they were denied. Use it for
+a proposal's Domain section, where `doctypes.md` already demands a definition,
+an example, and a counter-example per term. Do not use it for options, whose
+component is keyed option panels.
 
 ## Keyed option panels
 
@@ -154,12 +180,13 @@ the label states the genre twice and states the content zero times. The
 bordered blocks this skill does draw, the do-and-do-not panels, take headings
 naming their own content.
 
-**Label-value definition rows.** A row that repeats one label set under every
-item is a form, not a comparison: `Refutes / Maintenance / Verdict` under
-option one, then again under option two, then again. A reader compares
-nothing, because the values never sit side by side. Route the content to
-keyed option panels above, or to a grouped table when the values really are
-short and flat.
+**Label-value rows carrying a comparison.** A row that repeats one label set
+under every item compares nothing, because the values never sit side by side:
+`Refutes / Maintenance / Verdict` under option one, then again under option
+two, then again. Route a comparison to keyed option panels above, or to a
+grouped table when the values really are short and flat. The typed record uses
+the same shape for the opposite job — a reader who wants one term's fields, not
+two terms ranked — so the fault is the comparison, never the repeated labels.
 
 The second shape has one entrance left, and `page-html.md` closes it: a wide
 table that turns itself into label-value rows at the narrow measure. There is

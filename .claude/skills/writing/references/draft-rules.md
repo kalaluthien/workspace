@@ -78,9 +78,12 @@ say what object it is about, it fails.
 
 Events go to a step chain, states to a state machine, actor order to a
 sequence diagram. The caption states the mission as a fact about the system,
-never as a fact about the drawing.
+never as a fact about the drawing. It runs to at most two sentences and it
+carries no key, because the legend under it already names every part.
 
 - Rejected: "Figure 2 shows the lifecycle of a task."
+- Rejected: "Keyed step chain. Key: circled numeral — one stage; dashed box —
+  an artifact nobody has built; dashed arrow — a proposed link."
 - Accepted: "`diffing` compares the old status value against the new one. It
   does not check the order, so a record can move from announced straight to
   done."

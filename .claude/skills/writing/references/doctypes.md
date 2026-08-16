@@ -107,15 +107,25 @@ the same words they do. On a proposal this section carries the page's
 negative space, so a proposal owes no separate negative-space section.
 
 Each definition carries one example and one counter-example, both from files
-the run read, per rule M in `draft-rules.md`. A definition of `spec` shows one
-real spec file, then the nearest file that is not one:
+the run read, per rule M in `draft-rules.md`. A term defined in words alone is
+where two readers agree on a sentence and mean different files.
 
-> **Spec** — a normative `.md` a reader settles a dispute against, such as
-> `docs/README.md`. Not `docs/agent-hooks.html`, which is derived and goes
-> stale by design.
+**The terms of one kind are drawn as typed records, never as a bullet each.**
+Four statements per term — what it is, one instance, one non-instance, and
+whatever the proposal moves it by — pack into one unreadable paragraph when a
+bullet carries them. The record gives each statement its own field, and the
+shared field set lets a reader read the second term by position. The component
+is in `components.md`, its markup in `page-html.md`.
 
-A term defined in words alone is where two readers agree on a sentence and
-mean different files.
+| field | what it holds |
+|---|---|
+| `is` | the definition, in one line |
+| `holds` | what the thing is made of, where that is part of the term |
+| `instance` | one real example, from a file the run read |
+| `not` | the nearest things it is not, one per line |
+
+Add a field the proposal's own argument turns on, such as `verdict` for a
+stage that gates or informs, and give it to every member of the kind.
 
 **The decisions come last.** A decision list placed before the argument asks
 the reader to accept rulings on a change nobody has explained yet, and it

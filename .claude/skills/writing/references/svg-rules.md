@@ -126,8 +126,8 @@ cognitive disability, which a hidden `sr-only` description does not.
     <title id="f1t">Three stages of one run, from the source read to the render check</title>
     …
   </svg>
-  <figcaption>Keyed step chain, one run at the pinned commit. Key: circled
-    numeral — one stage; solid arrow — the forward path.</figcaption>
+  <figcaption>One run at the pinned commit, from the source read to the
+    render check.</figcaption>
   <ol class="keys">
     <li><span class="k">1</span><p><strong>Read the source</strong> — stage. One sentence.</p></li>
   </ol>

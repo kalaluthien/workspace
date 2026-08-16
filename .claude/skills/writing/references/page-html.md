@@ -9,6 +9,7 @@ drawing.
 - [Tables](#tables)
 - [Do and do-not pair](#do-and-do-not-pair)
 - [Chips and badges](#chips-and-badges)
+- [Typed record](#typed-record)
 - [Icon callout](#icon-callout)
 - [Source citation](#source-citation)
 - [Toggle](#toggle)
@@ -77,8 +78,13 @@ ol.steps > li::marker { font-weight: 700; }
 ol.keys { list-style: none; padding-left: 0; margin: 1rem 0; }
 ol.keys > li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .6rem; margin: .8rem 0; }
 /* A grid track sizes to its longest unbreakable token unless it may shrink,
-   so a legend item holding a citation path would push the page sideways. */
-ol.keys > li > p { min-width: 0; margin: 0; }
+   so a legend item holding a path would push the page sideways. The <div> is
+   the wrapper a legend item takes when it separates its statements: two
+   children of the <li> would land the second one in the numeral column. */
+ol.keys > li > p, ol.keys > li > div { min-width: 0; }
+ol.keys > li > p, ol.keys > li > div > p { margin: 0; }
+ol.keys ul { margin: .3rem 0 0; padding-left: 1.05rem; }
+ol.keys ul li { margin: .2rem 0; }
 .k { display: inline-flex; align-items: center; justify-content: center; width: 1.45rem; height: 1.45rem;
   border: 1px solid var(--ink); border-radius: 50%; font-size: .72rem; font-weight: 700; }
 a { color: #14459b; text-decoration-color: #9bb0d8; }
@@ -116,6 +122,20 @@ table.filemap td:first-child { font-family: ui-monospace, SFMono-Regular, Menlo,
 .dont { border-style: dashed; }
 .do h4::before { content: "\2713\00a0"; }
 .dont h4::before { content: "\2715\00a0"; }
+/* One typed record per term: a name bar, then a fixed field set. The field
+   column is the record's type, so every record of one kind repeats it. */
+.recs { display: grid; gap: .9rem; margin: 1.4rem 0; }
+.rec { border: 1px solid var(--ink); }
+.rec-n { margin: 0; padding: .35rem .75rem; background: var(--wash);
+  border-bottom: 1px solid var(--ink); font-weight: 700; font-size: .92rem; }
+.rec-t { font-weight: 400; color: var(--mute); font-size: .78rem; }
+.rec dl { display: grid; grid-template-columns: max-content 1fr; gap: .25rem .8rem;
+  margin: 0; padding: .55rem .75rem .65rem; font-size: .9rem; }
+.rec dt { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .74rem;
+  color: var(--mute); padding-top: .22rem; white-space: nowrap; }
+.rec dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.rec dd ul { margin: .1rem 0 0; padding-left: 1.05rem; }
+.rec dd li { margin: .15rem 0; }
 .ct { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem;
   border: 1px solid var(--ink); border-radius: 3px; padding: 1px 4px; white-space: nowrap; }
 .hum { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem;
@@ -200,6 +220,33 @@ where each one is owed.
 - **Human badge**, rounded. The one transition no code performs, and nothing
   else.
 
+## Typed record
+
+One `div.recs` holds every member of one kind, stacked down the page. Each
+member is a `div.rec`: a name bar, then a `<dl>` of the kind's fields in a
+fixed order. `components.md` says when this component is the right one.
+
+```html
+<div class="recs">
+  <div class="rec">
+    <p class="rec-n"><code>tm-&lt;kebab-name&gt;</code> <span class="rec-t">term</span></p>
+    <dl>
+      <dt>half</dt>      <dd>domain</dd>
+      <dt>is</dt>        <dd>a word the program is about</dd>
+      <dt>instance</dt>  <dd>“balance”, how much water a plant still holds</dd>
+      <dt>settled by</dt><dd>a code identifier, <code>PlantStatus.balance</code></dd>
+      <dt>not</dt>       <dd>the code identifier that settles it</dd>
+    </dl>
+  </div>
+</div>
+```
+
+A field label is a short lowercase word, in monospace, and it is a label
+rather than a sentence. A `<dd>` holding more than one statement carries a
+`<ul>`, which is what keeps a definition, an example, and a non-example from
+collapsing into one paragraph. The name bar carries the term or its identifier
+grammar, with the kind beside it in `.rec-t`.
+
 ## Icon callout
 
 One glyph, one short paragraph, on the wash ground. It carries a warning, a
@@ -228,6 +275,14 @@ page standing on two repositories carries each file's own commit.
 ```html
 <span class="src">src/board/server/docs.py:101 @ 8fd13c1</span>
 ```
+
+**A citation sits on a prose claim, a callout, or evidence inside a toggle,
+and never inside a definition list or a figure legend.** A reader of a
+definition is reading for the term, and a `path:12-34 @ 9e2a365` tail at the
+end of that definition is a token nobody reads and everybody steps over. Where
+the file itself is the example, name the readable path alone, with no line
+range and no commit; the section's own prose carries the pinned citation for
+the same claim.
 
 A citation takes an `<a href>` only when the reader can open the target
 without a login. These repositories are private, so a file citation stays
