@@ -128,16 +128,16 @@
         <tr><td>writing/</td><td>the skill directory</td></tr>
         <tr><td>├── SKILL.md</td><td>entry point, steps 0 to 8</td></tr>
         <tr><td>├── references/</td><td>read at the step that names one</td></tr>
-        <tr><td>│   ├── components.md</td><td>step 3, twelve components</td></tr>
+        <tr><td>│   ├── components.md</td><td>step 3, sixteen components</td></tr>
         <tr><td>│   ├── doctypes.md</td><td>step 0, three doctypes</td></tr>
-        <tr><td>│   ├── draft-rules.md</td><td>step 5, twelve draft rules</td></tr>
+        <tr><td>│   ├── draft-rules.md</td><td>step 5, fifteen draft rules</td></tr>
         <tr><td>│   ├── page-html.md</td><td>step 6, skeleton and CSS</td></tr>
         <tr><td>│   ├── plain-writing.md</td><td>step 5, caps and word lists</td></tr>
         <tr><td>│   └── svg-rules.md</td><td>step 4, figure geometry</td></tr>
         <tr><td>├── scripts/</td><td>run, never read</td></tr>
         <tr><td>│   └── render-check</td><td>step 7, renders and checks</td></tr>
         <tr><td>└── evals/</td><td>read by an author, not by a run</td></tr>
-        <tr><td>    └── trigger-cases.md</td><td>twelve requests, eighteen rubric lines</td></tr>
+        <tr><td>    └── trigger-cases.md</td><td>twelve requests, twenty-two rubric lines</td></tr>
       </tbody>
     </table>
     <figcaption>One entry point, <span class="ct">6&times; reference</span>, one
@@ -146,16 +146,16 @@
   </figure>
 
   <p><code>SKILL.md</code> holds the frontmatter and the nine steps.
-  <span class="src">.claude/skills/writing/SKILL.md:1-190 @ 1c7bffb</span>
+  <span class="src">.claude/skills/writing/SKILL.md:1-152 @ a5b1501</span>
   No step names <code>evals/trigger-cases.md</code>, so a run never reads it.
-  <span class="src">.claude/skills/writing/SKILL.md:51-146 @ 1c7bffb</span></p>
+  <span class="src">.claude/skills/writing/SKILL.md:51-152 @ a5b1501</span></p>
 
   <h2 id="brief">Fields of the brief</h2>
 
   <p>The brief is the whole input to a run. It carries
   <span class="ct">5&times; field</span>. An unnamed doctype defaults to
   <span class="chip">explanation</span>.
-  <span class="src">.claude/skills/writing/SKILL.md:41-53 @ 1c7bffb</span></p>
+  <span class="src">.claude/skills/writing/SKILL.md:41-53 @ a5b1501</span></p>
 
   <table>
     <thead>
@@ -215,11 +215,11 @@
 
   <p>The title stays the same across re-renders. A rewrite never renames a
   document on its own. One subject is one file.
-  <span class="src">.claude/skills/writing/references/doctypes.md:62-72 @ 1c7bffb</span></p>
+  <span class="src">.claude/skills/writing/references/doctypes.md:62-72 @ a5b1501</span></p>
 
   <p>Step 0 then reads <code>INDEX.md</code> and lists the views the store
   already holds. Three outcomes follow.
-  <span class="src">.claude/skills/writing/SKILL.md:53-70 @ 1c7bffb</span></p>
+  <span class="src">.claude/skills/writing/SKILL.md:53-69 @ a5b1501</span></p>
 
   <table>
     <thead>
@@ -246,12 +246,14 @@
   </table>
 
   <p>The skill runs in a fork of its own.
-  <span class="src">.claude/skills/writing/SKILL.md:1-10 @ 1c7bffb</span>
+  <span class="src">.claude/skills/writing/SKILL.md:1-10 @ a5b1501</span>
   <code>background: false</code> holds the invoking turn until the fork returns.
   The fork holds no conversation history. No user answers a question during the
-  run. Memory is not a source. The return message carries a status line and
+  run. Memory is not a source.
+  <span class="src">.claude/skills/writing/SKILL.md:28-39 @ a5b1501</span>
+  The return message carries a status line and
   <span class="ct">5&times; section</span>.
-  <span class="src">.claude/skills/writing/SKILL.md:28-39 @ 1c7bffb</span></p>
+  <span class="src">.claude/skills/writing/SKILL.md:154-176 @ a5b1501</span></p>
 
   <ul>
     <li><code>## Output</code> — where the run left the file.
@@ -283,7 +285,7 @@
   <p>Every claim on the page comes from a file the run read. Only the return
   message reaches the main session. Every file read and all tool output die with
   the fork context.
-  <span class="src">.claude/skills/writing/SKILL.md:28-39 @ 1c7bffb</span></p>
+  <span class="src">.claude/skills/writing/SKILL.md:154-157 @ a5b1501</span></p>
 
   <div class="pair">
     <div class="do">
@@ -389,7 +391,7 @@
         <ul>
           <li>Route each section question to one component.</li>
           <li>Draw each figure before its prose.</li>
-          <li>Draft against the twelve rules in <code>draft-rules.md</code>.</li>
+          <li>Draft against the fifteen rules in <code>draft-rules.md</code>.</li>
         </ul>
       </div></li>
       <li><span class="k">4</span><div>
@@ -413,10 +415,21 @@
     </ol>
   </figure>
 
-  <p>An explanation and a proposal each hold one section of negative space: what
-  does not start the subject, and what the subject does not change. Rule L asks
-  for the fewest components. It never trims that section.
-  <span class="src">.claude/skills/writing/references/draft-rules.md:135-146 @ 1c7bffb</span></p>
+  <p>An explanation and a proposal each carry negative space: what does not
+  start the subject, and what the subject does not change. Rule L asks for the
+  fewest components. It never trims the negative space.
+  <span class="src">.claude/skills/writing/references/draft-rules.md:136-149 @ a5b1501</span></p>
+
+  <p>The doctype fixes where the negative space sits.
+  <span class="src">.claude/skills/writing/SKILL.md:88-93 @ a5b1501</span></p>
+
+  <ul>
+    <li><span class="chip">explanation</span> — a section of its own.</li>
+    <li><span class="chip">proposal</span> — the Domain section, which its
+      fixed section order already requires.</li>
+    <li><span class="chip">guide</span> — none, because a guide walks one
+      procedure.</li>
+  </ul>
 
   <h2 id="check">Render check of the built page</h2>
 
@@ -492,6 +505,10 @@
           <code>scripts/</code>.</p>
         <ul>
           <li>It drives headless Chrome and crops each image to the drawn page.</li>
+          <li>At each width it compares the document's <code>scrollWidth</code>
+            against the viewport, because a screenshot crops sideways overflow
+            away.
+            <span class="src">.claude/skills/writing/scripts/render-check:110-132 @ a5b1501</span></li>
           <li>The run calls it by its installed path, because the fork inherits
             the caller's working directory.</li>
         </ul>
@@ -531,7 +548,7 @@
     script measures the width it received with <code>window.innerWidth</code> and
     prints it beside each render. A narrow render that reads as text cut off at
     the right edge is the instrument, not the page.
-    <span class="src">.claude/skills/writing/scripts/render-check:19-26 @ 1c7bffb</span></p>
+    <span class="src">.claude/skills/writing/scripts/render-check:19-23 @ a5b1501</span></p>
   </div>
 
   <p><code>check-figures</code> holds <span class="ct">3&times; rule</span>, and
@@ -554,7 +571,7 @@
 
   <p>The run then reads both images back. A label that touches another mark is
   invisible to the script, which reads markup only.
-  <span class="src">~/.claude/git-hooks/check-figures:26-28 @ 98af604</span></p>
+  <span class="src">~/.claude/git-hooks/check-figures:26-28 @ 8a82a8e</span></p>
 
   <h2 id="outside">Requests and outputs outside the run</h2>
 
@@ -563,7 +580,8 @@
   in the first group ends the run: it returns
   <span class="chip">INSUFFICIENT-INPUT</span>, names the route, and writes no
   HTML.
-  <span class="src">.claude/skills/writing/evals/trigger-cases.md:18-35 @ 1c7bffb</span></p>
+  <span class="src">.claude/skills/writing/evals/trigger-cases.md:22-31 @ a5b1501</span>
+  <span class="src">.claude/skills/writing/references/doctypes.md:165-173 @ a5b1501</span></p>
 
   <table>
     <thead>
@@ -589,14 +607,14 @@
   <p>Two neighbouring requests split on one word. A request to find a cause is a
   diagnosis. It goes to the <code>debugger</code> subagent. A request to lay out
   a change whose cause is already established is a proposal. It starts a run.
-  <span class="src">.claude/skills/writing/evals/trigger-cases.md:29-32 @ 1c7bffb</span></p>
+  <span class="src">.claude/skills/writing/evals/trigger-cases.md:33-36 @ a5b1501</span></p>
 
   <div class="callout">
     <span class="g" aria-hidden="true">🚫</span>
     <p><strong>A view carries no script.</strong> A request that needs one moving
     part is the wrong deliverable. The run says so instead of writing a page that
     cannot move.
-    <span class="src">.claude/skills/writing/SKILL.md:182-190 @ 1c7bffb</span></p>
+    <span class="src">.claude/skills/writing/SKILL.md:188-191 @ a5b1501</span></p>
   </div>
 
 </article>
