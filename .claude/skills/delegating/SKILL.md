@@ -36,8 +36,10 @@ or not. All scripts live in
 
    Model and effort follow the global preference (`~/.claude/CLAUDE.md`,
    "Claude Code"): every session launches as Opus, whatever its role, because
-   a session owns decisions — what to try, what to commit — and Fable stays
-   with this orchestrator, never below it. Effort is per task, not per role:
+   a session owns decisions — what to try, what to commit. `--model fable` is
+   the exception, and the task earns it: a problem that is extremely hard, a
+   mission that reads two ways, a design with no obvious shape. Never pass it
+   because this orchestrator happens to run that tier. Effort is per task, not per role:
    it measures breadth. Pass `--effort high` (or `xhigh`) when the task spans
    many exceptional cases or a large state space; keep the default `medium`
    (or drop to `low`) when the scope is narrow. Subagents a session spawns
