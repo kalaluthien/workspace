@@ -5,10 +5,11 @@
 #
 # The name says what the session is for — <role>-<task>, for example
 # survey-tflite-detectors or build-preview-crash. Every session launches as
-# Opus (a session owns decisions; Fable stays with the orchestrator, per
-# ~/.claude/CLAUDE.md "Claude Code"). Pass --effort per the task's breadth —
-# the default medium fits a narrow scope. --model is an escape hatch for one
-# session. The same name lands on the claude session (`--name`), so `/resume`
+# Opus (a session owns decisions, per ~/.claude/CLAUDE.md "Claude Code").
+# --model is the escape hatch, and the task earns it: fable for a problem that
+# is extremely hard or reads two ways, never because the orchestrator runs
+# that tier. Pass --effort per the task's breadth — the default medium fits a
+# narrow scope. The same name lands on the claude session (`--name`), so `/resume`
 # and the transcript under ~/.claude/projects/ answer to it after the pane
 # closes.
 #

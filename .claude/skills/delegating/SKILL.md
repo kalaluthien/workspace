@@ -39,10 +39,15 @@ or not. All scripts live in
    a session owns decisions — what to try, what to commit. `--model fable` is
    the exception, and the task earns it: a problem that is extremely hard, a
    mission that reads two ways, a design with no obvious shape. Never pass it
-   because this orchestrator happens to run that tier. Effort is per task, not per role:
-   it measures breadth. Pass `--effort high` (or `xhigh`) when the task spans
-   many exceptional cases or a large state space; keep the default `medium`
-   (or drop to `low`) when the scope is narrow. Subagents a session spawns
+   because this orchestrator happens to run that tier. Effort is per task, not
+   per role: it is a thinking budget, and both breadth and difficulty spend it.
+   Pass `--effort high` (or `xhigh`) when the task spans many exceptional cases
+   or a large state space, or when its one case is genuinely hard; keep the
+   default `medium` (or drop to `low`) when the task is both narrow and well
+   understood. Where a backlog item is the task, its `#easy` or `#hard` tag is
+   that estimate already made at writing time — take it instead of guessing
+   again, and take the hardest tag in a batch, since one session works the
+   whole set. Subagents a session spawns
    follow the same preference — Opus where they decide, Sonnet where they
    search, classify, or summarize.
 
