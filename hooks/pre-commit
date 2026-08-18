@@ -7,10 +7,11 @@
 # catalogued, every catalogued view present, the provenance block, the
 # doctype, its chapter, and the Updated date.
 #
-# It reads the working tree, not the index, so an unstaged problem under
-# docs/ blocks the commit too. That is the wrong half of the trade only when
-# docs/ is dirty for another reason; the checker owns whole-directory rules
-# (a chapter listing a file that is not there) that the index cannot answer.
+# --staged points it at the index, so the tree it judges is the one this
+# commit ships: an untracked draft under docs/ cannot refuse a commit that
+# does not carry it. The index is a whole tree, so the checker keeps its
+# whole-directory rules — a chapter listing a file that is not staged still
+# fails.
 #
 # Git hooks do not clone. Wire this directory up once per machine:
 #   git config core.hooksPath .git/local-hooks
@@ -34,4 +35,4 @@ if [ -n "$views" ] && [ -x "$figure_checker" ]; then
 	printf '%s\n' "$views" | sed "s|^|$root/|" | xargs python3 "$figure_checker"
 fi
 
-exec python3 "$root/scripts/check-docs" "$root"
+exec python3 "$root/scripts/check-docs" --staged "$root"

@@ -10,9 +10,13 @@ service compiles the same declaration to build its Docs surface, which is
 what makes the block a contract rather than a description — a document that
 passes here is one the surface can list.
 
-    scripts/check-docs [DIR ...]     # default: the workspace root
+    scripts/check-docs [--staged] [DIR ...]   # default: the workspace root
 
-Each DIR is a repository root holding a `docs/`. What is checked:
+Each DIR is a repository root holding a `docs/`. Without `--staged` the check
+reads the working tree, which is what a person wants before staging anything.
+With `--staged` it reads the git index instead — the tree the commit ships —
+so an untracked draft under `docs/` cannot refuse a commit that does not carry
+it. A `pre-commit` passes `--staged`. What is checked:
 
   1. every view in `docs/` is listed by a chapter of `docs/INDEX.md`
   2. every view a chapter lists exists on disk
@@ -37,6 +41,7 @@ is never a pass.
 import json
 import os
 import re
+import subprocess
 import sys
 
 WORKSPACE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -54,6 +59,63 @@ DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 class ContractError(Exception):
     """The declaration could not be read, with the reason a reader can act on."""
+
+
+class WorkTree(object):
+    """The files as they sit on disk, untracked drafts and all."""
+
+    def names(self, root, directory, extension):
+        path = os.path.join(root, directory)
+        if not os.path.isdir(path):
+            return []
+        return sorted(
+            name
+            for name in os.listdir(path)
+            if name.endswith(extension)
+            and os.path.isfile(os.path.join(path, name))
+        )
+
+    def read(self, root, relative):
+        try:
+            with open(os.path.join(root, relative), encoding="utf-8") as handle:
+                return handle.read()
+        except OSError:
+            return None
+
+
+class Index(object):
+    """The files as the commit stages them.
+
+    A draft nobody staged is not in the index, so it cannot refuse a commit
+    that does not carry it. A staged file is read at its staged content, not
+    at whatever the working tree happens to hold beside it.
+    """
+
+    def names(self, root, directory, extension):
+        listed = self._git(
+            root, ["ls-files", "--cached", "-z", "--", directory + "/*" + extension]
+        )
+        if listed is None:
+            return []
+        found = set()
+        for path in listed.split("\0"):
+            head, _, name = path.rpartition("/")
+            if head == directory and name.endswith(extension):
+                found.add(name)
+        return sorted(found)
+
+    def read(self, root, relative):
+        return self._git(root, ["show", ":" + relative])
+
+    def _git(self, root, argv):
+        result = subprocess.run(
+            ["git", "-C", root] + argv,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+        )
+        if result.returncode != 0:
+            return None
+        return result.stdout.decode("utf-8")
 
 
 def contract(path=CONTRACT_DOCUMENT):
@@ -83,27 +145,17 @@ def contract(path=CONTRACT_DOCUMENT):
     return data
 
 
-def views(root, rule):
+def views(tree, root, rule):
     """Every view of one repository's docs directory, at the declared depth."""
-    directory = os.path.join(root, rule["view"]["dir"])
-    if not os.path.isdir(directory):
-        return []
-    extension = rule["view"]["extension"]
-    return sorted(
-        name
-        for name in os.listdir(directory)
-        if name.endswith(extension)
-        and os.path.isfile(os.path.join(directory, name))
-    )
+    return tree.names(root, rule["view"]["dir"], rule["view"]["extension"])
 
 
-def chapters(root, rule):
+def chapters(tree, root, rule):
     """→ [(chapter title, [view filename, ...])], in the order INDEX.md reads."""
-    path = os.path.join(root, rule["view"]["dir"], rule["index"]["file"])
-    try:
-        with open(path, encoding="utf-8") as handle:
-            text = handle.read()
-    except OSError:
+    text = tree.read(
+        root, os.path.join(rule["view"]["dir"], rule["index"]["file"])
+    )
+    if text is None:
         return None
     prefix = rule["index"]["chapter_prefix"]
     ignore = tuple(rule["index"].get("ignore_lines") or ())
@@ -159,15 +211,15 @@ def role_of(fields, rule, role):
     return None
 
 
-def check(root, rule):
+def check(tree, root, rule):
     """Problems with one repository's docs directory, as a list of sentences."""
     problems = []
     label = os.path.relpath(root, os.path.dirname(WORKSPACE))
-    present = views(root, rule)
+    present = views(tree, root, rule)
     if not present:
         return problems
 
-    book = chapters(root, rule)
+    book = chapters(tree, root, rule)
     chapter_of = {}
     if book is None:
         problems.append(
@@ -194,9 +246,7 @@ def check(root, rule):
         row["name"].casefold(): row["chapter"] for row in rule["doctypes"]
     }
     for name in present:
-        path = os.path.join(root, rule["view"]["dir"], name)
-        with open(path, encoding="utf-8") as handle:
-            text = handle.read()
+        text = tree.read(root, os.path.join(rule["view"]["dir"], name))
         fields = provenance(text, rule)
         if fields is None:
             problems.append(
@@ -259,10 +309,12 @@ def main():
         print("check-docs: %s" % exc, file=sys.stderr)
         return 2
 
-    roots = sys.argv[1:] or [WORKSPACE]
+    argv = sys.argv[1:]
+    tree = Index() if "--staged" in argv else WorkTree()
+    roots = [arg for arg in argv if arg != "--staged"] or [WORKSPACE]
     problems = []
     for root in roots:
-        problems += check(os.path.abspath(root), rule)
+        problems += check(tree, os.path.abspath(root), rule)
     if problems:
         print("check-docs: the docs contract is not satisfied —", file=sys.stderr)
         for problem in problems:

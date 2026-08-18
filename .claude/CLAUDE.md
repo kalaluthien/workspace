@@ -11,7 +11,7 @@ these. A change here is committed to the root repository:
 | `.claude/` | workspace instructions, conditional rules, skills, output styles | this file |
 | `docs/` | workspace-level specs and views, over both planes, plus the machine contract every `docs/` reader parses | `docs/README.md` |
 | `hooks/` | this repository's own git hooks, chained after the shared guard by `.git/local-hooks/pre-commit` | `hooks/pre-commit` |
-| `scripts/` | workspace-level herdr tooling (`herdr-survey`, `herdr-update`) and `check-docs` | script headers |
+| `scripts/` | workspace-level herdr tooling (`herdr-survey`, `herdr-update`), `check-docs` and its test | script headers |
 
 A document request whose topic belongs to no project entry lands in `docs/`,
 as a spec (`.md`) or a view (`.html`) — never in a project entry it does not

@@ -1,0 +1,185 @@
+#!/usr/bin/env python3
+"""Check that `check-docs` judges the tree the commit ships, not the desk.
+
+    scripts/check-docs-test
+
+Each case builds a throwaway git repository under a temporary directory, wires
+the real `hooks/pre-commit` into it, and commits. The repository is thrown away
+with the temporary directory, so nothing here touches the workspace.
+
+HOME points at the temporary directory for every git call. That keeps the
+machine's own git config and hook checkers out of the fixture: this file is
+about which tree `check-docs` reads, and a neighbouring checker firing on the
+fixture's views would answer a different question.
+
+Stdlib only, like the checker it tests. Exit 0 when every case holds.
+"""
+
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+CHECKER = os.path.join(HERE, "check-docs")
+HOOK = os.path.join(os.path.dirname(HERE), "hooks", "pre-commit")
+CONTRACT = os.path.join(os.path.dirname(HERE), "docs", "README.md")
+
+INDEX = """# Docs
+
+## Specifications
+
+- [good.html](good.html) — a view that satisfies the contract
+- [other.html](other.html) — a second one, so the directory is never empty
+"""
+
+VIEW = """<!doctype html>
+<html><head><title>%s</title></head><body>
+<dl class="provenance">
+  <dt>Doctype</dt><dd>spec</dd>
+  <dt>Updated</dt><dd>%s</dd>
+</dl>
+</body></html>
+"""
+
+
+def run(argv, cwd, home):
+    """One command, with its exit code and both streams joined for a report."""
+    environment = dict(os.environ, HOME=home, GIT_CONFIG_NOSYSTEM="1")
+    result = subprocess.run(
+        argv,
+        cwd=cwd,
+        env=environment,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    return result.returncode, result.stdout.decode("utf-8", "replace")
+
+
+def write(root, relative, text):
+    path = os.path.join(root, relative)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write(text)
+
+
+def fixture(home):
+    """A repository holding one good, staged view — the starting point of a case."""
+    root = os.path.join(home, "repo")
+    os.makedirs(os.path.join(root, "docs"))
+    run(["git", "init", "-q", "-b", "main"], root, home)
+    run(["git", "config", "user.email", "test@example.invalid"], root, home)
+    run(["git", "config", "user.name", "check-docs test"], root, home)
+
+    # The hook calls "$root/scripts/check-docs" — the copy under test.
+    os.makedirs(os.path.join(root, "scripts"))
+    shutil.copy(CHECKER, os.path.join(root, "scripts", "check-docs"))
+    shutil.copy(HOOK, os.path.join(root, ".git", "hooks", "pre-commit"))
+    os.chmod(os.path.join(root, ".git", "hooks", "pre-commit"), 0o755)
+
+    # The copied checker reads its contract from its own docs/README.md, so
+    # the fixture carries the real one. It is a .md, so no view rule sees it.
+    shutil.copy(CONTRACT, os.path.join(root, "docs", "README.md"))
+
+    write(root, "docs/INDEX.md", INDEX)
+    write(root, "docs/good.html", VIEW % ("Good", "2026-08-18"))
+    write(root, "docs/other.html", VIEW % ("Other", "2026-08-18"))
+    run(["git", "add", "docs/INDEX.md", "docs/good.html", "docs/other.html"], root, home)
+    return root
+
+
+def commit(root, home):
+    return run(["git", "commit", "-m", "docs: a case"], root, home)
+
+
+def case_untracked_draft_lets_the_commit_through():
+    """The defect this mode exists for: a draft nobody staged blocks nothing."""
+    with tempfile.TemporaryDirectory() as home:
+        root = fixture(home)
+        write(root, "docs/draft.html", VIEW % ("Draft", "2026-08-18"))
+        code, output = commit(root, home)
+        if code != 0:
+            return "an untracked draft refused the commit:\n%s" % output
+
+        # ...and the draft really is a problem, so the case is not vacuous:
+        # a person running the checker by hand must still see it.
+        code, output = run([sys.executable, CHECKER, root], root, home)
+        if code == 0:
+            return "the working-tree mode passed a draft no chapter lists:\n%s" % output
+    return None
+
+
+def case_staged_broken_doc_still_refuses():
+    """The half that must not be lost: a real fault in the staged tree fails."""
+    with tempfile.TemporaryDirectory() as home:
+        root = fixture(home)
+        write(root, "docs/rogue.html", VIEW % ("Rogue", "2026-08-18"))
+        run(["git", "add", "docs/rogue.html"], root, home)
+        code, output = commit(root, home)
+        if code == 0:
+            return "a staged view no chapter lists was let through:\n%s" % output
+        if "rogue.html" not in output:
+            return "the refusal never named rogue.html:\n%s" % output
+    return None
+
+
+def case_staged_malformed_date_still_refuses():
+    """A fault inside a staged view, not just a fault in the catalogue."""
+    with tempfile.TemporaryDirectory() as home:
+        root = fixture(home)
+        write(root, "docs/good.html", VIEW % ("Good", "yesterday"))
+        run(["git", "add", "docs/good.html"], root, home)
+        code, output = commit(root, home)
+        if code == 0:
+            return "a staged view with Updated 'yesterday' was let through:\n%s" % output
+        if "yesterday" not in output:
+            return "the refusal never named the bad date:\n%s" % output
+    return None
+
+
+def case_whole_directory_rule_survives():
+    """The index is a whole tree, so a chapter listing a missing view fails.
+
+    other.html stays staged: a docs directory with no view at all is not
+    checked, so dropping every view would prove nothing.
+    """
+    with tempfile.TemporaryDirectory() as home:
+        root = fixture(home)
+        run(["git", "rm", "-q", "--cached", "docs/good.html"], root, home)
+        os.remove(os.path.join(root, "docs", "good.html"))
+        code, output = commit(root, home)
+        if code == 0:
+            return "a chapter listing an unstaged view was let through:\n%s" % output
+        if "good.html" not in output:
+            return "the refusal never named good.html:\n%s" % output
+    return None
+
+
+CASES = [
+    case_untracked_draft_lets_the_commit_through,
+    case_staged_broken_doc_still_refuses,
+    case_staged_malformed_date_still_refuses,
+    case_whole_directory_rule_survives,
+]
+
+
+def main():
+    failed = 0
+    for case in CASES:
+        name = case.__name__.replace("case_", "").replace("_", " ")
+        problem = case()
+        if problem:
+            failed += 1
+            print("FAIL  %s\n      %s" % (name, problem.replace("\n", "\n      ")))
+        else:
+            print("ok    %s" % name)
+    if failed:
+        print("\ncheck-docs-test: %d of %d cases failed" % (failed, len(CASES)))
+        return 1
+    print("\ncheck-docs-test: %d cases, all ok" % len(CASES))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
