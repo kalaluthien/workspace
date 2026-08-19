@@ -224,10 +224,8 @@ leave room for its duplicate suffix, so the prefix spends 17 and the task part
 is cut to about 12 — every worked example in this file loses letters. And a
 clipped name is no longer a `/resume` key, so a worker launched this way is
 found through its ticket rather than through its own transcript.
-A close in a migrated pool is a `DELETE` call on the board server. Where a
-pool's `backlog.md` still stands, re-read it immediately before every close:
-filings and other tickets edit it while you work, and a rewrite from the copy
-you read at claim time drops their rows.
+A close is a `DELETE` call on the board server, on the ticket's own minted
+id. Every pool's tickets are in the store, so no close edits a file.
 
 End the batch with no row still `[/]` and untagged. A mission you will not
 finish is retagged `#need-you`, which hands that row back and is a correct

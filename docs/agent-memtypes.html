@@ -117,14 +117,14 @@
   <dl class="provenance">
     <dt>Doctype</dt>  <dd>explanation</dd>
     <dt>Question</dt> <dd>Which kinds of memory file exist, and which kind does a new fact take?</dd>
-    <dt>Updated</dt>  <dd>2026-08-16</dd>
+    <dt>Updated</dt>  <dd>2026-08-19</dd>
   </dl>
 
   <h2 id="falsifier">Falsifier of a memory file</h2>
 
   <figure id="fig-axis">
     <svg viewBox="0 0 360 302" role="img" aria-labelledby="f1t">
-      <title id="f1t">One question about a memory file, the three lifecycle classes its answers name, and the six filename prefixes those classes admit</title>
+      <title id="f1t">One question about a memory file, the three lifecycle classes its answers name, and the five filename prefixes those classes admit</title>
       <defs>
         <marker id="arrow-memtypes" viewBox="0 0 8 8" refX="7" refY="4"
                 markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -154,8 +154,7 @@
       <path d="M252,160 H270" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-memtypes)"/>
       <text x="14" y="165" font-size="10" font-weight="bold" fill="currentColor">a state change</text>
       <text x="168" y="165" font-size="11" font-weight="bold" fill="currentColor">semantic</text>
-      <text x="280" y="157" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">backlog</text>
-      <text x="280" y="175" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">topic-</text>
+      <text x="280" y="165" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="currentColor">topic-</text>
       <circle cx="28" cy="124" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
       <text x="28" y="124" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold" fill="currentColor">2</text>
 
@@ -176,7 +175,7 @@
       make it wrong. The answer fixes the <code>metadata.type</code> value the
       file declares and the filename prefixes it may take,
       <span class="ct">3&times; answer</span> to
-      <span class="ct">6&times; prefix</span>.</figcaption>
+      <span class="ct">5&times; prefix</span>.</figcaption>
     <ol class="keys">
       <li><span class="k">1</span><div>
         <p><strong>Nothing falsifies it</strong> — a <code>history-</code>
@@ -189,10 +188,10 @@
         </ul>
       </div></li>
       <li><span class="k">2</span><div>
-        <p><strong>A state change</strong> — a <code>backlog</code> item and a
-          <code>topic-</code> file both state what is true now.</p>
+        <p><strong>A state change</strong> — a <code>topic-</code> file
+          states what is true now.</p>
         <ul>
-          <li>Both are updated in place.</li>
+          <li>It is updated in place.</li>
           <li><code>topic-release-digit</code> holds the settled reading of
             board's release-digit rule.</li>
           <li>A newly settled case rewrites that file.</li>
@@ -224,7 +223,6 @@
       <tr class="grp"><td colspan="3">Episodic — nothing falsifies it</td></tr>
       <tr><td><code>history-</code></td><td>what version control cannot see, and a rejected option with its kill reason</td><td>append-only</td></tr>
       <tr class="grp"><td colspan="3">Semantic — a state change falsifies it</td></tr>
-      <tr><td><code>backlog</code></td><td>the pool's live work</td><td>an item is deleted when it closes</td></tr>
       <tr><td><code>topic-</code></td><td>one subject's current truth, distilled from work</td><td>updated in place</td></tr>
       <tr class="grp"><td colspan="3">Procedural — a practice change falsifies it</td></tr>
       <tr><td><code>feedback-</code></td><td>an owner correction, or a standing owner preference</td><td>updated in place</td></tr>
@@ -234,10 +232,12 @@
   </table>
 
   <p>A memory file is named <code>&lt;subcategory&gt;-&lt;topic&gt;</code>, so
-  the prefix is the first field of the name. <code>backlog</code> and
-  <code>pitfalls</code> are fixed names instead, one file per pool. A name
+  the prefix is the first field of the name. <code>pitfalls</code> is a fixed
+  name instead, one file per pool — the last one, since the <code>backlog</code>
+  row retired with the last pool <code>backlog.md</code> on 2026-08-19. A name
   carries no date and no project name, because the pool directory already
-  names the project. <span class="src">~/.claude/CLAUDE.md:147,157 @ 8a82a8e</span></p>
+  names the project.
+  <span class="src">~/.claude/CLAUDE.md:169,173 @ 4429875</span></p>
 
   <p>The frontmatter repeats the answer. <code>topic-release-digit.md</code>
   declares <code>type: semantic</code> under its <code>metadata</code> block,
@@ -364,13 +364,16 @@
     message and exits 1.</p>
 <pre>'profile-demo' matches no row of the memtype table. A new memtype is
 added to the table in the same change that first uses it; the table
-names 'backlog', 'feedback-*', 'history-*', 'pitfalls', 'setup-*',
-'topic-*'.
+names 'feedback-*', 'history-*', 'pitfalls', 'setup-*', 'topic-*'.
   (the memtype table is declared in /Users/hyungmokim/.claude/CLAUDE.md,
   section Filing)</pre>
     <p>A frontmatter block that cannot be read is a refusal too, because the
     guard keeps no table of its own to fall back on.
-    <span class="src">~/.claude/hooks/check-memtype.py:26-27,246 @ 8a82a8e</span></p>
+    <span class="src">~/.claude/hooks/check-memtype.py:26-27,246 @ 8a82a8e</span>
+    The message above is what the guard prints today, and it is also what now
+    refuses a <code>backlog.md</code> written back into a pool: that name
+    matches no row.
+    <span class="src">probed against ~/.claude/CLAUDE.md @ 4429875</span></p>
   </details>
 
   <h2 id="scope">Scope of a memtype declaration</h2>
@@ -392,11 +395,10 @@ names 'backlog', 'feedback-*', 'history-*', 'pitfalls', 'setup-*',
       </ul>
     </li>
     <li><strong>A fixed filename is not a memtype signal.</strong>
-      <code>backlog</code> and <code>pitfalls</code> take one file per pool
-      each.
+      <code>pitfalls</code> takes one file per pool and no prefix at all.
       <ul>
-        <li><code>backlog</code> declares <span class="chip">semantic</span>.</li>
-        <li><code>pitfalls</code> declares <span class="chip">procedural</span>.</li>
+        <li>It declares <span class="chip">procedural</span> like the
+          prefixed rows beside it.</li>
       </ul>
     </li>
     <li><strong>A decision is not a memtype.</strong> The choice and the rule
