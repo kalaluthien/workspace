@@ -22,8 +22,8 @@ or not. All scripts live in
    `~/.claude/projects/` answer to it after the pane is gone. It must say what
    the pane is for; a reader of `herdr agent list` learns the repository from
    the pane's `cwd` and the model from the role, and neither belongs in the
-   name. A worker launched by a board-dispatched mission takes this same name
-   behind the ticket's namespace — "Board-dispatched missions" below. The role
+   name. A worker launched by a board-dispatched service-ticket takes this same
+   name behind its namespace — "Board-dispatched service-tickets" below. The role
    is one of five:
 
    | role | the work |
@@ -139,44 +139,52 @@ or not. All scripts live in
    run it when a session is misclassified, since the agent's screen markers
    are the only evidence it has.
 
-## Board-dispatched missions
-The board's start action spawns a session whose whole prompt is one line:
-`/delegating <pool board file> <the rows it claims>`. When the arguments open
-with a pool board file path, the mission is the rows that line names and no
-others, and each row's marker is the user-visible state of the job — the board
-renders the file on every scan. One row arrives as its own title and body; a
-batch arrives as a numbered run, `(1) … (2) …`, in the file's own order, which
-is the user's priority. Two writes to that file are part of the mission, not
-bookkeeping:
+## Board-dispatched service-tickets
+The board's start action spawns a session whose whole prompt is one
+`/delegating` line. It opens with where the backlog-tickets live and which
+doors change them, then the namespace clause, then one line per row, each
+opening with its own backlog-ticket id. No file appears anywhere in it: a
+backlog-ticket lives in the board's store and has no line to edit. The rows it
+names are the service-ticket and no others, and each row's state is the
+user-visible state of the work — the board draws the card from the row itself.
+One row arrives as its own title and body; a batch arrives as a numbered run,
+`(1) … (2) …`, in the page's own order, which is the user's priority. Two
+calls to the store are part of the service-ticket, not bookkeeping:
 
-1. Claim the item before anything else: flip its marker to `[/]` in the named
-   file. The tap that spawned this session promised "working", and until the
-   marker moves the board shows a promise the corpus denies.
-2. End the item on completion, per the Filing rules in `~/.claude/CLAUDE.md`,
+1. Claim the row before anything else:
+   `PATCH /api/backlog-tickets/<id>/head` with `{"state":"working"}`. The tap
+   that spawned this session promised "working", and until the state moves the
+   board shows a promise the store denies.
+2. End the row on completion, per the Filing rules in `~/.claude/CLAUDE.md`,
    in exactly one of three ways. The work shipped and nothing waits on the
-   owner: delete the row, after lifting any owed remainder into its own
-   `#need-you` item. The work is finished but the close waits on the owner's
-   review: leave the marker `[/]` and tag the row `#need-you`. The work is
-   unfinished and waits on the owner's input: put the marker back to `[ ]` and
-   tag the row `#need-you`. The tag holds the item's next automatic
+   owner: `DELETE /api/backlog-tickets/<id>`, after lifting any owed remainder
+   into its own `#need-you` row. The work is finished but the close waits on
+   the owner's review: leave the state `working` and tag the row `#need-you`.
+   The work is unfinished and waits on the owner's input: set the state back to
+   `open` and tag the row `#need-you`. The tag holds the row's next automatic
    transition, so only the owner ends a tagged row. A session that ends with
-   the marker still `[/]` and no such tag leaves a card that reads as running
+   the row `working` and no such tag leaves a card that reads as running
    forever.
 
-When the item's scope turns out to hold a technical decision that is unknown
-or open to more than one reading, do not finish the item by choosing an answer
+`done` is reachable only through `DELETE`. The head door refuses it
+(`check_state`), so a row's settled state never has two places it could live.
+A close keeps the row for good and the board stops drawing it, so a closed row
+is a permanent record rather than a deletion.
+
+When the row's scope turns out to hold a technical decision that is unknown
+or open to more than one reading, do not finish the row by choosing an answer
 yourself: the tap asked for the work, not for the decision behind it, and a
 guess ships as if the owner had made it. Write a proposal instead, in that
 project's own docs and per the workspace document system — named options,
 their trade-offs, one recommendation — and commit it. Then file a new
-`#need-you` ticket in the same pool naming the decision, with a sentence or
-two on why it blocks the work and a pointer to the proposal — through the
-board's filing door (`~/.claude/CLAUDE.md`, Filing, "Tickets"). Hand your own
-row back the third way above — unfinished, waiting on the owner's input —
-and name the blocking row in its body, so a re-tap meets the decision instead
-of the same ambiguity.
+`#need-you` backlog-ticket in the same pool naming the decision, with a
+sentence or two on why it blocks the work and a pointer to the proposal —
+through the board's filing door (`~/.claude/CLAUDE.md`, Filing, "Tickets").
+Hand your own row back the third way above — unfinished, waiting on the
+owner's input — and name the blocking row in its body, so a re-tap meets the
+decision instead of the same ambiguity.
 
-When the line naming one item also says the owner tapped Start on it
+When the line naming one row also says the owner tapped Start on it
 themselves, that tap is under the owner's own finger, so it confirms — but the
 board has no interface for a choice, so it cannot decide. Read the row and the
 proposal it points to, and judge what the row's owner-waiting tag was waiting
@@ -191,56 +199,53 @@ first, then record the answer in the proposal document, drop the tag, and do the
 work the answer selects. Either way, do not ask the owner anything the
 confirmation already answered.
 
-When the line names several rows, the mission is exactly those rows, in that
-order, and no other row of the file however workable it looks. The board
-froze that set at the tap and claims exactly it, so a row you add to the
-mission is a row nobody claimed and nobody measures — worked beside whatever
-already held it, and still running when the board calls the batch finished. A
-row filed after the tap is not the batch's; it takes a second tap. Claim the
-named rows in one edit before anything else, for the reason a single claim is
-made: until the markers move the board shows a promise the corpus denies, and
-the rows are already held against a second tap.
+When the line names several rows, the service-ticket is exactly those rows, in
+that order, and no other row of the pool however workable it looks. The board
+froze that set at the tap and claims exactly it, so a row you add is a row
+nobody claimed and nobody measures — worked beside whatever already held it,
+and still running when the board calls the batch finished. A row filed after
+the tap is not the batch's; it takes a second tap. Claim every named row
+before anything else, one `PATCH .../head` call each: until the states move the
+board shows a promise the store denies, and the rows are already held against a
+second tap.
 
-With no row after the pool file at all — a line typed by hand, never one the
-board sends — the mission is the whole page: every item whose marker is `[ ]`
-and which carries no tag waiting on the owner, in the order the file lists
-them.
+With no row named after the doors at all — a line typed by hand, never one the
+board sends — the service-ticket is the whole pool: every row whose state is
+`open` and which carries no tag waiting on the owner, read from
+`GET /api/snapshot`, in the order it lists them.
 
-Then run them as separate missions, and close each item as its own mission
-ships — not the batch at the end. Fan out only where the missions' changes
-cannot meet; they land in one repository, so each takes its own worktree and
-anything touching the same files runs in sequence. Keep at most three
-running, so one `Monitor` watch covers them.
+Then run them as separate service-tickets, and close each row as its own work
+ships — not the batch at the end. Fan out only where the changes cannot meet;
+they land in one repository, so each takes its own worktree and anything
+touching the same files runs in sequence. Keep at most three running, so one
+`Monitor` watch covers them.
 
-Name every session a board-dispatched mission launches inside the ticket's
+Name every session a board-dispatched service-ticket launches inside the
 namespace, which the board's own line hands you: `st-<id>--<role>-<task>`,
 the same `<role>-<task>` as anywhere else with that prefix in front. It is
 what makes a worker reachable by anything but this session: the board's cancel
-interrupts every pane in the namespace and closes it once the ticket settles,
-and a worker named outside the namespace survives a cancelled ticket with
-nobody able to name it. Two prices, both known and neither a reason to shorten
-the prefix. herdr allows 32 characters and `launch-session` clips at 29 to
-leave room for its duplicate suffix, so the prefix spends about 13 and the task
-part is cut to about 16 — a worked example in this file can lose letters. And a
-clipped name is no longer a `/resume` key, so a worker launched this way is
-found through its ticket rather than through its own transcript.
-A close is a `DELETE /api/backlog-tickets/{id}` call on the board server, on
-the ticket's own minted id. It marks the row `done` and keeps it; the board
-stops drawing it. Every pool's tickets are in the store, so no close edits a
-file.
+interrupts every pane in the namespace and closes it once the service-ticket
+settles, and a worker named outside the namespace survives a cancelled
+service-ticket with nobody able to name it. Two prices, both known and neither
+a reason to shorten the prefix. herdr allows 32 characters and
+`launch-session` clips at 29 to leave room for its duplicate suffix, so the
+prefix spends about 13 and the task part is cut to about 16 — a worked example
+in this file can lose letters. And a clipped name is no longer a `/resume` key,
+so a worker launched this way is found through its row rather than through its
+own transcript.
 
-End the batch with no row still `[/]` and untagged. A mission you will not
+End the batch with no row still `working` and untagged. Work you will not
 finish is retagged `#need-you`, which hands that row back and is a correct
-outcome; so is a `[/] #need-you` row, which says the work is finished and the
-close is held for the owner. A row left working with no such tag reads as a
-session that is still running, and the board waits on it for ever.
+outcome; so is a `working` + `#need-you` row, which says the work is finished
+and the close is held for the owner. A row left working with no such tag reads
+as a session that is still running, and the board waits on it for ever.
 
-When the orchestrator collects a board-dispatched session, it checks the
-item's marker before reporting: a worker can ship the work, print its
-sentinel, and still leave the row `[/]`. Close the item yourself then — the
-work is verified by the report you just read, and re-asking the session costs
-a round-trip for one line. Do not close a row tagged `#need-you`: the tag
-holds the automatic close, and only the owner closes it.
+When the orchestrator collects a board-dispatched session, it checks the row's
+state before reporting: a worker can ship the work, print its sentinel, and
+still leave the row `working`. Close the row yourself then — the work is
+verified by the report you just read, and re-asking the session costs a
+round-trip for one line. Do not close a row tagged `#need-you`: the tag holds
+the automatic close, and only the owner closes it.
 
 ## Worked example — "add object detection to camera"
 1. Not workspace-level work → this skill. Route: research → `notes`,
