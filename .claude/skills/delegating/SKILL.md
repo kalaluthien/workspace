@@ -213,19 +213,21 @@ anything touching the same files runs in sequence. Keep at most three
 running, so one `Monitor` watch covers them.
 
 Name every session a board-dispatched mission launches inside the ticket's
-namespace, which the board's own line hands you: `ticket-<id>--<role>-<task>`,
+namespace, which the board's own line hands you: `st-<id>--<role>-<task>`,
 the same `<role>-<task>` as anywhere else with that prefix in front. It is
 what makes a worker reachable by anything but this session: the board's cancel
 interrupts every pane in the namespace and closes it once the ticket settles,
 and a worker named outside the namespace survives a cancelled ticket with
 nobody able to name it. Two prices, both known and neither a reason to shorten
 the prefix. herdr allows 32 characters and `launch-session` clips at 29 to
-leave room for its duplicate suffix, so the prefix spends 17 and the task part
-is cut to about 12 — every worked example in this file loses letters. And a
+leave room for its duplicate suffix, so the prefix spends about 13 and the task
+part is cut to about 16 — a worked example in this file can lose letters. And a
 clipped name is no longer a `/resume` key, so a worker launched this way is
 found through its ticket rather than through its own transcript.
-A close is a `DELETE` call on the board server, on the ticket's own minted
-id. Every pool's tickets are in the store, so no close edits a file.
+A close is a `DELETE /api/backlog-tickets/{id}` call on the board server, on
+the ticket's own minted id. It marks the row `done` and keeps it; the board
+stops drawing it. Every pool's tickets are in the store, so no close edits a
+file.
 
 End the batch with no row still `[/]` and untagged. A mission you will not
 finish is retagged `#need-you`, which hands that row back and is a correct
