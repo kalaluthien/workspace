@@ -44,7 +44,7 @@ or not. All scripts live in
    Pass `--effort high` (or `xhigh`) when the task spans many exceptional cases
    or a large state space, or when its one case is genuinely hard; keep the
    default `medium` (or drop to `low`) when the task is both narrow and well
-   understood. Where a backlog item is the task, its `#easy` or `#hard` tag is
+   understood. Where a ticket is the task, its `#easy` or `#hard` tag is
    that estimate already made at writing time — take it instead of guessing
    again, and take the hardest tag in a batch, since one session works the
    whole set. Subagents a session spawns
@@ -168,9 +168,10 @@ or open to more than one reading, do not finish the item by choosing an answer
 yourself: the tap asked for the work, not for the decision behind it, and a
 guess ships as if the owner had made it. Write a proposal instead, in that
 project's own docs and per the workspace document system — named options,
-their trade-offs, one recommendation — and commit it. Then append a new
-`#need-you` row to the same backlog file naming the decision, with a sentence
-or two on why it blocks the work and a pointer to the proposal. Hand your own
+their trade-offs, one recommendation — and commit it. Then file a new
+`#need-you` ticket in the same pool naming the decision, with a sentence or
+two on why it blocks the work and a pointer to the proposal — through the
+board's filing door (`~/.claude/CLAUDE.md`, Filing, "Tickets"). Hand your own
 row back the third way above — unfinished, waiting on the owner's input —
 and name the blocking row in its body, so a re-tap meets the decision instead
 of the same ambiguity.
@@ -223,9 +224,10 @@ leave room for its duplicate suffix, so the prefix spends 17 and the task part
 is cut to about 12 — every worked example in this file loses letters. And a
 clipped name is no longer a `/resume` key, so a worker launched this way is
 found through its ticket rather than through its own transcript.
-Re-read the backlog file immediately before every close: filings and other
-tickets edit it while you work, and a rewrite from the copy you read at
-claim time drops their rows.
+A close in a migrated pool is a `DELETE` call on the board server. Where a
+pool's `backlog.md` still stands, re-read it immediately before every close:
+filings and other tickets edit it while you work, and a rewrite from the copy
+you read at claim time drops their rows.
 
 End the batch with no row still `[/]` and untagged. A mission you will not
 finish is retagged `#need-you`, which hands that row back and is a correct

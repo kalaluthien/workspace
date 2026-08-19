@@ -347,7 +347,7 @@
         <tr><td><code>UserPromptSubmit</code></td><td>every prompt</td><td><code>echo</code> of one reminder line</td></tr>
         <tr><td><code>PreToolUse</code></td><td><code>Bash</code></td><td><code>rtk hook claude</code></td></tr>
         <tr class="grp"><td colspan="3">Guards the record — can refuse</td></tr>
-        <tr><td><code>PostToolUse</code></td><td><code>Write|Edit</code></td><td><code>check-backlog-format.py</code></td></tr>
+        <tr><td><code>PostToolUse</code></td><td><code>Write|Edit</code></td><td><code>check-memtype.py</code></td></tr>
         <tr><td><code>Stop</code></td><td>every turn</td><td><code>stop-takeaway-check.py</code></td></tr>
       </tbody>
     </table>
@@ -357,8 +357,11 @@
         everyday language over jargon.</li>
       <li><code>PreToolUse</code> guards the token budget — the command is
         rewritten to its rtk proxy, which trims the output.</li>
-      <li><code>PostToolUse</code> guards the backlog item grammar in any
-        pool's <code>backlog.md</code>.</li>
+      <li><code>PostToolUse</code> guards the memtype declaration of any
+        pool's memory files. The backlog grammar check that ran here retired
+        on 2026-08-19 (dotclaude <code>3808484</code>): a ticket is now filed
+        through the board server's doors, which check it before the
+        write.</li>
       <li><code>Stop</code> guards the durable takeaway — the Filing
         reminder.</li>
     </ul>
@@ -366,12 +369,13 @@
     <details>
       <summary>Both checking hooks fail loud: the offending line comes back, and an unreadable contract is a refusal</summary>
       <ul>
-        <li><strong>Backlog check.</strong> A rejected write comes back with
-          the line that caused it.
+        <li><strong>Memtype check.</strong> A rejected write comes back with
+          the reason it broke the table.
           <ul>
-            <li>It returns the offending line on stderr.</li>
-            <li>It refuses rather than passes when it cannot read the pool
-              contract.</li>
+            <li>It names the type the table gives the file and lists what the
+              table currently names.</li>
+            <li>It refuses rather than passes when it cannot read the memtype
+              table or the pool contract.</li>
           </ul>
         </li>
         <li><strong>Stop check.</strong> It decides from the transcript, not
@@ -652,9 +656,10 @@
       <li><code>~/.claude/hooks/stop-takeaway-check.py</code> — the
         <code>stop_hook_active</code> return, the transcript walk, and the
         tool-call condition on the block</li>
-      <li><code>~/.claude/hooks/check-backlog-format.py</code> — its header:
-        the two entry points, the exit-2 behavior, and the refusal on an
-        unreadable contract</li>
+      <li><code>~/.claude/hooks/check-memtype.py</code> — its header: the
+        table parse, the path gate, and the refusal on an unreadable table
+        (replaced the retired <code>check-backlog-format.py</code> here,
+        2026-08-19, dotclaude <code>3808484</code>)</li>
       <li><code>~/.claude/git-hooks/no-main-commits</code> — the shared guard:
         the protected branch names, the detached-HEAD pass, and the
         <code>--no-verify</code> override</li>
