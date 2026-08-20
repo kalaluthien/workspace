@@ -94,7 +94,16 @@ class Herdr:
         return rows
 
     def pane(self, pane_id):
-        return (self.rpc("pane.get", {"pane_id": pane_id}).get("pane") or {})
+        """The pane record, or {} when herdr no longer has that pane.
+
+        A closed pane answers `pane_not_found`, which is the success case
+        for the read that confirms a close -- so absence is returned, not
+        raised.
+        """
+        try:
+            return (self.rpc("pane.get", {"pane_id": pane_id}).get("pane") or {})
+        except RuntimeError:
+            return {}
 
     def process_info(self, pane_id):
         return (self.rpc("pane.process_info", {"pane_id": pane_id})
