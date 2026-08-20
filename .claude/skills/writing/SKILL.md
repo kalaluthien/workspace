@@ -194,3 +194,6 @@ one action for the main session
 - Headless Chrome does not lay out below 500 CSS units. `render-check`
   measures the width it got and prints it, so a narrow render that reads as
   text cut off at the right edge is the instrument, not the page.
+- `render-check` captures at most 16000 pixels of height, so a long page fails
+  at phone width with nothing wrong with it. Re-shoot taller and read the tail
+  before believing the failure.
