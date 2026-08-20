@@ -30,6 +30,12 @@ replace. Acceptance: a separate evaluator scored the skill 86/100 on
 simplicity, completeness, and modularity against a 50-point first-version
 anchor, and its render script was proved able to fail before being trusted.
 
+Confirmed by the owner on 2026-08-20. The read this decision still owed
+(backlog-ticket `workspace-t16`, filed 2026-08-12) came back with no veto and
+no change asked for, so the skill stands as the normative site. It was read as
+it stands today, six commits past `ea84832`, three of which encode owner
+feedback on the pages it wrote.
+
 What the 2026-08-04 decision bought is kept: one normative site, loaded by
 the one actor that writes views. What changes: the site now lives inside
 the workspace repository, so a rule change and the workspace documents that
