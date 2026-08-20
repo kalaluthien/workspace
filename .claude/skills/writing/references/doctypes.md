@@ -202,6 +202,12 @@ reason. The page then carries its history instead of losing it in a diff.
 1. **One idea per proposal.** A page that argues two changes gets both
    rejected on the weaker one. When a page will not fit, split it by document
    role — the facts in one, the argument in another — and never by feature.
+   The same rule is the repair when a reader calls a proposal hard to read:
+   count the decisions on the page before cutting any words. A page carrying
+   a settled decision beside an open one reads as neither, and the fix is to
+   name the one live question in the provenance block, keep only what serves
+   it, and push the settled half into an appendix. Trimming sentences on a
+   two-decision page leaves it exactly as hard to answer.
 2. **Rationale sits beside the change, never after it.** Each proposed change
    carries the AS-IS fact it answers. A change with no fact above it is a
    preference. Both cultures have tried and abandoned a separate rationale
