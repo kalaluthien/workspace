@@ -275,6 +275,11 @@ def title_index():
     same string as the terminal title. That shared value links a pane that
     predates the linking hook to its own transcript.
 
+    A session titles itself twice over: `ai-title` rows carry the generated
+    title, `custom-title` rows the one a person typed with /rename. Both are
+    read, last one wins, because the pane shows whichever came last -- index
+    only the generated one and a renamed session becomes unfindable.
+
     One title routinely names several files: `/clear` and `/resume` fork a
     new session id mid-process and the new session keeps the old title. So
     this maps to a list, and the caller judges every candidate rather than
@@ -286,14 +291,17 @@ def title_index():
         try:
             with open(path, "r", errors="replace") as fh:
                 for line in fh:
-                    if '"ai-title"' not in line:
+                    if '"ai-title"' not in line and '"custom-title"' not in line:
                         continue
                     try:
                         row = json.loads(line)
                     except ValueError:
                         continue
-                    if row.get("type") == "ai-title" and row.get("aiTitle"):
-                        title = row["aiTitle"]
+                    named = row.get("aiTitle") if row.get("type") == "ai-title" \
+                        else row.get("customTitle") if row.get("type") == "custom-title" \
+                        else None
+                    if named:
+                        title = named
         except OSError:
             continue
         if title:
@@ -399,12 +407,17 @@ def repo_label(pane):
     return None
 
 
-def classify(herdr, pane, roster, titles, quiet_min, me):
+def classify(herdr, pane, roster, titles, quiet_min, me, explicit=False):
     """One pane's verdict and every reason it is being held.
 
     `holds` is the whole safety argument: a pane closes only when the list
     is empty, so any evidence that cannot be read lands here as a reason
     rather than being resolved by a guess.
+
+    `explicit` marks a pane the caller named by id rather than one a sweep
+    happened across. It drops only the focus hold, which exists to keep a
+    broad sweep away from the pane the owner is looking at -- naming that
+    pane is the owner saying so.
     """
     pane_id = pane["pane_id"]
     out = {
@@ -432,7 +445,7 @@ def classify(herdr, pane, roster, titles, quiet_min, me):
 
     if pane_id == me:
         hold("self")
-    if pane.get("is_focused"):
+    if pane.get("is_focused") and not explicit:
         hold("focused")
 
     status = pane.get("agent_status")
@@ -560,7 +573,8 @@ def gather(herdr, args, me, titles=None):
             continue
         if args.pane and pane["pane_id"] not in args.pane:
             continue
-        rows.append(classify(herdr, pane, roster, titles, args.quiet_min, me))
+        rows.append(classify(herdr, pane, roster, titles, args.quiet_min, me,
+                             explicit=bool(args.pane)))
     return rows
 
 
@@ -588,7 +602,7 @@ def do_close(herdr, args, me):
         fresh["name"] = row["name"]
         fresh["is_focused"] = False
         recheck = classify(herdr, fresh, herdr.roster(), titles,
-                           args.quiet_min, me)
+                           args.quiet_min, me, explicit=bool(args.pane))
         if not closable(recheck):
             # It woke up, or grew a hold, between the sweep and now. The
             # re-classification is the guard, not the pane revision: that

@@ -8,6 +8,7 @@ reading it tested.
 
     verify-verdicts        run every case, print pass or fail
 """
+import json
 import os
 import sys
 import tempfile
@@ -118,6 +119,40 @@ def check_gate():
     return failures
 
 
+def check_titles():
+    """A session is findable by whichever title it wears last."""
+    failures = []
+    original = S.PROJECTS
+    with tempfile.TemporaryDirectory() as tmp:
+        project = os.path.join(tmp, "-a-project")
+        os.makedirs(project)
+
+        def write(name, *rows):
+            with open(os.path.join(project, name + ".jsonl"), "w") as fh:
+                for row in rows:
+                    fh.write(json.dumps(row) + "\n")
+
+        write("aaa", {"type": "ai-title", "aiTitle": "Generated Name"})
+        write("bbb", {"type": "ai-title", "aiTitle": "Old Name"},
+                     {"type": "custom-title", "customTitle": "renamed-by-hand"})
+        write("ccc", {"type": "ai-title", "aiTitle": "Shared Name"})
+        write("ddd", {"type": "ai-title", "aiTitle": "Shared Name"})
+
+        S.PROJECTS = tmp
+        index = S.title_index()
+        S.PROJECTS = original
+
+    if index.get("Generated Name") != ["aaa"]:
+        failures.append("titles: a generated title did not resolve")
+    if index.get("renamed-by-hand") != ["bbb"]:
+        failures.append("titles: a hand-typed title did not resolve")
+    if "Old Name" in index:
+        failures.append("titles: a superseded title still resolved")
+    if sorted(index.get("Shared Name") or []) != ["ccc", "ddd"]:
+        failures.append("titles: a shared title lost a candidate")
+    return failures
+
+
 def check_closable():
     """Only an empty hold list closes, whatever the verdict says."""
     failures = []
@@ -131,8 +166,8 @@ def check_closable():
 
 
 def main():
-    failures = check_state() + check_gate() + check_closable()
-    total = len(CASES) + 5
+    failures = check_state() + check_gate() + check_titles() + check_closable()
+    total = len(CASES) + 9
     for line in failures:
         print("FAIL  %s" % line)
     print("%d/%d checks passed" % (total - len(failures), total))
