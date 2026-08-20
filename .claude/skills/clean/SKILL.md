@@ -59,6 +59,11 @@ something in plain prose owes you an answer and looks exactly like one that
 is finished. The question-mark hold catches most of them. It is a guess about
 language, not a guarantee -- raise `--quiet-min` when that matters.
 
+The owner was shown that residual risk beside the alternative -- print the
+candidates and close only what a person picks -- and chose the quiet-period
+close anyway (2026-08-21). So a sweep acting on its own is the decision, not
+an oversight: do not add a confirmation step back without asking.
+
 ## Sweep the workspace
 `scripts/sweep-sessions [<repo>] [--close] [--include-workspace]
 [--quiet-min N] [--pane P]` reads every pane under `~/workspace` and prints
