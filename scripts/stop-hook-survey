@@ -1,0 +1,524 @@
+#!/usr/bin/env python3
+"""Measure what the Stop takeaway hook does, from the transcripts it ran in.
+
+Every Stop hook run leaves a `stop_hook_summary` system entry in the session
+transcript: which hook commands ran, the reason text of any that blocked, and
+when. This script reads those entries across `~/.claude/projects/*/*.jsonl`
+and answers three questions:
+
+  fired    - how many stops the hook saw, how many it blocked, and how many
+             its firing condition let through
+  filed    - after a block, did the session write to a filing destination,
+             and which kind: a memory pool file, an instruction file, the
+             board ticket door, or the retired pool ticket list
+  repeats  - how many blocks one session takes, split by the session's role
+
+Three things make a naive count wrong, so each is handled here:
+
+  * A silent pass records only the hook's command, never its message, so the
+    hook must be recognised by filename as well as by its reason text.
+  * The model attempts to stop many times inside one turn when another hook
+    keeps blocking. Only the first attempt after a real user prompt tests the
+    working-turn gate; every later attempt passes on `stop_hook_active`
+    whatever the gate would have said.
+  * The `/goal` skill installs a second, session-scoped Stop hook. It shares
+    the same summary entry, so a run counts here only when this hook's own
+    command or reason text appears in it.
+
+Filing through Bash (a redirect, a `curl` to the ticket door) is counted
+alongside Write/Edit, so the filed rate is a floor: a filing done by a shape
+this script does not recognise reads as nothing filed. Subagent transcripts,
+one directory deeper, carry no stop entry - the Stop hook does not fire for a
+subagent - so the glob stays one level deep.
+
+`--counterfactual` answers a fourth question: replay the hook as it stands
+today over every recorded firing and report what it would have silenced. It
+imports the decision from the hook file itself, so the answer cannot drift
+from the shipped condition.
+
+Usage: stop-hook-survey [--json] [--root DIR] [--since YYYY-MM-DD]
+                        [--counterfactual] [--hook PATH]
+"""
+
+import argparse
+import collections
+import glob
+import importlib.util
+import json
+import os
+import re
+import sys
+
+HOOK_PATH = os.path.expanduser("~/.claude/hooks/stop-takeaway-check.py")
+
+TAKEAWAY_MARK = "durable takeaway"
+HOOK_NAMES = ("stop-takeaway-check.py", TAKEAWAY_MARK)
+
+# Filing destinations, by the kind of thing they hold. The first pattern that
+# matches names the class, so the retired ticket list is tested first.
+DESTINATIONS = [
+    ("pool_ticket_list", re.compile(r"/memory/backlog\.md$")),
+    ("memory_pool", re.compile(r"/memory/[^/]+\.md$")),
+    ("instructions", re.compile(r"(/\.claude/CLAUDE\.md$|(^|/)CLAUDE\.md$"
+                                r"|/output-styles/[^/]+\.md$|/\.claude/rules/[^/]+\.md$)")),
+]
+# A scratch copy of an instruction file is a working file, not a filing.
+SCRATCH = re.compile(r"(^|/)(private/)?tmp/|/scratchpad/")
+WRITE_TOOLS = {"Write", "Edit", "MultiEdit", "NotebookEdit"}
+
+# Bash filings, in the only two shapes that are unambiguous: a call to the
+# ticket door, and a redirect or in-place edit whose target is a filing path.
+TICKET_DOOR = re.compile(r"backlog-tickets")
+DOOR_WRITE = re.compile(r"-X\s+(POST|PATCH|PUT|DELETE)")
+REDIRECT_FILING = re.compile(
+    r"(>>?|\btee\b|sed -i(\s+\S+)?)\s+['\"]?\S*"
+    r"(/memory/[\w.-]+\.md|MEMORY\.md|CLAUDE\.md|pitfalls\.md"
+    r"|output-styles/[\w.-]+\.md|\.claude/rules/[\w.-]+\.md)"
+)
+
+ROLE_PATTERNS = [
+    ("utility", re.compile(r"^(You are filing one request|You are folding one follow-up"
+                           r"|Generate a short tab title)")),
+    ("dispatched", re.compile(r"^/goal\b|^(Mission|Prompt) \(|it is your prompt, and not"
+                              r"|session name: \S|Work from your own git worktree")),
+]
+REVIEW_WORDS = re.compile(r"\b(review|verify|audit|proofread|red-team)\b", re.I)
+
+# Older transcripts open with the slash command as markup rather than plain
+# text. A session-control command carries no task, so the role comes from the
+# next prompt instead; any other command's arguments are the prompt text.
+COMMAND_NAME = re.compile(r"<command-name>\s*/?([\w-]+)\s*</command-name>", re.S)
+COMMAND_ARGS = re.compile(r"<command-args>(.*?)</command-args>", re.S)
+SESSION_CONTROL = {"clear", "compact", "model", "effort", "resume", "config", "exit"}
+
+
+def prompt_text(raw):
+    """The task text of one prompt, or None when the prompt carries no task."""
+    text = (raw or "").lstrip()
+    if text.startswith("<local-command-stdout>"):
+        return None
+    name = COMMAND_NAME.search(text)
+    if not name:
+        return text
+    if name.group(1).lower() in SESSION_CONTROL:
+        return None
+    args = COMMAND_ARGS.search(text)
+    return "/%s %s" % (name.group(1), args.group(1).strip() if args else "")
+
+
+def classify_role(prompts):
+    """Name the session's role from the first prompt that carries a task."""
+    for candidate in prompts:
+        text = prompt_text(candidate["text"])
+        if not text:
+            continue
+        head = text[:600]
+        for name, pattern in ROLE_PATTERNS:
+            if pattern.search(head):
+                if name == "dispatched" and REVIEW_WORDS.search(head):
+                    return "reviewer"
+                return name
+        return "operator"
+    return "unknown"
+
+
+def filing_class(tool_name, tool_input):
+    """Name the filing destination this tool call writes to, or None."""
+    if tool_name in WRITE_TOOLS:
+        path = tool_input.get("file_path") or tool_input.get("notebook_path") or ""
+        if not path or SCRATCH.search(path):
+            return None
+        for name, pattern in DESTINATIONS:
+            if pattern.search(path):
+                return name
+        return None
+    if tool_name != "Bash":
+        return None
+    command = tool_input.get("command") or ""
+    if TICKET_DOOR.search(command) and DOOR_WRITE.search(command):
+        return "ticket_door"
+    hit = REDIRECT_FILING.search(command)
+    if not hit or SCRATCH.search(hit.group(0)):
+        return None
+    target = hit.group(3)
+    if target.endswith("backlog.md"):
+        return "pool_ticket_list"
+    if "/memory/" in hit.group(0) or target in ("MEMORY.md", "pitfalls.md"):
+        return "memory_pool"
+    return "instructions"
+
+
+def parse_entries(path):
+    """Every JSON line of a transcript, in order; unreadable lines are skipped."""
+    entries = []
+    try:
+        handle = open(path, encoding="utf-8")
+    except OSError:
+        return entries
+    with handle:
+        for line in handle:
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return entries
+
+
+def is_our_fire(entry):
+    """True for a stop summary entry that records a run of this hook."""
+    if entry.get("type") != "system" or entry.get("subtype") != "stop_hook_summary":
+        return False
+    commands = " ".join(i.get("command", "") for i in (entry.get("hookInfos") or []))
+    errors = " ".join(entry.get("hookErrors") or [])
+    return any(n in commands for n in HOOK_NAMES) or TAKEAWAY_MARK in errors
+
+
+def read_session(path):
+    """Parse one transcript into the ordered main-chain events this survey reads."""
+    return build_events(parse_entries(path))
+
+
+def build_events(entries):
+    """The ordered main-chain events this survey reads, from parsed lines."""
+    events = []
+    for entry in entries:
+        if entry.get("isSidechain"):
+            continue
+        kind = entry.get("type")
+        stamp = entry.get("timestamp")
+        if kind == "system" and entry.get("subtype") == "stop_hook_summary":
+            if not is_our_fire(entry):
+                continue
+            infos = entry.get("hookInfos") or []
+            commands = " ".join(info.get("command", "") for info in infos)
+            errors = " ".join(entry.get("hookErrors") or [])
+            events.append({
+                "kind": "stop",
+                "time": stamp,
+                # `preventedContinuation` is always false here; a block is
+                # visible as the reason text the harness echoes back.
+                "blocked": TAKEAWAY_MARK in errors,
+                "era": "python" if "stop-takeaway-check.py" in commands else "jq",
+                "shared": len(infos) > 1,
+            })
+            continue
+        message = entry.get("message") or {}
+        content = message.get("content")
+        if kind == "user" and not entry.get("isMeta") and isinstance(content, str):
+            events.append({"kind": "prompt", "time": stamp, "text": content})
+            continue
+        if kind == "assistant" and isinstance(content, list):
+            calls = [
+                (block.get("name"), block.get("input") or {})
+                for block in content
+                if isinstance(block, dict) and block.get("type") == "tool_use"
+            ]
+            usage = message.get("usage") or {}
+            events.append({
+                "kind": "assistant",
+                "time": stamp,
+                "calls": calls,
+                "output_tokens": usage.get("output_tokens") or 0,
+            })
+    return events
+
+
+def filings_around(events, index, forward):
+    """Filing classes written on one side of a block, inside the same turn."""
+    window = events[index + 1:] if forward else reversed(events[:index])
+    found = set()
+    for event in window:
+        if event["kind"] in ("prompt", "stop"):
+            break
+        if event["kind"] != "assistant":
+            continue
+        for name, tool_input in event["calls"]:
+            found.add(filing_class(name, tool_input))
+    return {f for f in found if f}
+
+
+def survey_session(path, since):
+    """Walk one session's events and return its stop-hook record, or None."""
+    events = read_session(path)
+    if not any(e["kind"] == "stop" for e in events):
+        return None
+
+    role = classify_role([e for e in events if e["kind"] == "prompt"][:6])
+    runs = []
+    stops_this_turn = 0
+    for index, event in enumerate(events):
+        if event["kind"] == "prompt":
+            stops_this_turn = 0
+            continue
+        if event["kind"] != "stop":
+            continue
+        stops_this_turn += 1
+        if since and event["time"] and event["time"][:10] < since:
+            continue
+        run = {
+            "time": event["time"],
+            "era": event["era"],
+            "blocked": event["blocked"],
+            "first_of_turn": stops_this_turn == 1,
+            "shared": event["shared"],
+        }
+        if event["blocked"]:
+            tokens_after = calls_after = 0
+            for later in events[index + 1:]:
+                if later["kind"] in ("prompt", "stop"):
+                    break
+                if later["kind"] == "assistant":
+                    tokens_after += later["output_tokens"]
+                    calls_after += len(later["calls"])
+            run["filed_before"] = filings_around(events, index, False)
+            run["filed_after"] = filings_around(events, index, True)
+            run["output_tokens_after"] = tokens_after
+            run["tool_calls_after"] = calls_after
+        runs.append(run)
+
+    if not runs:
+        return None
+    return {"path": path, "project": os.path.basename(os.path.dirname(path)),
+            "role": role, "runs": runs}
+
+
+def percent(part, whole):
+    return 0.0 if not whole else round(100.0 * part / whole, 1)
+
+
+def build_report(root, since):
+    files = sorted(glob.glob(os.path.join(root, "*", "*.jsonl")))
+    sessions = [s for s in (survey_session(p, since) for p in files) if s]
+
+    runs = [r for s in sessions for r in s["runs"]]
+    firsts = [r for r in runs if r["first_of_turn"]]
+    blocked = [r for r in runs if r["blocked"]]
+    times = sorted(r["time"] for r in runs if r["time"])
+
+    destinations = collections.Counter()
+    for run in blocked:
+        for name in run["filed_after"]:
+            destinations[name] += 1
+
+    by_role = {}
+    for session in sessions:
+        slot = by_role.setdefault(session["role"], {
+            "sessions": 0, "runs": 0, "blocks": 0, "filed": 0, "tokens": 0})
+        slot["sessions"] += 1
+        slot["runs"] += len(session["runs"])
+        for run in session["runs"]:
+            if not run["blocked"]:
+                continue
+            slot["blocks"] += 1
+            slot["filed"] += bool(run["filed_after"])
+            slot["tokens"] += run["output_tokens_after"]
+
+    per_session = [sum(1 for r in s["runs"] if r["blocked"]) for s in sessions]
+    barren = sum(
+        1 for s in sessions
+        if sum(1 for r in s["runs"] if r["blocked"]) >= 2
+        and not any(r["blocked"] and r["filed_after"] for r in s["runs"])
+    )
+    fresh = sum(1 for r in blocked if r["filed_after"] - r["filed_before"])
+
+    return {
+        "corpus": {
+            "transcript_files": len(files),
+            "sessions_the_hook_ran_in": len(sessions),
+            "first_stop_event": times[0] if times else None,
+            "last_stop_event": times[-1] if times else None,
+            "since_filter": since,
+        },
+        "fires": {
+            "hook_runs": len(runs),
+            "blocked": len(blocked),
+            "first_stop_of_a_turn": len(firsts),
+            "blocked_at_the_first_stop": sum(1 for r in firsts if r["blocked"]),
+            "gate_let_the_turn_through": sum(1 for r in firsts if not r["blocked"]),
+            "gate_pass_percent": percent(
+                sum(1 for r in firsts if not r["blocked"]), len(firsts)),
+            "later_stops_in_the_same_turn": len(runs) - len(firsts),
+            "runs_sharing_the_stop_with_another_hook": sum(1 for r in runs if r["shared"]),
+            "by_hook_version": dict(collections.Counter(r["era"] for r in runs)),
+        },
+        "follow_through": {
+            "blocks": len(blocked),
+            "filed_anything": sum(1 for r in blocked if r["filed_after"]),
+            "filed_percent": percent(sum(1 for r in blocked if r["filed_after"]), len(blocked)),
+            "filed_a_destination_not_written_earlier_in_the_turn": fresh,
+            "filed_fresh_percent": percent(fresh, len(blocked)),
+            "already_filed_before_the_block": sum(1 for r in blocked if r["filed_before"]),
+            "no_tool_call_after_the_block": sum(
+                1 for r in blocked if r["tool_calls_after"] == 0),
+            "no_tool_call_percent": percent(
+                sum(1 for r in blocked if r["tool_calls_after"] == 0), len(blocked)),
+            "destinations": dict(destinations),
+            "output_tokens_after_blocks": sum(r["output_tokens_after"] for r in blocked),
+            "median_output_tokens_after_a_block": (
+                sorted(r["output_tokens_after"] for r in blocked)[len(blocked) // 2]
+                if blocked else 0),
+        },
+        "by_role": by_role,
+        "repeats": {
+            "mean_blocks_per_session": round(sum(per_session) / len(per_session), 2)
+            if per_session else 0,
+            "most_blocks_in_one_session": max(per_session) if per_session else 0,
+            "sessions_blocked_twice_or_more": sum(1 for n in per_session if n >= 2),
+            "of_those_that_never_filed": barren,
+        },
+    }
+
+
+def load_hook(path):
+    """Import the Stop hook so its own decision answers the counterfactual."""
+    spec = importlib.util.spec_from_file_location("stop_takeaway_check", path)
+    if spec is None or spec.loader is None:
+        raise SystemExit(f"cannot import the hook at {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    for name in ("should_block", "work_done"):
+        if not hasattr(module, name):
+            raise SystemExit(f"{path} has no {name}(); it cannot be replayed")
+    return module
+
+
+def counterfactual(root, hook_path):
+    """Replay the hook as it stands over every firing already recorded."""
+    hook = load_hook(hook_path)
+    fires = kept = 0
+    past_blocks = kept_blocks = 0
+    fresh_filings = kept_fresh = 0
+    work = collections.Counter()
+    for path in sorted(glob.glob(os.path.join(root, "*", "*.jsonl"))):
+        entries = parse_entries(path)
+        if not any(is_our_fire(e) for e in entries):
+            continue
+        events = build_events(entries)
+        stops = [i for i, e in enumerate(events) if e["kind"] == "stop"]
+        # The hook reads the transcript before its own summary line is written,
+        # so each firing replays against the lines that preceded it.
+        raw_stops = [i for i, e in enumerate(entries) if is_our_fire(e)]
+        for order, raw_index in enumerate(raw_stops):
+            done = hook.work_done(entries[:raw_index])
+            blocks_now = done >= hook.WORK_THRESHOLD
+            fires += 1
+            kept += blocks_now
+            work[min(done, 10)] += 1
+            if order < len(stops) and events[stops[order]]["blocked"]:
+                past_blocks += 1
+                kept_blocks += blocks_now
+                event_index = stops[order]
+                if filings_around(events, event_index, True) - filings_around(
+                        events, event_index, False):
+                    fresh_filings += 1
+                    kept_fresh += blocks_now
+    return {
+        "hook": hook_path,
+        "threshold": hook.WORK_THRESHOLD,
+        "firings_replayed": fires,
+        "would_still_fire": kept,
+        "would_be_silenced": fires - kept,
+        "silenced_percent": percent(fires - kept, fires),
+        "past_blocks": past_blocks,
+        "past_blocks_still_blocked": kept_blocks,
+        "past_blocks_silenced_percent": percent(past_blocks - kept_blocks, past_blocks),
+        "past_blocks_that_filed_something_fresh": fresh_filings,
+        "of_those_still_blocked": kept_fresh,
+        "work_counted_distribution": {str(k): v for k, v in sorted(work.items())},
+    }
+
+
+def print_counterfactual(result):
+    print("== counterfactual: the hook as it stands, replayed over every firing")
+    print(f"   hook                          {result['hook']}")
+    print(f"   threshold                     {result['threshold']} changing tool calls"
+          " since the previous firing")
+    print(f"   firings replayed              {result['firings_replayed']}")
+    print(f"   would be silenced             {result['would_be_silenced']}"
+          f" ({result['silenced_percent']}%)")
+    print(f"   would still fire              {result['would_still_fire']}")
+    print(f"   past blocks                   {result['past_blocks']}"
+          f", of them silenced {result['past_blocks_silenced_percent']}%")
+    print("   past blocks that filed something the turn had not already filed  "
+          f"{result['past_blocks_that_filed_something_fresh']}"
+          f", of them kept {result['of_those_still_blocked']}")
+    print(f"   work counted per firing       {result['work_counted_distribution']}"
+          " (10 means ten or more)")
+
+
+def print_report(report):
+    corpus, fires = report["corpus"], report["fires"]
+    follow, repeats = report["follow_through"], report["repeats"]
+    print("== corpus")
+    print(f"   transcript files               {corpus['transcript_files']}")
+    print(f"   sessions the hook ran in       {corpus['sessions_the_hook_ran_in']}")
+    print(f"   first stop event               {corpus['first_stop_event']}")
+    print(f"   last stop event                {corpus['last_stop_event']}")
+    print("== fires")
+    print(f"   hook runs                      {fires['hook_runs']}")
+    print(f"   first stop of a turn           {fires['first_stop_of_a_turn']}")
+    print(f"     blocked                      {fires['blocked_at_the_first_stop']}")
+    print(f"     gate let the turn through    {fires['gate_let_the_turn_through']}"
+          f" ({fires['gate_pass_percent']}%)")
+    print(f"   later stops in the same turn   {fires['later_stops_in_the_same_turn']}"
+          " (all pass on stop_hook_active)")
+    print(f"   stops shared with another hook {fires['runs_sharing_the_stop_with_another_hook']}")
+    print(f"   by hook version                {fires['by_hook_version']}")
+    print("== follow-through after a block")
+    print(f"   filed anything                 {follow['filed_anything']}"
+          f" ({follow['filed_percent']}%)")
+    print("   filed somewhere not written earlier that turn "
+          f"{follow['filed_a_destination_not_written_earlier_in_the_turn']}"
+          f" ({follow['filed_fresh_percent']}%)")
+    print(f"   had already filed that turn    {follow['already_filed_before_the_block']}")
+    print(f"   ran no tool at all             {follow['no_tool_call_after_the_block']}"
+          f" ({follow['no_tool_call_percent']}%)")
+    print(f"   destinations                   {follow['destinations']}")
+    print(f"   output tokens spent            {follow['output_tokens_after_blocks']}"
+          f" (median {follow['median_output_tokens_after_a_block']} per block)")
+    print("== by session role")
+    print(f"   {'role':<12} {'sessions':>8} {'runs':>7} {'blocks':>7} {'filed':>7} {'filed%':>7}")
+    for role, slot in sorted(report["by_role"].items(), key=lambda kv: -kv[1]["blocks"]):
+        print(f"   {role:<12} {slot['sessions']:>8} {slot['runs']:>7} {slot['blocks']:>7}"
+              f" {slot['filed']:>7} {percent(slot['filed'], slot['blocks']):>7}")
+    print("== repeats")
+    print(f"   mean blocks per session        {repeats['mean_blocks_per_session']}")
+    print(f"   most blocks in one session     {repeats['most_blocks_in_one_session']}")
+    print(f"   sessions blocked 2+ times      {repeats['sessions_blocked_twice_or_more']}")
+    print(f"     of those, never filed        {repeats['of_those_that_never_filed']}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--json", action="store_true", help="print the raw numbers")
+    parser.add_argument("--root", default=os.path.expanduser("~/.claude/projects"),
+                        help="transcript root (default: ~/.claude/projects)")
+    parser.add_argument("--since", help="ignore stop events before this date (YYYY-MM-DD)")
+    parser.add_argument("--counterfactual", action="store_true",
+                        help="replay the hook as it stands over every recorded firing")
+    parser.add_argument("--hook", default=HOOK_PATH,
+                        help=f"the hook to replay (default: {HOOK_PATH})")
+    args = parser.parse_args()
+
+    if args.counterfactual:
+        result = counterfactual(args.root, args.hook)
+        if args.json:
+            json.dump(result, sys.stdout, indent=2, sort_keys=True)
+            print()
+        else:
+            print_counterfactual(result)
+        return 0
+
+    report = build_report(args.root, args.since)
+    report["generated_from"] = os.path.abspath(args.root)
+    if args.json:
+        json.dump(report, sys.stdout, indent=2, sort_keys=True)
+        print()
+    else:
+        print_report(report)
+        print(f"== read from {report['generated_from']}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
