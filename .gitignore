@@ -5,6 +5,7 @@
 # ...except these
 !/.gitignore
 !/.claude/
+!/AGENTS.md
 !/docs/
 !/hooks/
 !/scripts/

@@ -13,7 +13,7 @@ or not. All scripts live in
 
 ## Decision loop
 1. Route the request to repository entries with the workspace catalogue
-   (`~/workspace/.claude/CLAUDE.md`).
+   (`~/workspace/AGENTS.md`).
 2. Name the worker for the work, `<role>-<task>` — `survey-tflite-detectors`,
    `build-preview-crash`, `plan-camera-v3`. The name is the routing key for
    every later step and the search key for the worker's history:
