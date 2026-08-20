@@ -48,3 +48,8 @@ Template: `templates/spec.md`
   and behaviour halves down to a settling test, four entrypoints, an
   eval stage over code and models, and a recovery path for code-first
   patches; garden is the testbed; Open.
+- [`agent-session-cleanup.html`](agent-session-cleanup.html) — where the
+  cleanup of a delegated session's claims belongs: the measured firing gap
+  between the turn-end and session-end events, the one leak that is real,
+  three options with the destructor killed, and the owner's three yes-or-no
+  decisions; Open.

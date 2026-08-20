@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session cleanup</title>
+<style>
+  :root { --ink:#111; --mute:#555; --hair:#e4e4e4; --wash:#f4f4f4; }
+  html { font-size: 16px; }
+  body { max-width: 42rem; margin: 0 auto; padding: 4rem 1.5rem 8rem;
+         background: #ffffff; color: var(--ink);
+         font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+         line-height: 1.55; overflow-wrap: break-word; }
+  h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 .9rem; font-weight: 700; letter-spacing: -.01em; }
+  h2 { font-size: 1.25rem; margin: 3rem 0 .5rem; font-weight: 700; }
+  h3 { font-size: 1rem; margin: 2rem 0 .3rem; font-weight: 700; }
+  h4 { font-size: .95rem; margin: 0 0 .4rem; font-weight: 700; }
+  p, li { margin: .6rem 0; }
+  ul, ol { padding-left: 1.2rem; }
+  ol.steps { padding-left: 1.6rem; }
+  ol.steps > li { margin: 1.3rem 0; }
+  ol.steps > li::marker { font-weight: 700; }
+  ol.keys { list-style: none; padding-left: 0; margin: 1rem 0; }
+  ol.keys > li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .6rem; margin: .8rem 0; }
+  ol.keys > li > p, ol.keys > li > div { min-width: 0; }
+  ol.keys > li > p, ol.keys > li > div > p { margin: 0; }
+  ol.keys ul { margin: .3rem 0 0; padding-left: 1.05rem; }
+  ol.keys ul li { margin: .2rem 0; }
+  .k { display: inline-flex; align-items: center; justify-content: center; width: 1.45rem; height: 1.45rem;
+    border: 1px solid var(--ink); border-radius: 50%; font-size: .72rem; font-weight: 700; }
+  a { color: #14459b; text-decoration-color: #9bb0d8; }
+  code, pre, .provenance dd, .src { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
+  pre { overflow-x: auto; background: var(--wash); padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
+  .src { color: var(--mute); }
+  table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid var(--hair); }
+  th { font-weight: 700; }
+  tr.grp td { background: var(--wash); font-weight: 700; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; }
+  @media (max-width: 42rem) {
+    table { font-size: .85rem; }
+    th, td { padding-right: .5rem; }
+  }
+  .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem;
+    margin: 0 0 2.4rem; font-size: .85rem; color: var(--mute); }
+  .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
+  .provenance dd { margin: 0; }
+  figure { margin: 2.2rem 0; }
+  figure svg { display: block; width: 100%; height: auto; }
+  figure pre { margin: 0; }
+  figure.pan { overflow-x: auto; }
+  figcaption { margin-top: .7rem; font-size: .85rem; color: var(--mute); line-height: 1.5; }
+  .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1.2rem; margin: 2.2rem 0; }
+  .figure-row figure { margin: 0; }
+  table.filemap td { border-bottom: none; padding: .12rem .8rem .12rem 0; }
+  table.filemap td:first-child { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85em; white-space: pre; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin: 1.4rem 0; }
+  .do, .dont { border: 2px solid var(--ink); padding: .8rem 1rem; }
+  .dont { border-style: dashed; }
+  .do h4::before { content: "\2713\00a0"; }
+  .dont h4::before { content: "\2715\00a0"; }
+  /* One typed record per term: a name bar, then a fixed field set. The field
+     column is the record's type, so every record of one kind repeats it. */
+  .recs { display: grid; gap: .9rem; margin: 1.4rem 0; }
+  .rec { border: 1px solid var(--ink); }
+  .rec-n { margin: 0; padding: .35rem .75rem; background: var(--wash);
+    border-bottom: 1px solid var(--ink); font-weight: 700; font-size: .92rem; }
+  .rec-t { font-weight: 400; color: var(--mute); font-size: .78rem; }
+  .rec dl { display: grid; grid-template-columns: max-content 1fr; gap: .25rem .8rem;
+    margin: 0; padding: .55rem .75rem .65rem; font-size: .9rem; }
+  .rec dt { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .74rem;
+    color: var(--mute); padding-top: .22rem; white-space: nowrap; }
+  .rec dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .rec dd ul { margin: .1rem 0 0; padding-left: 1.05rem; }
+  .rec dd li { margin: .15rem 0; }
+  .ct { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem;
+    border: 1px solid var(--ink); border-radius: 3px; padding: 1px 4px; white-space: nowrap; }
+  .hum { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem;
+    border: 1px solid var(--ink); border-radius: 11px; padding: 1px 8px; }
+  .chip { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem;
+    background: var(--wash); border-radius: 3px; padding: 1px 5px; }
+  .callout { display: grid; grid-template-columns: 1.5rem 1fr; gap: .7rem; align-items: start;
+    background: var(--wash); border-left: 3px solid var(--hair); padding: .8rem 1rem; margin: 1.4rem 0; }
+  .callout .g { font-size: 1.05rem; line-height: 1.35; }
+  .callout p { margin: 0; font-size: .92rem; }
+  .callout strong { font-weight: 700; }
+  details { border: 1px solid var(--hair); border-radius: 3px; padding: .45rem .9rem;
+    margin: 1.2rem 0; font-size: .92rem; }
+  details summary { cursor: pointer; font-weight: 600; font-size: .92rem; list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: "\25B8\00a0\00a0"; color: var(--mute); }
+  details[open] summary::before { content: "\25BE\00a0\00a0"; }
+  details[open] summary { margin-bottom: .5rem; }
+  /* Last, so it wins over the two-column .pair declared above. */
+  @media (max-width: 42rem) { .pair { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<article>
+
+  <h1>Session cleanup</h1>
+  <dl class="provenance">
+    <dt>Doctype</dt>  <dd>proposal</dd>
+    <dt>Status</dt>   <dd>Open</dd>
+    <dt>Question</dt> <dd>Where does the cleanup of a delegated session&rsquo;s claims belong: the turn-end Stop hook, a session-end hook, or the existing sweep script?</dd>
+    <dt>Updated</dt>  <dd>2026-08-20</dd>
+  </dl>
+
+  <h2>One report at session end</h2>
+
+  <p>One new hook writes down what a session still holds when that session
+  ends.</p>
+
+  <p>The record covers three things: the session&rsquo;s git worktree, the
+  board row it claimed, and the panes it spawned. The hook removes none of
+  them and refuses nothing.</p>
+
+  <h2>Domain</h2>
+
+  <p>A delegated session is one claude session in a herdr pane, working one
+  repository. Such a session takes <span class="ct">3&times; claim</span>. The
+  harness offers <span class="ct">2&times; event</span> that could return them.
+  <code>scripts/launch-session</code> starts one session. It gives that
+  session a pane and a tab of its own.
+  <span class="src">~/workspace/.claude/skills/delegating/scripts/launch-session:72-113 @ workspace 5a9a9e8</span></p>
+
+  <p>No hook fires at session end today. The settings file declares
+  <span class="ct">4&times; hook</span> &mdash; <code>PreToolUse</code>,
+  <code>PostToolUse</code>, <code>UserPromptSubmit</code>, and
+  <code>Stop</code>. This proposal changes none of the four. It changes
+  neither the git guard nor <code>sweep-sessions</code>.
+  <span class="src">~/.claude/settings.json:5-51 @ dotclaude a1fa211</span></p>
+
+  <h3>Events the harness offers</h3>
+
+  <div class="recs">
+
+    <div class="rec">
+      <p class="rec-n"><code>Stop</code> <span class="rec-t">harness event</span></p>
+      <dl>
+        <dt>is</dt>       <dd>the event the harness raises when one assistant turn ends</dd>
+        <dt>fires</dt>    <dd>after every turn, and again a few seconds after a hook blocks the stop</dd>
+        <dt>instance</dt> <dd>the settings file runs <code>stop-takeaway-check.py</code> on it</dd>
+        <dt>not</dt>      <dd>
+          <ul>
+            <li>a session-end event &mdash; the hook recorded 2021 firings over
+              500 sessions between 2026-08-04 and 2026-08-19</li>
+            <li>a signal that the session released anything</li>
+          </ul></dd>
+      </dl>
+    </div>
+
+    <div class="rec">
+      <p class="rec-n"><code>SessionEnd</code> <span class="rec-t">harness event</span></p>
+      <dl>
+        <dt>is</dt>       <dd>the event the harness raises when a session stops</dd>
+        <dt>fires</dt>    <dd>on a normal exit and on SIGTERM, and not on SIGKILL</dd>
+        <dt>instance</dt> <dd>a probe on Claude Code 2.1.236 read a payload carrying
+          <code>session_id</code>, <code>transcript_path</code>, <code>cwd</code>,
+          and <code>reason</code></dd>
+        <dt>not</dt>      <dd>
+          <ul>
+            <li>one of the four hooks the settings file declares today</li>
+            <li>a guarantee &mdash; a killed session raises nothing</li>
+          </ul></dd>
+      </dl>
+    </div>
+
+  </div>
+
+  <h3>Claims a session takes</h3>
+
+  <div class="recs">
+
+    <div class="rec">
+      <p class="rec-n">Worktree <span class="rec-t">claim</span></p>
+      <dl>
+        <dt>is</dt>          <dd>a second checkout, where a session works one branch</dd>
+        <dt>taken by</dt>    <dd><code>git worktree add</code>, run by the session</dd>
+        <dt>released by</dt> <dd><code>git worktree remove</code> or <code>git worktree prune</code>, run by the same session</dd>
+        <dt>instance</dt>    <dd><code>/private/tmp/wt-hooks-workspace</code></dd>
+        <dt>not</dt>         <dd>the branch &mdash; removing the checkout leaves the branch and its commits</dd>
+      </dl>
+    </div>
+
+    <div class="rec">
+      <p class="rec-n">Ticket claim <span class="rec-t">claim</span></p>
+      <dl>
+        <dt>is</dt>          <dd>the <span class="chip">working</span> marker the board store puts on one backlog row</dd>
+        <dt>taken by</dt>    <dd><code>POST /api/backlog-tickets/{id}/claim</code></dd>
+        <dt>released by</dt> <dd>the orchestrator, through the head door or the close door</dd>
+        <dt>instance</dt>    <dd>two rows sat in <span class="chip">working</span> on 2026-08-20, and a live session held each one</dd>
+        <dt>not</dt>         <dd>a close &mdash; a close marks the row <span class="chip">done</span> and keeps it for good</dd>
+      </dl>
+    </div>
+
+    <div class="rec">
+      <p class="rec-n">Spawned pane <span class="rec-t">claim</span></p>
+      <dl>
+        <dt>is</dt>          <dd>a herdr pane holding one delegated claude session</dd>
+        <dt>taken by</dt>    <dd><code>scripts/launch-session</code>, which creates a tab and starts the agent in it</dd>
+        <dt>released by</dt> <dd><code>scripts/clean-session --close</code>, or <code>scripts/sweep-sessions --close</code></dd>
+        <dt>instance</dt>    <dd>panes reading <span class="chip">done</span> stood in the workspace and board entries on 2026-08-20</dd>
+        <dt>not</dt>         <dd>the calling pane &mdash; the sweep skips <code>$HERDR_PANE_ID</code>, so it cannot close itself</dd>
+      </dl>
+    </div>
+
+  </div>
+
+  <h2>Firing points of Stop and SessionEnd</h2>
+
+  <figure id="fig-events">
+    <svg viewBox="0 0 360 328" role="img" aria-labelledby="f-ev-t">
+      <title id="f-ev-t">Stop fires at every turn end, while SessionEnd fires once at a clean exit and not at all on a kill signal</title>
+      <defs>
+        <marker id="arrow-ev" viewBox="0 0 8 8" refX="7" refY="4"
+                markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <g fill="none" stroke="currentColor" stroke-width="1.4">
+        <rect x="70" y="16" width="220" height="64"/>
+        <rect x="70" y="116" width="220" height="84"/>
+        <rect x="15" y="254" width="150" height="62"/>
+        <rect x="190" y="254" width="150" height="62"/>
+        <path d="M180,80 L180,116" marker-end="url(#arrow-ev)"/>
+        <path d="M180,200 L180,232"/>
+        <path d="M90,232 L265,232"/>
+        <path d="M90,232 L90,254" marker-end="url(#arrow-ev)"/>
+        <path d="M265,232 L265,254" marker-end="url(#arrow-ev)"/>
+      </g>
+      <g font-size="12" font-weight="bold">
+        <text x="80" y="46">First turn ends</text>
+        <text x="80" y="146">Later turns end</text>
+        <text x="25" y="284">Clean exit</text>
+        <text x="200" y="284">Kill signal</text>
+      </g>
+      <g font-size="11" font-family="ui-monospace, Menlo, monospace">
+        <text x="80" y="64">Stop hook fires</text>
+        <text x="80" y="164">Stop fires again</text>
+        <text x="80" y="182">2 mean, 21 max</text>
+        <text x="25" y="302">SessionEnd fires</text>
+        <text x="200" y="302">nothing fires</text>
+      </g>
+      <g font-size="11">
+        <text x="188" y="101">next turn</text>
+        <text x="188" y="218">the session stops</text>
+      </g>
+      <g fill="#ffffff" stroke="currentColor" stroke-width="1.2">
+        <circle cx="70" cy="16" r="11"/>
+        <circle cx="70" cy="116" r="11"/>
+        <circle cx="15" cy="254" r="11"/>
+        <circle cx="190" cy="254" r="11"/>
+      </g>
+      <g font-size="11" font-weight="bold" text-anchor="middle">
+        <text x="70" y="16" dy=".35em">1</text>
+        <text x="70" y="116" dy=".35em">2</text>
+        <text x="15" y="254" dy=".35em">3</text>
+        <text x="190" y="254" dy=".35em">4</text>
+      </g>
+    </svg>
+    <figcaption>One session, from its first turn to its exit. The two boxes at
+      the bottom are the two ways a session stops.</figcaption>
+    <ol class="keys">
+      <li><span class="k">1</span><p><strong>First turn ends</strong> &mdash;
+        the harness raises <code>Stop</code>, and
+        <code>stop-takeaway-check.py</code> runs. One turn is not one session.
+        <span class="src">~/.claude/settings.json:43-51 @ dotclaude a1fa211</span></p></li>
+      <li><span class="k">2</span><p><strong>Later turns end</strong> &mdash;
+        <code>Stop</code> fires again on every later turn. The hook&rsquo;s own
+        header records 2021 firings over 500 sessions, between 2026-08-04 and
+        2026-08-19.
+        <span class="src">~/.claude/hooks/stop-takeaway-check.py:26-27 @ dotclaude a1fa211</span>
+        A survey of the same transcripts on 2026-08-20 put the mean at 2 blocks
+        per session. The largest session took 21. That survey also found 43
+        summary entries listing two Stop hooks at once. A <code>/goal</code>
+        session installs the second hook, which keeps blocking.
+        <span class="src">~/workspace/scripts/stop-hook-survey:1-40 @ workspace fa3d111</span></p></li>
+      <li><span class="k">3</span><p><strong>Clean exit</strong> &mdash; a probe
+        on Claude Code 2.1.236, run on 2026-08-20, saw a <code>SessionEnd</code>
+        hook fire on a normal <code>claude -p</code> exit. It fired again when
+        the session was sent SIGTERM. The payload carried
+        <code>session_id</code>, <code>transcript_path</code>, <code>cwd</code>,
+        and a <code>reason</code> field.</p></li>
+      <li><span class="k">4</span><p><strong>Kill signal</strong> &mdash; the
+        same probe sent SIGKILL. No hook ran. A hook on <code>SessionEnd</code>
+        is therefore nearly reliable, and never certain.</p></li>
+    </ol>
+  </figure>
+
+  <p>The two events answer different questions. <code>Stop</code> says a turn
+  finished. <code>SessionEnd</code> says the session finished. A teardown
+  wired to the first one runs while the session is still working.</p>
+
+  <h2>Claims a finished session leaves standing today</h2>
+
+  <figure id="fig-claims" class="pan">
+    <svg viewBox="0 0 520 266" style="min-width:520px" role="img" aria-labelledby="f-cl-t">
+      <title id="f-cl-t">Three claims a session takes, the actor that releases each one today, and the state measured on 2026-08-20</title>
+      <defs>
+        <marker id="arrow-cl" viewBox="0 0 8 8" refX="7" refY="4"
+                markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <g font-size="11" fill="#555">
+        <text x="95" y="26" text-anchor="middle">a session takes</text>
+        <text x="287" y="26" text-anchor="middle">something releases</text>
+        <text x="398" y="26">live, 2026-08-20</text>
+      </g>
+      <g fill="none" stroke="currentColor" stroke-width="1.4">
+        <rect x="20" y="44" width="150" height="56"/>
+        <rect x="20" y="120" width="150" height="56"/>
+        <rect x="20" y="196" width="150" height="56"/>
+        <rect x="212" y="44" width="150" height="56"/>
+        <rect x="212" y="120" width="150" height="56"/>
+        <rect x="212" y="196" width="150" height="56"/>
+        <path d="M172,72 L210,72" marker-end="url(#arrow-cl)"/>
+        <path d="M172,148 L210,148" marker-end="url(#arrow-cl)"/>
+        <path d="M172,224 L210,224" marker-end="url(#arrow-cl)"/>
+        <path d="M364,72 L390,72" marker-end="url(#arrow-cl)"/>
+        <path d="M364,148 L390,148" marker-end="url(#arrow-cl)"/>
+        <path d="M364,224 L390,224" marker-end="url(#arrow-cl)"/>
+      </g>
+      <g font-size="12" font-weight="bold">
+        <text x="30" y="74">Worktree</text>
+        <text x="30" y="150">Spawned pane</text>
+        <text x="30" y="226">Ticket claim</text>
+        <text x="222" y="74">The session</text>
+        <text x="222" y="150">A later sweep</text>
+        <text x="222" y="226">The orchestrator</text>
+      </g>
+      <g font-size="11" font-family="ui-monospace, Menlo, monospace">
+        <text x="30" y="92">403 added</text>
+        <text x="30" y="168">321 launched</text>
+        <text x="30" y="244">2 held now</text>
+        <text x="222" y="92">415 removed</text>
+        <text x="222" y="168">132 closed</text>
+        <text x="222" y="244">no history yet</text>
+      </g>
+      <g font-size="11">
+        <text x="398" y="76">no orphan</text>
+        <text x="398" y="152">panes standing</text>
+        <text x="398" y="228">unknown</text>
+      </g>
+      <g fill="#ffffff" stroke="currentColor" stroke-width="1.2">
+        <circle cx="20" cy="44" r="11"/>
+        <circle cx="20" cy="120" r="11"/>
+        <circle cx="20" cy="196" r="11"/>
+      </g>
+      <g font-size="11" font-weight="bold" text-anchor="middle">
+        <text x="20" y="44" dy=".35em">1</text>
+        <text x="20" y="120" dy=".35em">2</text>
+        <text x="20" y="196" dy=".35em">3</text>
+      </g>
+    </svg>
+    <figcaption>Each claim, the actor that returns it today, and what a live
+      read found. The call counts come from the recorded transcripts, and the
+      right column from the repositories and the board store.</figcaption>
+    <ol class="keys">
+      <li><span class="k">1</span><p><strong>Worktree</strong> &mdash; the
+        transcripts hold 403 <code>git worktree add</code> calls against 415
+        <code>remove</code> or <code>prune</code> calls. 296 sessions added one.
+        297 sessions removed one. A read of the eight repositories on 2026-08-20
+        found no orphan worktree.</p></li>
+      <li><span class="k">2</span><p><strong>Spawned pane</strong> &mdash; 321
+        launch calls in 159 sessions, against 132 sweep-or-close calls in 46
+        sessions. Panes reading <span class="chip">done</span> stood in the
+        workspace and board entries on 2026-08-20.
+        <span class="src">~/workspace/.claude/skills/delegating/scripts/sweep-sessions:85-95 @ workspace 5a9a9e8</span></p></li>
+      <li><span class="k">3</span><p><strong>Ticket claim</strong> &mdash; the
+        board store held two rows in <span class="chip">working</span> on
+        2026-08-20, and a live session held each one. The claim door landed on
+        2026-08-19. One day of records exists.
+        <span class="src">~/.claude/CLAUDE.md:184 @ dotclaude a1fa211</span></p></li>
+    </ol>
+  </figure>
+
+  <p>The worktree counts balance. The pane counts do not. That gap is the one
+  measured leak, and it names the claim any cleanup must reach first.</p>
+
+  <h2>Proposed homes for the cleanup</h2>
+
+  <div class="figure-row">
+
+    <figure id="fig-opt1">
+      <svg viewBox="0 0 200 156" role="img" aria-labelledby="f-o1-t">
+        <title id="f-o1-t">Nothing runs at session end, and a sweep closes the spent panes later</title>
+        <defs>
+          <marker id="arrow-o1" viewBox="0 0 8 8" refX="7" refY="4"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.4">
+          <rect x="18" y="38" width="164" height="26"/>
+          <path d="M100,64 L100,84" marker-end="url(#arrow-o1)"/>
+          <path d="M100,110 L100,128" marker-end="url(#arrow-o1)"/>
+        </g>
+        <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="5 4">
+          <rect x="18" y="84" width="164" height="26"/>
+        </g>
+        <g font-size="11" text-anchor="middle">
+          <text x="100" y="55">session ends</text>
+          <text x="100" y="101">no hook runs</text>
+          <text x="100" y="144">a sweep, when asked</text>
+        </g>
+        <circle cx="18" cy="16" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+        <text x="18" y="16" dy=".35em" font-size="11" font-weight="bold" text-anchor="middle">1</text>
+      </svg>
+      <figcaption>Sweep on demand: the session ends, and the panes wait for a
+        sweep.</figcaption>
+    </figure>
+
+    <figure id="fig-opt2">
+      <svg viewBox="0 0 200 156" role="img" aria-labelledby="f-o2-t">
+        <title id="f-o2-t">A hook on session end that writes a report and removes nothing</title>
+        <defs>
+          <marker id="arrow-o2" viewBox="0 0 8 8" refX="7" refY="4"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.4">
+          <rect x="18" y="38" width="164" height="26"/>
+          <path d="M100,64 L100,84" marker-end="url(#arrow-o2)"/>
+          <path d="M100,110 L100,128" marker-end="url(#arrow-o2)"/>
+        </g>
+        <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="5 4">
+          <rect x="18" y="84" width="164" height="26"/>
+        </g>
+        <g font-size="11" text-anchor="middle">
+          <text x="100" y="55">session ends</text>
+          <text x="100" y="101">SessionEnd hook</text>
+          <text x="100" y="144">a report, nothing gone</text>
+        </g>
+        <circle cx="18" cy="16" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+        <text x="18" y="16" dy=".35em" font-size="11" font-weight="bold" text-anchor="middle">2</text>
+      </svg>
+      <figcaption>SessionEnd reporter: the same hook, writing down the three
+        claims.</figcaption>
+    </figure>
+
+    <figure id="fig-opt3">
+      <svg viewBox="0 0 200 156" role="img" aria-labelledby="f-o3-t">
+        <title id="f-o3-t">A hook on session end that removes the worktree, the claim and the panes</title>
+        <defs>
+          <marker id="arrow-o3" viewBox="0 0 8 8" refX="7" refY="4"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.4">
+          <rect x="18" y="38" width="164" height="26"/>
+          <path d="M100,64 L100,84" marker-end="url(#arrow-o3)"/>
+          <path d="M100,110 L100,128" marker-end="url(#arrow-o3)"/>
+        </g>
+        <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="5 4">
+          <rect x="18" y="84" width="164" height="26"/>
+        </g>
+        <g font-size="11" text-anchor="middle">
+          <text x="100" y="55">session ends</text>
+          <text x="100" y="101">SessionEnd hook</text>
+          <text x="100" y="144">all three claims gone</text>
+        </g>
+        <circle cx="18" cy="16" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+        <text x="18" y="16" dy=".35em" font-size="11" font-weight="bold" text-anchor="middle">3</text>
+      </svg>
+      <figcaption>SessionEnd destructor: the same hook, removing what the
+        session held.</figcaption>
+    </figure>
+
+    <figure id="fig-opt4">
+      <svg viewBox="0 0 200 156" role="img" aria-labelledby="f-o4-t">
+        <title id="f-o4-t">The same teardown on the turn-end event, which removes a worktree the session still uses</title>
+        <defs>
+          <marker id="arrow-o4" viewBox="0 0 8 8" refX="7" refY="4"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.4">
+          <rect x="18" y="38" width="164" height="26"/>
+          <path d="M100,64 L100,84" marker-end="url(#arrow-o4)"/>
+          <path d="M100,110 L100,128" marker-end="url(#arrow-o4)"/>
+        </g>
+        <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="5 4">
+          <rect x="18" y="84" width="164" height="26"/>
+        </g>
+        <g font-size="11" text-anchor="middle">
+          <text x="100" y="55">every turn ends</text>
+          <text x="100" y="101">Stop hook</text>
+          <text x="100" y="144">a live worktree gone</text>
+        </g>
+        <circle cx="18" cy="16" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+        <text x="18" y="16" dy=".35em" font-size="11" font-weight="bold" text-anchor="middle">4</text>
+      </svg>
+      <figcaption>Cleanup on Stop: the same teardown, wired to the turn-end
+        event.</figcaption>
+    </figure>
+
+  </div>
+
+  <p><span class="ct">4&times; option</span> for one job. Only the sweep is
+  built. Every box nobody has written is drawn dashed.</p>
+
+  <ol class="keys">
+    <li><span class="k">1</span><div>
+      <p><strong>Sweep on demand</strong> &mdash; today&rsquo;s arrangement.
+        Nothing new is wired. <code>sweep-sessions</code> classifies every
+        delegated session and closes only the spent ones. It never closes the
+        calling pane.</p>
+      <ul>
+        <li>gives up: timing. The sweep runs when
+          <span class="hum">a person asks for it</span>.</li>
+        <li>verdict: standing. Every other option leaves it in place.</li>
+      </ul>
+    </div></li>
+    <li><span class="k">2</span><div>
+      <p><strong>SessionEnd reporter</strong> &mdash; one hook on
+        <code>SessionEnd</code> that records the ending session&rsquo;s
+        worktree, ticket claim, and spawned panes. It removes nothing and
+        refuses nothing.</p>
+      <ul>
+        <li>gives up: the clearing itself, which still needs a second
+          actor.</li>
+        <li>a report cannot destroy work, so a wrong record costs a reader one
+          line</li>
+        <li>verdict: recommended.</li>
+      </ul>
+    </div></li>
+    <li><span class="k">3</span><div>
+      <p><strong>SessionEnd destructor</strong> &mdash; the same hook, which
+        also removes the worktree, releases the ticket claim, and closes the
+        spawned panes.</p>
+      <ul>
+        <li>gives up: certainty. SIGKILL leaves the hook unfired. That is the
+          case where cleanup matters most.</li>
+        <li>gives up: safety on a worktree, which can hold the only copy of its
+          work</li>
+        <li>needs a named exception to the rule that forbids closing a pane
+          nobody created
+          <span class="src">~/workspace/.claude/CLAUDE.md:93 @ workspace 5a9a9e8</span></li>
+        <li>verdict: killed on reach. The measured leak is panes rather than
+          worktrees. The destructive half therefore buys little.</li>
+      </ul>
+    </div></li>
+    <li><span class="k">4</span><div>
+      <p><strong>Cleanup on Stop</strong> &mdash; any of the three moves above,
+        wired to the turn-end event instead.</p>
+      <ul>
+        <li>verdict: killed on the event. <code>Stop</code> fires at every turn
+          end. A teardown there removes a worktree the session is still working
+          in. The 2021 firings over 500 sessions measure that gap.</li>
+      </ul>
+    </div></li>
+  </ol>
+
+  <h2>Reporter without a destructor</h2>
+
+  <table>
+    <thead><tr><th>What</th><th>The hook&rsquo;s move</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr class="grp"><td colspan="3">Recorded, and left standing</td></tr>
+      <tr><td>worktree</td><td>writes the path</td><td>proves the balance holds</td></tr>
+      <tr><td>ticket claim</td><td>writes the row id</td><td>fills a one-day history</td></tr>
+      <tr><td>spawned panes</td><td>writes the pane ids</td><td>names the measured leak</td></tr>
+      <tr class="grp"><td colspan="3">Never done by the hook</td></tr>
+      <tr><td>remove a worktree</td><td>none</td><td>may hold the only copy</td></tr>
+      <tr><td>close a ticket row</td><td>none</td><td>the orchestrator&rsquo;s move</td></tr>
+      <tr><td>close a spawned pane</td><td>none</td><td>rule 3 forbids it</td></tr>
+    </tbody>
+  </table>
+
+  <p>Two facts pick the reporter. The measured leak is spawned panes, which
+  the destructive half of a session-end hook does not reach any better. A
+  destructor that misses a kill signal cannot be the thing anybody relies on.
+  <code>sweep-sessions</code> therefore stays standing under every option.</p>
+
+  <div class="callout">
+    <span class="g" aria-hidden="true">&#9888;&#65039;</span>
+    <p><strong>A destructor sometimes does not run.</strong> SIGKILL leaves a
+    <code>SessionEnd</code> hook unfired. A killed session is the one most
+    likely to leave a claim behind.</p>
+  </div>
+
+  <details>
+    <summary>Two gaps sit under this recommendation, and neither is closed</summary>
+    <ul>
+      <li><strong>The operator-closed pane.</strong> The probe covered a normal
+        exit and SIGTERM. Whether <code>SessionEnd</code> fires when a person
+        closes a herdr pane was not probed.</li>
+      <li><strong>The claim door&rsquo;s history.</strong> The door landed on
+        2026-08-19, and one day of records exists. The leak rate for a ticket
+        claim is unknown rather than low.</li>
+    </ul>
+  </details>
+
+  <h2>Decisions for the owner</h2>
+
+  <p>Three questions carry this proposal. Each one takes a yes or a no.</p>
+
+  <ol>
+    <li><strong>Adopt the SessionEnd reporter at all?</strong> A yes adds a
+      fifth declared hook to <code>~/.claude/settings.json</code>. That hook
+      fires once per session end, in every repository.
+      <span class="src">~/.claude/settings.json:5-51 @ dotclaude a1fa211</span></li>
+    <li><strong>May a session release its own board ticket claim when it
+      ends?</strong> A yes lets the hook call the board door for the one row
+      this session claimed. It reaches no other row. It closes nothing.</li>
+    <li><strong>May the delegating layer close the panes it spawned when the
+      spawning session ends?</strong> A yes writes a named exception into rule 3
+      of &ldquo;Concurrent agents&rdquo;, in
+      <code>~/workspace/.claude/CLAUDE.md</code>. The exception covers panes the
+      ending session itself launched, and no others.
+      <span class="src">~/workspace/.claude/CLAUDE.md:93 @ workspace 5a9a9e8</span></li>
+  </ol>
+
+</article>
+</body>
+</html>
