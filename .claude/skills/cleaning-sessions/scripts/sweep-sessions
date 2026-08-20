@@ -41,7 +41,10 @@
 #           root, whose rows report closed:false unless the caller named it.
 #           A pending session is waiting on an answer or finished without a
 #           sentinel, so its fate is a judgement this script does not make.
-source "$(dirname "$0")/_lib.sh"
+# The pane-reading helpers, and the verdict classifier above all, are one
+# library shared with the delegating skill, whose scripts read the same
+# screens to decide reuse. It stays in one place; this names the path.
+source "$(dirname "$0")/../../delegating/scripts/_lib.sh"
 require_herdr
 
 repo_arg= close=false shells=false include_workspace=false

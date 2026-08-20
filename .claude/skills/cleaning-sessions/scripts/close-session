@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Retire one delegated session whose output has been collected — the normal end
+# of a delegation (SKILL.md, "Retire one collected worker"). Allowed only for
+# sessions the delegating skill launched (a herdr agent name exists only where
+# a script started one); closing anything else needs --force and an explicit
+# user request.
+#
+# Closing discards the pane, so the output is read before this runs, not after.
+# The evidence behind the report is the worker's transcript under
+# ~/.claude/projects/, which answers to the worker's name in /resume.
+#
+# Usage: close-session <target> [--force]
+# Output: one JSON object -> {closed: <pane>}
+#
+# The pane helpers are one library shared with the delegating skill, whose
+# scripts read the same panes to decide reuse. It stays in one place; this
+# names the path.
+source "$(dirname "$0")/../../delegating/scripts/_lib.sh"
+require_herdr
+
+target=${1:?usage: close-session <target> [--force]}; shift
+force=false
+while [ $# -gt 0 ]; do
+  case $1 in
+    --force) force=true; shift ;;
+    *)       die "unknown option: $1" ;;
+  esac
+done
+
+pane=$(pane_of "$target")
+name=$(agent_row "$target" | jq -r '.name // empty')
+if [ -z "$name" ] && ! $force; then
+  die "'$target' is not a named session; refuse to close without --force"
+fi
+herdr pane close "$pane" >/dev/null
+jq -nc --arg p "$pane" '{closed: $p}'

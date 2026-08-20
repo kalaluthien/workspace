@@ -1,6 +1,6 @@
 ---
 name: delegating
-description: Orchestrate work across named worker claude sessions in herdr panes, one per ~/workspace repository. Use when a request belongs in a project entry (research → notes, app work → camera, ...) or spans several entries, when the user asks to spawn, reuse, message, monitor, or clean agent sessions, or for fire-and-forget surveys beside monitored implementation. Not for work this session can finish in its own cwd.
+description: Orchestrate work across named worker claude sessions in herdr panes, one per ~/workspace repository. Use when a request belongs in a project entry (research → notes, app work → camera, ...) or spans several entries, when the user asks to spawn, reuse, message or monitor agent sessions, or for fire-and-forget surveys beside monitored implementation. Not for work this session can finish in its own cwd, and not for retiring sessions, which is the cleaning-sessions skill.
 ---
 
 # Delegating
@@ -10,6 +10,9 @@ it does not do the delegated work itself. A session this skill launches and
 names is a worker; "session" alone means any claude session in a pane, named
 or not. All scripts live in
 `scripts/` here, print JSON, and never touch panes they did not create.
+Retiring a session is the `cleaning-sessions` skill: this one decides what to
+run and reads what comes back, and that one closes the panes and settles the
+board rows they held.
 
 ## Decision loop
 1. Route the request to repository entries with the workspace catalogue
@@ -62,7 +65,7 @@ or not. All scripts live in
    never runs out of room; pick `--effort` from the task's breadth per step 2;
    `--model` is an escape hatch for one session).
    Claim a reused session here, before sending:
-   `scripts/clean-session <name> --rename <role>-<task>` resets it to a
+   `scripts/claim-session <name> --rename <role>-<task>` resets it to a
    known-empty context and renames both sides — the herdr agent and the claude
    session — for the new task, because a worker found idle carries both the
    last delegation's context and its name. The role has to stay the same, and
@@ -107,37 +110,19 @@ or not. All scripts live in
    once when the reset has passed.
 6. Collect and retire. Read the worker's output, and when its repository still
    holds uncommitted work, have it clean up (commit, remove worktree) and wait
-   for that to finish. Then close the pane:
-   `scripts/clean-session <name> --close`. Close only after the output is
-   collected — closing first discards the pane tail — and close only `done`
-   workers; a `pending` or `blocked` one still needs a re-request or an
-   answer. The pane is not the evidence behind the report: the worker's
-   transcript under `~/.claude/projects/` is, and it answers to the worker's
-   name in `/resume`. A worker reports in its own shape — verbose, ordered by
+   for that to finish. Then retire the worker through the `cleaning-sessions`
+   skill, which owns every rule about closing a pane — the output read first,
+   `done` workers only, and the board row settled before the pane goes.
+   A worker reports in its own shape — verbose, ordered by
    its criteria walk, blind to the sibling workers. Write the user's report
    instead of forwarding that: keep the results that change what the user
    knows or must do, merge the workers into one narrative, and state the
    conclusions they left implicit. Wording follows the output style,
    "Reporting".
-7. When the user asks for a session clean-up, `scripts/sweep-sessions` reads
-   every pane and prints a verdict: `empty`, `done`, `pending`, or the herdr
-   status of a pane too busy to read. Adding `--close` retires the empty and
-   done ones and nothing else, because a `pending` session is either waiting
-   on an answer or finished without a sentinel and the screen cannot tell
-   which. Sessions in the container root itself (repo `workspace`) are reported
-   but never closed by a bare sweep — `--include-workspace`, or naming the root
-   as the sweep's target, is the explicit user request that reaches them.
-   Report the pending ones and let the user decide. Run it dry first
-   when the sweep covers sessions whose output has not been collected yet —
-   closing a `done` session discards the report behind it.
-   `--shells` widens the same sweep to panes holding no session at all. A bare
-   shell reads as `shell` when its foreground process group is the shell
-   itself and `shell-busy` while a command holds it, and only the idle ones
-   close. Empty tabs and workspaces need no step of their own — herdr retires
-   a tab when its last pane closes, and a workspace when its last tab does.
-   `scripts/verify-verdicts` checks the classifier against captured screens;
-   run it when a session is misclassified, since the agent's screen markers
-   are the only evidence it has.
+7. A request to clean sessions up, rather than to get work done, is the
+   `cleaning-sessions` skill's whole subject and not a step of a delegation:
+   it sweeps every pane, retires the spent ones, and leaves the rest for the
+   user to judge.
 
 ## Board-dispatched service-tickets
 The board's start action spawns a session whose whole prompt is one
@@ -240,12 +225,9 @@ outcome; so is a `working` + `#need-you` row, which says the work is finished
 and the close is held for the owner. A row left working with no such tag reads
 as a session that is still running, and the board waits on it for ever.
 
-When the orchestrator collects a board-dispatched session, it checks the row's
-state before reporting: a worker can ship the work, print its sentinel, and
-still leave the row `working`. Close the row yourself then — the work is
-verified by the report you just read, and re-asking the session costs a
-round-trip for one line. Do not close a row tagged `#need-you`: the tag holds
-the automatic close, and only the owner closes it.
+A worker can ship the work, print its sentinel, and still leave its row
+`working`, so a row's state is read before its pane goes. That check belongs to
+the retirement and lives with it, in the `cleaning-sessions` skill.
 
 ## Worked example — "add object detection to camera"
 1. Not workspace-level work → this skill. Route: research → `notes`,
@@ -255,7 +237,7 @@ the automatic close, and only the owner closes it.
    subjects. Both questions are narrow, so the default effort stands. Put them
    under one `Monitor` watch and carry on with other work.
 3. Each survey arrives as its own notification. A third question goes to a pane
-   already there: `clean-session survey-photo-subjects --rename
+   already there: `claim-session survey-photo-subjects --rename
    survey-model-licences` claims it — same role, similar breadth, new task. The
    write-up is `curate` work, another role, so it gets its own pane —
    `launch-session notes curate-detection-wiki` — with the two survey outputs
@@ -268,6 +250,6 @@ the automatic close, and only the owner closes it.
    background `Bash` call.
 5. Its line arrives as `done`, or as `pending` when it stopped early — then
    read the output and re-request the remainder. Have it clean the repository,
-   close each worker as its output lands (`clean-session <name> --close`), and
+   retire each worker as its output lands (the `cleaning-sessions` skill), and
    report the summary. The transcripts keep the evidence under the workers'
    names.

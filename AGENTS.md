@@ -80,8 +80,9 @@ own conventions, and restating them in a prompt only competes with them.
 
 # Herdr sessions
 Herdr is the one terminal interface over these repositories. The session
-lifecycle — find, name, launch, send, await, report, clean — is owned by the
-`/delegating` skill and its scripts; use them instead of raw herdr calls.
+lifecycle — find, name, launch, send, await, report — is owned by the
+`/delegating` skill, and retiring a session by the `/cleaning-sessions` skill;
+use their scripts instead of raw herdr calls.
 Install, version, environment, and output-parsing facts are in the
 `setup-herdr` memory.
 

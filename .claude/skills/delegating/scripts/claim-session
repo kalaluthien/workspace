@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Claim a standing session for new work: reset the claude session with /clear
+# so the new task starts on an empty context, and rename both sides when the
+# task changed. The pane survives — retiring one is close-session, in the
+# cleaning-sessions skill.
+#
+# Claim when taking a session for new work, not when finishing the old one —
+# see SKILL.md step 3. --rename belongs to the same claim: a pane named for the
+# task it just finished lies about the task it is about to run, so a reused
+# pane is renamed on both sides — the herdr agent and the claude session — as
+# it is cleared. The new name must keep the old role. The pane keeps the model
+# and effort `claude` started with, and a claim does not drive claude's own
+# `/model` and `/effort` switches — so work of another role, or of a breadth
+# the launch effort does not fit, needs its own pane.
+#
+# Usage: claim-session <target> [--rename <role>-<task>]
+source "$(dirname "$0")/_lib.sh"
+require_herdr
+
+target=${1:?usage: claim-session <target> [--rename <role>-<task>]}; shift
+rename=
+while [ $# -gt 0 ]; do
+  case $1 in
+    --rename) rename=${2:?}; shift 2 ;;
+    *)        die "unknown option: $1" ;;
+  esac
+done
+
+pane=$(pane_of "$target")
+# Settle the new name before clearing: a rename refused after the /clear
+# would leave an emptied pane still answering to the finished task's name.
+name=
+if [ -n "$rename" ]; then
+  was=$(agent_row "$target" | jq -r '.name // empty')
+  [ -n "$was" ] || die "'$target' has no name to rename; launch a session"
+  name=$(free_name "$rename")
+  old_role=$(role_of "$was") new_role=$(role_of "$name")
+  [ "$old_role" = "$new_role" ] ||
+    die "a $old_role pane cannot take $new_role work: it keeps its launch model"
+fi
+
+herdr pane send-text "$pane" "/clear"
+sleep 1
+herdr pane send-keys "$pane" Enter
+# Re-stamp the claude-side name after the clear — the new name on a rename,
+# the standing name otherwise — so the transcript keeps answering to the
+# same name the herdr agent carries.
+stamp=$name
+[ -n "$stamp" ] || stamp=$(agent_row "$target" | jq -r '.name // empty')
+if [ -n "$stamp" ]; then
+  sleep 1
+  herdr pane send-text "$pane" "/rename $stamp"
+  sleep 1
+  herdr pane send-keys "$pane" Enter
+fi
+[ -n "$name" ] && herdr agent rename "$pane" "$name" >/dev/null
+jq -nc --arg p "$pane" --arg n "$name" \
+  '{cleared: $p, name: (if $n == "" then null else $n end)}'
