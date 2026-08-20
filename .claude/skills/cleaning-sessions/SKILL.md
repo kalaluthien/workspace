@@ -1,6 +1,7 @@
 ---
 name: cleaning-sessions
-description: Retire the claude sessions that are spent — one collected worker, or a sweep over every pane and shell under ~/workspace — and settle the board rows they held. Use when the user asks to clean up, sweep, tidy or close sessions or panes, when a delegation's output has been collected and its pane must go, or when a session is classified wrongly. Not for routing, launching, prompting or waiting on a session, which is the delegating skill.
+description: Sweep every pane and shell under ~/workspace, retire the sessions that are spent, and settle the board rows they held.
+disable-model-invocation: true
 ---
 
 # Cleaning sessions
