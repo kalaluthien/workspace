@@ -119,7 +119,7 @@
     <dl class="provenance">
       <dt>Doctype</dt>  <dd>explanation</dd>
       <dt>Question</dt> <dd>what hooks run around a working session, which layer owns each, and what does each guard? (runtime view)</dd>
-      <dt>Updated</dt>  <dd>2026-08-19</dd>
+      <dt>Updated</dt>  <dd>2026-08-20</dd>
       <dt>Commit</dt>   <dd>c66bc5c</dd>
     </dl>
   </header>
@@ -128,9 +128,10 @@
 
     <h2 id="answer">Answer</h2>
 
-    <p>Four hooks fire inside the session itself, and a second layer — each
-      repository's own git hooks — takes over the moment a session runs
-      <code>git commit</code>.</p>
+    <p>Four declared hooks fire inside the session itself — a
+      <code>/goal</code> session adds a fifth at run time — and a second
+      layer, each repository's own git hooks, takes over the moment a session
+      runs <code>git commit</code>.</p>
 
     <div class="box">
       <ol>
@@ -163,11 +164,14 @@
           </ul>
         </li>
         <li><span class="n">4</span><strong>Turn end.</strong>
-          <code>Stop</code> <mark>blocks one stop per working turn</mark> with
-          the Filing reminder.
+          <code>Stop</code> blocks at most one stop per firing. It blocks only
+          when the session <mark>changed three or more things since this hook
+          itself last fired</mark>.
           <ul>
-            <li>A turn that only answered in text is let straight
-              through.</li>
+            <li>A change is a file write or edit, or a shell command that
+              writes, commits, or calls a service door.</li>
+            <li>A turn that only read, probed, searched or launched a worker
+              changed nothing. It is let straight through.</li>
           </ul>
         </li>
       </ol>
@@ -230,7 +234,7 @@
         <tr><td>1 &middot; Prompt in</td><td>session moment</td><td>the prompt is submitted; the hook has no matcher, so its line joins every prompt</td></tr>
         <tr><td>2 &middot; Tool call</td><td>session moment</td><td>a tool runs; one hook wraps <code>Bash</code>, another follows <code>Write</code> and <code>Edit</code></td></tr>
         <tr><td>3 &middot; Git layer</td><td>repository boundary</td><td>the hooks git finds for one clone, reached only when a command invokes git</td></tr>
-        <tr><td>4 &middot; Turn end</td><td>session moment</td><td>the model tries to end the turn; the hook decides whether it may</td></tr>
+        <tr><td>4 &middot; Turn end</td><td>session moment</td><td>the model tries to end the turn; the hook blocks it only after three changing tool calls</td></tr>
         <tr><td>session runs</td><td>sequence edge</td><td>the turn proceeds from the prompt into its tool calls</td></tr>
         <tr><td>commit</td><td>crossing edge</td><td>a committing Bash command hands control to that clone's hook chain</td></tr>
         <tr><td>turn ends</td><td>sequence edge</td><td>tool calls are exhausted and the model attempts to stop</td></tr>
@@ -293,7 +297,9 @@
       <summary>Untracked wiring is why the git layer is installed once per clone, not cloned with it</summary>
       <ul>
         <li><strong>Harness side.</strong> Everything the harness runs is under
-          version control.
+          version control, with one exception: the session-scoped
+          <code>Stop</code> hook the <code>/goal</code> skill installs at run
+          time (<a href="#harness">Harness hooks</a>, point 3).
           <ul>
             <li>No project settings file defines any hook.</li>
             <li><code>~/.claude</code> tracks <code>settings.json</code>,
@@ -328,13 +334,31 @@
               cost and register, and <mark>refuse nothing</mark>.</li>
           </ul>
         </li>
-        <li><span class="n">2</span><strong><code>Stop</code> asks twice
-          over.</strong> Two conditions send it back silently.
+        <li><span class="n">2</span><strong><code>Stop</code> asks three times
+          over.</strong> Three conditions send it back silently.
           <ul>
             <li><mark><code>stop_hook_active</code></mark> is set, so the hook
               can never loop a turn.</li>
-            <li>The finished turn <mark>made no tool call</mark> — a text-only
-              answer has nothing to file.</li>
+            <li>The work since its own previous fire is <mark>below three
+              changing tool calls</mark>.</li>
+            <li>The transcript cannot be read.</li>
+          </ul>
+        </li>
+        <li><span class="n">3</span><strong>A fifth <code>Stop</code> hook no
+          settings file declares.</strong> The <code>/goal</code> skill
+          <mark>installs its own <code>Stop</code> hook at run time</mark>,
+          carrying the goal condition.
+          <ul>
+            <li>The session announces it: <code>A session-scoped Stop hook is
+              now active with condition: "…"</code>.</li>
+            <li>62 sessions in the transcript record installed one. 43 stop
+              summary entries list two <code>Stop</code> hooks side by side
+              (workspace <code>fa3d111</code>, measured with
+              <code>scripts/stop-hook-survey</code> over
+              <code>~/.claude/projects</code>).</li>
+            <li>It is in no settings file and under no version control. The
+              version-control claim above therefore covers the four declared
+              hooks only.</li>
           </ul>
         </li>
       </ol>
@@ -382,10 +406,13 @@
         <li><strong>Stop check.</strong> It decides from the transcript, not
           from the last message.
           <ul>
-            <li>It walks the transcript back to the last real user
-              prompt.</li>
-            <li>It blocks the stop only if a tool call happened in
-              between.</li>
+            <li>It walks back to the summary entry the harness wrote when this
+              hook last ran, not to the last user prompt.</li>
+            <li>It counts only the tool calls that changed something. A
+              subagent's sidechain work is not counted.</li>
+            <li>Replayed over the 2021 firings recorded across 500 sessions
+              between 2026-08-04 and 2026-08-19, the condition silences 83.0%
+              of them (workspace <code>fa3d111</code>).</li>
           </ul>
         </li>
       </ul>
@@ -654,9 +681,14 @@
       <li><code>~/.claude/settings.json</code> at dotclaude <code>13d1aa5</code>
         — the <code>hooks</code> section: the four events, their matchers, and
         the exact commands</li>
-      <li><code>~/.claude/hooks/stop-takeaway-check.py</code> — the
-        <code>stop_hook_active</code> return, the transcript walk, and the
-        tool-call condition on the block</li>
+      <li><code>~/.claude/hooks/stop-takeaway-check.py</code> at dotclaude
+        <code>a1fa211</code> — the <code>stop_hook_active</code> return, the
+        walk back to this hook's own previous fire, the count of changing tool
+        calls, and the threshold of three</li>
+      <li><code>~/workspace/scripts/stop-hook-survey</code> at workspace
+        <code>fa3d111</code> — the <code>stop_hook_summary</code> entries it
+        reads, and the counterfactual replay that imports the hook's own
+        decision</li>
       <li><code>~/.claude/hooks/check-memtype.py</code> — its header: the
         table parse, the path gate, and the refusal on an unreadable table
         (replaced the retired <code>check-backlog-format.py</code> here,
