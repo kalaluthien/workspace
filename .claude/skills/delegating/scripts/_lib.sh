@@ -25,10 +25,10 @@ repo_path() {
 
 # role_of <name> -> the role prefix of a session name
 #
-# A board-dispatched worker is named inside its ticket's namespace,
-# ticket-<id>--<role>-<task>, so the role is read after the "--" boundary
-# rather than off the head of the name — where it would say "ticket" for
-# every worker a board mission launches.
+# A board-dispatched worker is named inside its dispatch's namespace,
+# work-<project>-<n>--<role>-<task>, so the role is read after the "--"
+# boundary rather than off the head of the name — where it would say "work"
+# for every worker a board mission launches.
 role_of() { local n=${1##*--}; printf '%s\n' "${n%%-*}"; }
 
 # fold_kebab <text> -> lower-case kebab, no leading or trailing dash
@@ -43,12 +43,12 @@ fold_kebab() {
 # request is folded to lower-case kebab, cut to leave room for a "-NN" suffix,
 # and disambiguated against the live roster.
 #
-# A board-dispatched worker carries its ticket's namespace in front,
-# ticket-<id>--<role>-<task>. Each side of that "--" folds on its own, because
-# the fold collapses every run of separators to a single dash and would
-# otherwise eat the boundary — which is what tells the board which ticket owns
-# the pane. The cut lands on the joined name, so the namespace spends from the
-# same budget and the task part is what loses letters.
+# A board-dispatched worker carries its dispatch's namespace in front,
+# work-<project>-<n>--<role>-<task>. Each side of that "--" folds on its own,
+# because the fold collapses every run of separators to a single dash and
+# would otherwise eat the boundary — which is what tells the board which
+# ticket owns the pane. The cut lands on the joined name, so the namespace
+# spends from the same budget and the task part is what loses letters.
 free_name() {
   local want=$1 prefix= base name n taken
   case $want in
