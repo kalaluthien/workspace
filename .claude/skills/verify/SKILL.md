@@ -35,7 +35,7 @@ non-zero when it fails.
 
 3. **The session classifier.**
 
-       .claude/skills/cleaning-sessions/scripts/verify-verdicts
+       .claude/skills/clean/scripts/verify-verdicts
 
    Runs the pane classifier against captured screens with a stub herdr, so it
    touches no live session. Prints one `ok` line per screen. A session's screen

@@ -2,7 +2,7 @@
 # Claim a standing session for new work: reset the claude session with /clear
 # so the new task starts on an empty context, and rename both sides when the
 # task changed. The pane survives — retiring one is close-session, in the
-# cleaning-sessions skill.
+# clean skill.
 #
 # Claim when taking a session for new work, not when finishing the old one —
 # see SKILL.md step 3. --rename belongs to the same claim: a pane named for the

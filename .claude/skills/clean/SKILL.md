@@ -1,10 +1,10 @@
 ---
-name: cleaning-sessions
+name: clean
 description: Sweep every pane and shell under ~/workspace, retire the sessions that are spent, and settle the board rows they held.
 disable-model-invocation: true
 ---
 
-# Cleaning sessions
+# Clean
 
 Retiring a session is deterministic where delegating it is not: a classifier
 reads each pane, and only two of its verdicts may be closed. Nothing here

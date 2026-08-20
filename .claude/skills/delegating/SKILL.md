@@ -1,6 +1,6 @@
 ---
 name: delegating
-description: Orchestrate work across named worker claude sessions in herdr panes, one per ~/workspace repository. Use when a request belongs in a project entry (research → notes, app work → camera, ...) or spans several entries, when the user asks to spawn, reuse, message or monitor agent sessions, or for fire-and-forget surveys beside monitored implementation. Not for work this session can finish in its own cwd, and not for retiring sessions, which is the `cleaning-sessions` command.
+description: Orchestrate work across named worker claude sessions in herdr panes, one per ~/workspace repository. Use when a request belongs in a project entry (research → notes, app work → camera, ...) or spans several entries, when the user asks to spawn, reuse, message or monitor agent sessions, or for fire-and-forget surveys beside monitored implementation. Not for work this session can finish in its own cwd, and not for retiring sessions, which is the `clean` command.
 ---
 
 # Delegating
@@ -10,9 +10,9 @@ it does not do the delegated work itself. A session this skill launches and
 names is a worker; "session" alone means any claude session in a pane, named
 or not. All scripts live in
 `scripts/` here, print JSON, and never touch panes they did not create.
-Retiring a session is `cleaning-sessions`, a command a person types. Its
+Retiring a session is `clean`, a command a person types. Its
 rules are still the rules here, and this session reads them as a file —
-`.claude/skills/cleaning-sessions/SKILL.md` — because a command is hidden
+`.claude/skills/clean/SKILL.md` — because a command is hidden
 from the skill list. This skill decides what to run and reads what comes
 back; that file says which panes may close and how the board row settles.
 
@@ -115,8 +115,8 @@ back; that file says which panes may close and how the board row settles.
    for that to finish. Then retire the worker: read its output first, close
    only a worker whose verdict is `done` or `empty`, settle its board row
    before the pane goes, and run
-   `../cleaning-sessions/scripts/close-session <name>`. Every other rule
-   about closing a pane is in `.claude/skills/cleaning-sessions/SKILL.md`,
+   `../clean/scripts/close-session <name>`. Every other rule
+   about closing a pane is in `.claude/skills/clean/SKILL.md`,
    which is a file to read rather than a skill to load.
    A worker reports in its own shape — verbose, ordered by
    its criteria walk, blind to the sibling workers. Write the user's report
@@ -125,7 +125,7 @@ back; that file says which panes may close and how the board row settles.
    conclusions they left implicit. Wording follows the output style,
    "Reporting".
 7. A request to clean sessions up, rather than to get work done, is the
-   `cleaning-sessions` command's whole subject and not a step of a
+   `clean` command's whole subject and not a step of a
    delegation: it sweeps every pane, retires the spent ones, and leaves the
    rest for the user to judge.
 
@@ -233,7 +233,7 @@ as a session that is still running, and the board waits on it for ever.
 A worker can ship the work, print its sentinel, and still leave its row
 `working`, so a row's state is read before its pane goes. That check belongs to
 the retirement and lives with it, in
-`.claude/skills/cleaning-sessions/SKILL.md`.
+`.claude/skills/clean/SKILL.md`.
 
 ## Worked example — "add object detection to camera"
 1. Not workspace-level work → this skill. Route: research → `notes`,

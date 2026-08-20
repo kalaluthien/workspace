@@ -5,7 +5,7 @@ paths: docs/service-*.html
 # Services plane
 
 The workspace controls two planes. The agents plane is the catalogue plus the
-`delegating` and `cleaning-sessions` skills; the services plane is the long-running things the entries
+`delegating` and `clean` skills; the services plane is the long-running things the entries
 expose — a web app on a port, a bridge, a tailnet handler. A `docs/service-*`
 document governs the second one.
 
