@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Report every session pane under ~/workspace, and optionally retire it.
 
-    sweep-sessions [<repo>] [--close] [--include-workspace] [--quiet-min N]
+    sweep-sessions [<repo>] [--close] [--quiet-min N]
 
 One JSON object per pane: {repo, pane, name, title, status, session, link,
 quiet_min, verdict, holds, closable} -- plus `closed` under --close.
@@ -18,9 +18,9 @@ Verdicts:
   shell-busy  a pane with no agent, a command running
   <status>  herdr's own state when it is not idle: working, blocked, unknown
 
-Panes at the container root are the orchestrators, so a bare sweep reports
-them and closes none; --include-workspace, or naming `workspace` as <repo>,
-is the explicit request that reaches them.
+Panes at the container root are swept like any other repository's. The
+session running the sweep survives on its own `self` and `focused` holds, so
+an orchestrator that finished its work retires with the workers it drove.
 """
 import argparse
 import json
@@ -35,14 +35,12 @@ def main():
     parser = argparse.ArgumentParser(add_help=True)
     parser.add_argument("repo", nargs="?")
     parser.add_argument("--close", action="store_true")
-    parser.add_argument("--include-workspace", action="store_true")
     parser.add_argument("--quiet-min", type=float, default=S.DEFAULT_QUIET_MIN)
     parser.add_argument("--pane", action="append", default=[])
     opts = parser.parse_args()
 
     args = argparse.Namespace(
         repo=opts.repo,
-        all=opts.include_workspace or opts.repo == os.path.basename(S.WORKSPACE_ROOT),
         pane=opts.pane,
         quiet_min=opts.quiet_min,
     )

@@ -65,19 +65,17 @@ close anyway (2026-08-21). So a sweep acting on its own is the decision, not
 an oversight: do not add a confirmation step back without asking.
 
 ## Sweep the workspace
-`scripts/sweep-sessions [<repo>] [--close] [--include-workspace]
-[--quiet-min N] [--pane P]` reads every pane under `~/workspace` and prints
+`scripts/sweep-sessions [<repo>] [--close] [--quiet-min N] [--pane P]` reads every pane under `~/workspace` and prints
 one verdict per session. Adding `--close` retires the ones carrying no hold,
 re-reading each pane immediately beforehand so a session that woke up in the
 meantime survives.
 
 - Run it dry first whenever it covers sessions whose output nobody has
   collected yet.
-- Sessions in the container root itself (repo `workspace`) are reported but
-  never closed by a bare sweep -- those are the orchestrators, and a clean-up
-  asked about the entries must not retire the session that asked.
-  `--include-workspace`, or naming the root as the sweep's target, is the
-  explicit request that reaches them.
+- The container root (repo `workspace`) is swept like any entry. The session
+  running the sweep is held by `self` and `focused`, so the one that asked
+  survives; every other spent orchestrator retires with the workers it drove
+  (owner, 2026-08-21).
 - Empty tabs and workspaces need no step: herdr retires a tab when its last
   pane closes, and a workspace when its last tab does.
 

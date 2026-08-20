@@ -17,8 +17,8 @@ Safety is asymmetric by construction. Absent, ambiguous or stale evidence
 produces a hold, never a close; the failure mode is a pane that outlives its
 work, never work that dies with its pane.
 
-    session_state.py list  [--repo R] [--all] [--quiet-min N]
-    session_state.py close [--repo R] [--all] [--quiet-min N] [--pane P ...]
+    session_state.py list  [--repo R] [--quiet-min N]
+    session_state.py close [--repo R] [--quiet-min N] [--pane P ...]
     session_state.py verdict --pane P
 
 A verdict folds the holds back into one word, so a pane still working reads
@@ -619,11 +619,6 @@ def gather(herdr, args, me, titles=None):
             continue
         if args.repo and label != args.repo:
             continue
-        if not args.repo and not args.all \
-                and label == os.path.basename(WORKSPACE_ROOT):
-            # Container-root panes are the orchestrators; reaching them is an
-            # explicit request, not a side effect of sweeping the entries.
-            continue
         if args.pane and pane["pane_id"] not in args.pane:
             continue
         rows.append(classify(herdr, pane, roster, titles, args.quiet_min, me,
@@ -675,8 +670,6 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("list", "close", "verdict"))
     parser.add_argument("--repo")
-    parser.add_argument("--all", action="store_true",
-                        help="include container-root panes")
     parser.add_argument("--pane", action="append", default=[])
     parser.add_argument("--quiet-min", type=float, default=DEFAULT_QUIET_MIN)
     args = parser.parse_args()
