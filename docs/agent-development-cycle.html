@@ -109,7 +109,7 @@
     <dt>Doctype</dt>  <dd>proposal</dd>
     <dt>Status</dt>   <dd>Open</dd>
     <dt>Question</dt> <dd>What directory contract and work cycle should agent sessions follow in a program-building project entry, so that a spec&rsquo;s domain and its use cases both become machine-checkable and both survive a code-first patch?</dd>
-    <dt>Updated</dt>  <dd>2026-08-16</dd>
+    <dt>Updated</dt>  <dd>2026-08-20</dd>
   </dl>
 
   <h2>One checked chain from spec to settling test</h2>
@@ -960,11 +960,13 @@ run somePinnedTrace { eventually some p: Plant | some p.pinned } for 4 but 1..8 
     <ul>
       <li><strong>Phase 1, the contract.</strong>
         <ul>
-          <li>Rename <code>script/</code> to <code>scripts/</code>, and add the
-            four entrypoints.</li>
+          <li>Rename <code>script/</code> to <code>scripts/</code>. Done, in
+            garden and in camera. The four entrypoints are still to add.
+            <span class="src">garden/scripts/ @ 467e077</span> &middot;
+            <span class="src">camera/scripts/ @ d41b41b</span></li>
           <li>Correct the stale enforcement line, and give
             <code>README.md</code> its overview section.</li>
-          <li>Five tracked files reference <code>script/</code>: the entry's
+          <li>Five tracked files referenced <code>script/</code>: the entry's
             <code>README.md</code>, <code>.claude/CLAUDE.md</code>,
             <code>docs/release.md</code>, <code>docs/verification.md</code>, and
             <code>run-e2e.sh</code>.</li>
@@ -986,7 +988,9 @@ run somePinnedTrace { eventually some p: Plant | some p.pinned } for 4 but 1..8 
         </ul></li>
       <li><strong>Phase 3, the migration and the eval stage.</strong>
         <ul>
-          <li>Move <code>docs/*.md</code> specs into <code>spec/</code>.</li>
+          <li>Move <code>docs/*.md</code> specs into <code>spec/</code>. The
+            workspace root has done this. Garden has not.
+            <span class="src">spec/ @ aded5a1</span></li>
           <li>Split <code>docs/README.md</code> into a spec-rules file and a
             views-only file, and rewrite <code>docs/INDEX.md</code>.</li>
           <li>Start the eval stage with detekt cognitive complexity and a module
@@ -1002,6 +1006,9 @@ run somePinnedTrace { eventually some p: Plant | some p.pinned } for 4 but 1..8 
   <p>Nine rows this proposal settled on its own. One line from the owner
   reverses any row.</p>
 
+  <p>Rows 10 and 11 are not among them. The owner settled both on 2026-08-20.
+  The table records them, and no veto applies.</p>
+
   <table>
     <thead><tr><th>Decision</th><th>Consequence</th><th>Argued in</th></tr></thead>
     <tbody>
@@ -1011,6 +1018,8 @@ run somePinnedTrace { eventually some p: Plant | some p.pinned } for 4 but 1..8 
       <tr><td>3 &middot; <code>scripts/spec</code> joins the other three entrypoints</td><td>a session runs one command instead of reading prose</td><td>Stages and their entrypoints</td></tr>
       <tr><td>4 &middot; No <code>eval/</code> directory; a rubric is a spec file</td><td>one directory fewer, and a rubric is versioned as a specification</td><td>Directories of an entry</td></tr>
       <tr><td>5 &middot; <code>hooks/</code> stays top-level and unchanged</td><td>three entries keep a chained hook that already works</td><td>Directories of an entry</td></tr>
+      <tr><td>10 &middot; Every entry names its script directory <code>scripts/</code></td><td>a session runs one command name in every repository</td><td>Owner decision 2026-08-20; shipped in garden <code>467e077</code> and camera <code>d41b41b</code></td></tr>
+      <tr><td>11 &middot; <code>spec/</code> is a directory of its own, apart from <code>docs/</code></td><td><code>docs/</code> is views only, and neither kind inherits the other's rules</td><td>Owner decision 2026-08-20; shipped at the workspace root in <code>aded5a1</code></td></tr>
       <tr class="grp"><td colspan="3">Gates</td></tr>
       <tr><td>6 &middot; Only resolution and the model lint gate a commit</td><td>a model forced green never blocks anybody</td><td>Checks and what a green licenses</td></tr>
       <tr><td>7 &middot; A model's check is trusted only after two observed reds</td><td>a green model earns no trust on its own</td><td>Model evidence</td></tr>
@@ -1018,6 +1027,139 @@ run somePinnedTrace { eventually some p: Plant | some p.pinned } for 4 but 1..8 
       <tr><td>9 &middot; Instrumented tests stay out of the routine gate</td><td>a commit never waits on the one emulator serial</td><td>Stages and their entrypoints</td></tr>
     </tbody>
   </table>
+
+  <h2>What the red team could not kill</h2>
+
+  <p><span class="ct">6&times; finding</span> weighs against this proposal.
+  Five stand open. Decision 11 settles the sixth. Each record carries the
+  evidence behind the finding, and the observation that would refute it.</p>
+
+  <div class="recs">
+
+    <div class="rec">
+      <p class="rec-n">1 &middot; The gates catch typos, and there are no typos
+        <span class="rec-t">finding</span></p>
+      <dl>
+        <dt>evidence</dt> <dd>
+          <ul>
+            <li>The resolution gate licenses &ldquo;resolution, never that the
+              test tests the leaf&rdquo;.</li>
+            <li>A behaviour change that no test observed stays invisible to
+              every check.</li>
+            <li>Garden&rsquo;s <span class="ct">14&times; subject spec</span>
+              cite <span class="ct">26&times; test class name</span> across
+              <span class="ct">79&times; acceptance row</span>. All 26 resolve
+              to a real file. The gate&rsquo;s yield on the day it ships is
+              zero. <span class="src">garden/docs/*.md @ 3478192</span></li>
+          </ul></dd>
+        <dt>refuted by</dt> <dd>a count of the garden spec-to-test links that
+          have gone stale. Nobody has asked that <code>git log</code>
+          question.</dd>
+        <dt>standing</dt> <dd><span class="chip">open</span></dd>
+      </dl>
+    </div>
+
+    <div class="rec">
+      <p class="rec-n">2 &middot; The Alloy evidence argues against Alloy
+        <span class="rec-t">finding</span></p>
+      <dl>
+        <dt>evidence</dt> <dd>
+          <ul>
+            <li>Two of three model attempts could never be made red.</li>
+            <li>The third worked only after a ghost <code>Trail.actor</code>
+              variable made the assertion observable.</li>
+            <li>The trust rule then costs five runs and two mutations per
+              model, forever.</li>
+            <li>The model settles <code>inv-pin-immutable</code>, which
+              <code>IntervalOverrideTest#pinHeld</code> already settles.</li>
+          </ul></dd>
+        <dt>refuted by</dt> <dd>a model that refutes a design garden would have
+          shipped. Option 3 names that kill condition itself. It is met
+          today.</dd>
+        <dt>standing</dt> <dd><span class="chip">open</span></dd>
+      </dl>
+    </div>
+
+    <div class="rec">
+      <p class="rec-n">3 &middot; The escape hatch guarantees the chain rots
+        <span class="rec-t">finding</span></p>
+      <dl>
+        <dt>evidence</dt> <dd>
+          <ul>
+            <li>No gate demands a spec edit. Staleness only informs.</li>
+            <li>Spec-first &ldquo;becomes a gate only after it catches
+              something&rdquo;. A warning nobody must act on never earns that
+              promotion.</li>
+            <li>Garden&rsquo;s <code>docs/README.md</code> has denied a
+              <code>hooks/pre-commit</code> of 90 lines since 2026-08-15. Five
+              days later the line still stands.
+              <span class="src">garden/docs/README.md:144 @ 3478192</span></li>
+          </ul></dd>
+        <dt>refuted by</dt> <dd>one spec correction that a staleness warning
+          alone caused</dd>
+        <dt>standing</dt> <dd><span class="chip">open</span></dd>
+      </dl>
+    </div>
+
+    <div class="rec">
+      <p class="rec-n">4 &middot; The certain win was hostage to the argument
+        <span class="rec-t">finding</span></p>
+      <dl>
+        <dt>evidence</dt> <dd>
+          <ul>
+            <li>Phase 1 answers a measured problem. It needs no part of the
+              spec chain.</li>
+            <li>Bundling phase 1 into this proposal is why the one-line
+              enforcement fix waited five days.</li>
+          </ul></dd>
+        <dt>refuted by</dt> <dd>a dependency of phase 1 on the spec chain. The
+          proposal records none.</dd>
+        <dt>standing</dt> <dd><span class="chip">open</span></dd>
+      </dl>
+    </div>
+
+    <div class="rec">
+      <p class="rec-n">5 &middot; Nine decisions were locked at zero adoptions
+        <span class="rec-t">finding</span></p>
+      <dl>
+        <dt>evidence</dt> <dd>
+          <ul>
+            <li>The table settles nine rows for three entries.</li>
+            <li>Two of the three gave no input. Their tooling differs from
+              garden&rsquo;s.</li>
+          </ul></dd>
+        <dt>refuted by</dt> <dd>an adoption in camera or in board that the nine
+          rows survive unchanged</dd>
+        <dt>standing</dt> <dd><span class="chip">open</span></dd>
+      </dl>
+    </div>
+
+    <div class="rec">
+      <p class="rec-n">6 &middot; <code>docs/</code> meant two things in one
+        tree <span class="rec-t">finding</span></p>
+      <dl>
+        <dt>evidence</dt> <dd>
+          <ul>
+            <li>The workspace root&rsquo;s contract kept specifications in
+              <code>docs/</code>. This proposal moves an entry&rsquo;s
+              specifications to <code>spec/</code>.</li>
+            <li>The root split the other way on 2026-08-20. The tree now
+              carries one answer.
+              <span class="src">docs/README.md:14-25 @ 4a6a172</span></li>
+          </ul></dd>
+        <dt>refuted by</dt> <dd>nothing; decision 11 settles it</dd>
+        <dt>standing</dt> <dd><span class="chip">resolved</span></dd>
+      </dl>
+    </div>
+
+  </div>
+
+  <p><span class="ct">4&times; claim</span> survived the pass. The four
+  entrypoints answer a measured cost. A method-level link pins one method,
+  where a class name pins none. The vocabulary gap is real, because
+  garden&rsquo;s term <code>today list</code> names no identifier in the main
+  source. The two-observed-reds trust rule holds for any check, and not for
+  Alloy alone. <span class="src">garden/ @ 3478192</span></p>
 
   <h3>Open questions</h3>
 
@@ -1030,6 +1172,11 @@ run somePinnedTrace { eventually some p: Plant | some p.pinned } for 4 but 1..8 
     <li>The row grammar in final detail. Phase 2 hardens it after one survey of
       what traceability and document-lint tools check mechanically. The
       <code>notes</code> vault does not hold that page.</li>
+    <li>Whether phase 2 waits on a measured count of stale spec-to-test links
+      before it starts.</li>
+    <li>Whether the Alloy lint, the trust rule and the model corpus survive.
+      The alternative is a hand tool, run on a hard design and recorded beside
+      the decision.</li>
   </ul>
 
 </article>
