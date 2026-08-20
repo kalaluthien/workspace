@@ -151,6 +151,37 @@ transcript tailed-reopened <<'EOF'
 {"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Pushed to main."}]}}
 EOF
 
+# A worker that printed its sentinel and then left a background shell running:
+# the footer still counts it, and this machine's footer is the vim-mode one
+# herdr's own rule cannot match, so the screen is the only place the live work
+# shows. Closing this pane would kill a running command.
+fixture shelled working <<'EOF'
+⏺ Filed the pitfall to the project pool.
+
+  DONE curate-doc-chapters
+
+  -- INSERT -- ⏵⏵ auto mode on · 1 shell
+EOF
+
+# The same, waiting on background agents rather than a shell.
+fixture agented working <<'EOF'
+⏺ Handed the corpus to three writers.
+
+  DONE curate-doc-chapters
+
+✻ Waiting for 3 background agents to finish
+❯
+EOF
+
+# The footer with no count is the ordinary one: a spent session still closes.
+fixture footer done <<'EOF'
+⏺ Merged, pushed, worktree removed.
+
+  DONE curate-doc-chapters
+❯
+  -- INSERT -- ⏵⏵ auto mode on
+EOF
+
 # The stub answers only what sweep-sessions asks: the agent roster, and one
 # pane read per agent. Every fixture is idle, so every one reaches the reader.
 {

@@ -133,6 +133,13 @@ shell_verdict() {
 # session carries no sentinel to match. Splitting on a marker avoids assuming
 # its byte width, and a read that comes back with nothing is a failed read.
 #
+# One marker outranks every other, including the sentinel: the footer's count
+# of background shells, and the line naming background agents still to
+# finish. Both outlive the turn that started them, so a pane can be quiet
+# with real work running under it. herdr has rules for both, but neither
+# fires on this machine's footer, so the screen is read for them here — a
+# session with live work is never spent, and never closable.
+#
 # A usage-limit stop reads as blocked, and it outranks an earlier sentinel:
 # a /goal session can print its sentinel, have the judge send it back to
 # work, and then hit the limit — a screen whose last event is the limit
@@ -149,6 +156,7 @@ session_verdict() {
     awk -v name="$2" '
       BEGIN { sentinel = (name == "" ? "" : "DONE " name) }
       { seen = NR }
+      NF { ne++; tail[ne] = $0 }                                 # non-empty lines
       index($0, "\342\217\272") { output_at = NR }               # the assistant bullet
       index($0, "\342\226\220\342\226\233") { banner = 1 }       # the welcome banner
       index($0, "hit your session limit") { limit_at = NR }      # the usage-limit stop
@@ -161,7 +169,18 @@ session_verdict() {
         }
       }
       END {
-        if (!seen)                                  print "unknown"
+        # The footer says a background shell or a background agent is still
+        # running, and it outlives the turn that started them. herdr scores
+        # such a pane idle here — its own rule cannot match this footer —
+        # so this is the only reader that sees them: a pane with live work
+        # is working, whatever else the screen holds.
+        for (i = ne; i > ne - 12 && i > 0; i--) {
+          if ((index(tail[i], "\342\217\265") || index(tail[i], "\342\217\270")) \
+              && tail[i] ~ /[[:space:]][1-9][0-9]*[[:space:]]+shells?[[:space:]]*$/) live = 1
+          if (index(tail[i], "background agents to finish")) live = 1
+        }
+        if (live)                                   print "working"
+        else if (!seen)                             print "unknown"
         else if (limit_at > done_at && limit_at > input_at \
                  && limit_at > output_at)           print "blocked"
         else if (done_at > 0 && done_at > input_at) print "done"
