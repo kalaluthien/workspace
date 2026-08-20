@@ -535,9 +535,9 @@ def closable(row):
 
 # ------------------------------------------------------------------------ main
 
-def gather(herdr, args, me):
+def gather(herdr, args, me, titles=None):
     roster = herdr.roster()
-    titles = title_index()
+    titles = title_index() if titles is None else titles
     rows = []
     for pane in roster:
         label = repo_label(pane)
@@ -555,7 +555,11 @@ def gather(herdr, args, me):
 
 
 def do_close(herdr, args, me):
-    rows = gather(herdr, args, me)
+    # One title index for the sweep and every re-read: rebuilding it is a
+    # scan of every transcript, and an empty one silently unlinks each pane
+    # it is asked about -- a refusal that reads like a hold.
+    titles = title_index()
+    rows = gather(herdr, args, me, titles)
     if args.pane:
         wanted = set(args.pane)
         rows = [r for r in rows if r["pane"] in wanted]
@@ -576,9 +580,13 @@ def do_close(herdr, args, me):
             continue
         fresh["name"] = row["name"]
         fresh["is_focused"] = False
-        recheck = classify(herdr, fresh, herdr.roster(), {},
+        recheck = classify(herdr, fresh, herdr.roster(), titles,
                            args.quiet_min, me)
-        if not closable(recheck) or fresh.get("revision") != row["revision"]:
+        if not closable(recheck):
+            # It woke up, or grew a hold, between the sweep and now. The
+            # re-classification is the guard, not the pane revision: that
+            # counter moves on any repaint, so an idle pane bumps it while
+            # nothing about the session changed.
             recheck["closed"] = False
             recheck["holds"].append("raced")
             results.append(recheck)
