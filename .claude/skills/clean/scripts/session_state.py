@@ -479,6 +479,14 @@ def classify(herdr, pane, roster, titles, quiet_min, me):
 
     paths = [p for p in (transcript_for(s) for s in sessions) if p]
     if not paths:
+        # A transcript is created on the first prompt, so an authoritative id
+        # with no file behind it is a pane nobody has asked anything yet --
+        # the one case where missing evidence is itself the evidence. A id
+        # guessed from a title earns no such reading.
+        if sources and sources[0] in ("hook", "argv"):
+            out["session"] = sessions[0]
+            out["verdict"] = "empty"
+            return out
         hold("unlinked")
         out["verdict"] = "unlinked"
         return out
@@ -550,6 +558,8 @@ def gather(herdr, args, me, titles=None):
             # Container-root panes are the orchestrators; reaching them is an
             # explicit request, not a side effect of sweeping the entries.
             continue
+        if args.pane and pane["pane_id"] not in args.pane:
+            continue
         rows.append(classify(herdr, pane, roster, titles, args.quiet_min, me))
     return rows
 
@@ -560,9 +570,6 @@ def do_close(herdr, args, me):
     # it is asked about -- a refusal that reads like a hold.
     titles = title_index()
     rows = gather(herdr, args, me, titles)
-    if args.pane:
-        wanted = set(args.pane)
-        rows = [r for r in rows if r["pane"] in wanted]
     results = []
     for row in rows:
         if not closable(row):
