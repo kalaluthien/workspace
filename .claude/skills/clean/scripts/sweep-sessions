@@ -1,152 +1,67 @@
-#!/usr/bin/env bash
-# Classify every delegated session in ~/workspace and retire the spent ones.
-# A session is spent when it holds no work (empty) or when its last word was
-# the completion sentinel (done); everything else is reported, never closed.
-#
-# Enumeration walks the repository entries and then the container root, which
-# is a repository too, so a session run from the root is swept like any other.
-# The root pass matches its own cwd exactly rather than by prefix, so an entry
-# session is reported once, under its entry.
-#
-# One exclusion is structural, not an option: the calling pane
-# ($HERDR_PANE_ID) is skipped so a sweep cannot close itself.
-#
-# A session or shell in the container root itself (repo label "workspace") is
-# reported like any other but never closed by a bare sweep: those are the
-# orchestrators and the workspace-level work, and a clean-up asked about the
-# entries must not retire the session that asked. --include-workspace restores
-# close reach over them, and so does naming the root as <repo>, since both say
-# the caller means that target. The protection covers both passes, so the
-# session pass and --shells agree about the root.
-#
-# --shells adds the panes holding no session at all: a bare shell left behind
-# after its work, anywhere under the workspace root including the container
-# root. A shell is idle when its foreground process group is the shell itself,
-# and running something otherwise; only the idle one is retired. The scope is
-# opt-in because a shell is not a delegated session and the default sweep
-# answers a question about sessions. The focused pane is skipped for the same
-# reason the calling pane is.
-#
-# A tab needs no handling: herdr retires one when its last pane closes, and a
-# workspace when its last tab does.
-#
-# Usage: sweep-sessions [<repo>] [--close] [--include-workspace]
-#                       [--shells] [--lines N]
-# Output: one JSON object per session, one per line ->
-#         {repo, name, pane, verdict, closed}
-# Verdicts: empty | done | pending, for a quiet pane, plus the herdr status
-#           (working | blocked | unknown) for a pane not worth reading, plus
-#           shell and shell-busy under --shells.
-#           --close acts on empty, done, and shell, except in the container
-#           root, whose rows report closed:false unless the caller named it.
-#           A pending session is waiting on an answer or finished without a
-#           sentinel, so its fate is a judgement this script does not make.
-# The pane-reading helpers, and the verdict classifier above all, are one
-# library shared with the delegating skill, whose scripts read the same
-# screens to decide reuse. It stays in one place; this names the path.
-source "$(dirname "$0")/../../delegating/scripts/_lib.sh"
-require_herdr
+#!/usr/bin/python3
+"""Report every session pane under ~/workspace, and optionally retire it.
 
-repo_arg= close=false shells=false include_workspace=false
-while [ $# -gt 0 ]; do
-  case $1 in
-    --close)              close=true; shift ;;
-    --include-workspace)  include_workspace=true; shift ;;
-    --shells)             shells=true; shift ;;
-    --lines)              SESSION_READ_LINES=${2:?}; shift 2 ;;
-    -*)                   die "unknown option: $1" ;;
-    *)                    repo_arg=$1; shift ;;
-  esac
-done
+    sweep-sessions [<repo>] [--close] [--include-workspace] [--quiet-min N]
 
-# The container root's rows are read-only unless the caller reached for them,
-# by the flag or by naming a target at all — a named <repo> is already an
-# explicit choice of what to sweep.
-protect_root=true
-if $include_workspace || [ -n "$repo_arg" ]; then protect_root=false; fi
+One JSON object per pane: {repo, pane, name, title, status, session, link,
+quiet_min, verdict, holds, closable} -- plus `closed` under --close.
 
-# Match by prefix for an entry, whose sessions may sit in a subdirectory or a
-# worktree, but exactly for the container root, which is every entry's prefix
-# and would otherwise claim all of them a second time under its own label.
-sweep() {
-  local path=$1 label rows exact=false protect=false
-  [ "$path" = "$WORKSPACE_ROOT" ] && exact=true
-  if $exact && $protect_root; then protect=true; fi
-  label=$(basename "$path")
-  rows=$(herdr agent list | jq -c --arg path "$path" --argjson exact "$exact" '
-    .result.agents[]
-    | select(if $exact then .cwd == $path
-             else .cwd == $path or (.cwd | startswith($path + "/")) end)
-    | {name: .name, pane: .pane_id, status: .agent_status}')
+`holds` is the safety argument in the open: a pane retires only when that
+list is empty, so every reason one survives is printed beside it. Read the
+holds before asking why something stayed.
 
-  local row name pane status v closed
-  while IFS= read -r row; do
-    [ -n "$row" ] || continue
-    name=$(printf '%s' "$row" | jq -r '.name // ""')
-    pane=$(printf '%s' "$row" | jq -r '.pane')
-    status=$(printf '%s' "$row" | jq -r '.status')
-    [ "$pane" = "${HERDR_PANE_ID:-}" ] && continue
+Verdicts:
+  done      the session's own record shows its last turn complete
+  empty     a session pane that was never prompted
+  unlinked  no transcript could be tied to the pane -- never closable
+  shell     a pane with no agent, its shell idle
+  shell-busy  a pane with no agent, a command running
+  <status>  herdr's own state when it is not idle: working, blocked, unknown
 
-    v=$(session_verdict "$pane" "$name" "$status")
+Panes at the container root are the orchestrators, so a bare sweep reports
+them and closes none; --include-workspace, or naming `workspace` as <repo>,
+is the explicit request that reaches them.
+"""
+import argparse
+import json
+import os
+import sys
 
-    closed=false
-    if $close && ! $protect && { [ "$v" = empty ] || [ "$v" = done ]; }; then
-      herdr pane close "$pane" >/dev/null
-      closed=true
-    fi
-    jq -nc --arg repo "$label" --arg name "$name" --arg pane "$pane" \
-      --arg v "$v" --argjson closed "$closed" \
-      '{repo: $repo, name: (if $name == "" then null else $name end),
-        pane: $pane, verdict: $v, closed: $closed}'
-  done <<< "$rows"
-}
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import session_state as S
 
-# A pane with no agent holds a shell. Its repo label is the entry its cwd sits
-# in, and the container root labels as itself, so a stray shell is reported
-# where it lives rather than filed under the nearest repository.
-sweep_shells() {
-  local root=$1 rows row pane cwd label v closed protect
-  rows=$(herdr pane list | jq -c --arg root "$root" '
-    .result.panes[]
-    | select(.agent == null)
-    | select(.focused != true)
-    | select(.cwd == $root or (.cwd | startswith($root + "/")))
-    | {pane: .pane_id, cwd: .cwd}')
 
-  while IFS= read -r row; do
-    [ -n "$row" ] || continue
-    pane=$(printf '%s' "$row" | jq -r '.pane')
-    cwd=$(printf '%s' "$row" | jq -r '.cwd')
-    [ "$pane" = "${HERDR_PANE_ID:-}" ] && continue
+def main():
+    parser = argparse.ArgumentParser(add_help=True)
+    parser.add_argument("repo", nargs="?")
+    parser.add_argument("--close", action="store_true")
+    parser.add_argument("--include-workspace", action="store_true")
+    parser.add_argument("--quiet-min", type=float, default=S.DEFAULT_QUIET_MIN)
+    parser.add_argument("--pane", action="append", default=[])
+    opts = parser.parse_args()
 
-    label=${cwd#"$WORKSPACE_ROOT"/}
-    label=${label%%/*}
-    protect=false
-    if [ "$cwd" = "$WORKSPACE_ROOT" ]; then
-      label=$(basename "$WORKSPACE_ROOT")
-      protect=$protect_root
-    fi
+    args = argparse.Namespace(
+        repo=opts.repo,
+        all=opts.include_workspace or opts.repo == os.path.basename(S.WORKSPACE_ROOT),
+        pane=opts.pane,
+        quiet_min=opts.quiet_min,
+    )
+    herdr = S.Herdr()
+    me = os.environ.get("HERDR_PANE_ID")
 
-    v=$(shell_verdict "$pane")
+    if opts.close:
+        if not me:
+            sys.exit("refusing to close from outside a herdr pane: "
+                     "HERDR_PANE_ID is unset, so nothing excludes the caller.")
+        rows = S.do_close(herdr, args, me)
+    else:
+        rows = S.gather(herdr, args, me)
+        for row in rows:
+            row["closable"] = S.closable(row)
 
-    closed=false
-    if $close && ! $protect && [ "$v" = shell ]; then
-      herdr pane close "$pane" >/dev/null
-      closed=true
-    fi
-    jq -nc --arg repo "$label" --arg pane "$pane" --arg v "$v" \
-      --argjson closed "$closed" \
-      '{repo: $repo, name: null, pane: $pane, verdict: $v, closed: $closed}'
-  done <<< "$rows"
-}
+    for row in rows:
+        print(json.dumps(row, ensure_ascii=False))
 
-if [ -n "$repo_arg" ]; then
-  sweep "$(repo_path "$repo_arg")"
-  if $shells; then sweep_shells "$(repo_path "$repo_arg")"; fi
-else
-  for p in "$WORKSPACE_ROOT"/*/; do
-    if [ -d "$p/.git" ]; then sweep "${p%/}"; fi
-  done
-  sweep "$WORKSPACE_ROOT"
-  if $shells; then sweep_shells "$WORKSPACE_ROOT"; fi
-fi
+
+if __name__ == "__main__":
+    main()

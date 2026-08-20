@@ -1,218 +1,143 @@
-#!/usr/bin/env bash
-# Check sweep-sessions against captured pane screens. The classifier reads a
-# terminal, so it breaks silently when the agent's screen markers change; the
-# case that matters is a session mid-turn with no assistant bullet yet, which
-# an earlier draft called empty and would have closed with live work in it.
-#
-# A stub herdr on PATH feeds each fixture to sweep-sessions and the verdict is
-# compared with the expected one. Nothing real is read, and --close is never
-# passed, so this touches no session.
-#
-# Usage: verify-verdicts        (exit 0 when every case passes)
-set -euo pipefail
-here=$(cd "$(dirname "$0")" && pwd)
-tmp=$(mktemp -d)
-trap 'rm -rf "$tmp"' EXIT
+#!/usr/bin/python3
+"""Check the classifier against transcripts built to order. No herdr, no panes.
 
-mkdir -p "$tmp/bin" "$tmp/panes" "$tmp/root/repo/.git"
+Every case is a synthetic session record, so a rule can be broken in the
+source and watched to fail here -- which is the only way a guard earns
+trust. The screen-fixture suite this replaces is gone with the screen
+reading it tested.
 
-# Fixtures: <pane> <expected> <<screen. Names are the pane ids the stub serves.
-fixture() {
-  printf '%s %s\n' "$1" "$2" >> "$tmp/cases"
-  cat > "$tmp/panes/$1.txt"
-}
+    verify-verdicts        run every case, print pass or fail
+"""
+import os
+import sys
+import tempfile
 
-# transcript <pane> <<jsonl. The durable record behind one fixture, keyed on
-# that pane's own cwd, so it answers for that fixture and no other. Written
-# only where the screen alone cannot say what the session did.
-transcript() {
-  local dir
-  dir="$tmp/.claude/projects/$(printf '%s' "$tmp/root/repo/$1" | sed 's,[/.],-,g')"
-  mkdir -p "$dir"
-  cat > "$dir/session.jsonl"
-}
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import session_state as S
 
-fixture blank unknown </dev/null
+STAMP = "2026-08-20T%02d:00:00.000Z"
 
-fixture fresh empty <<'EOF'
- ▐▛███▜▌   Claude Code v2.1.220
-▝▜█████▛▘  Opus 5 with medium effort · Claude Max
-❯
-EOF
 
-fixture cleared empty <<'EOF'
- ▐▛███▜▌   Claude Code v2.1.220
-❯ /clear
-❯
-EOF
+def rows(*items):
+    return [dict(item, timestamp=STAMP % (10 + i))
+            for i, item in enumerate(items)]
 
-fixture midturn pending <<'EOF'
-❯ Research survey for the wiki. Report the path when you finish.
-✢ Befuddling… (12s · ↓ 219 tokens · thinking with medium effort)
-❯
-EOF
 
-fixture answered pending <<'EOF'
-❯ Where does the sidebar tagline come from?
-⏺ Both live in the site repository, not in the vault.
-❯
-EOF
+def prompt(text="do the thing"):
+    return {"type": "user", "message": {"content": [
+        {"type": "text", "text": text}]}}
 
-fixture finished done <<'EOF'
-❯ Index the docs as numbered chapters.
-⏺ Merged, pushed, worktree removed.
 
-  DONE curate-doc-chapters
-❯
-EOF
+def says(text, tools=()):
+    content = [{"type": "text", "text": text}]
+    for index, name in enumerate(tools):
+        content.append({"type": "tool_use", "id": "t%d" % index, "name": name})
+    return {"type": "assistant", "message": {"content": content}}
 
-# A long-lived session whose screen has repainted past everything that proves
-# what it did. Absence of markers is not evidence of an empty session.
-fixture faded unknown <<'EOF'
-✻ Churned for 4m 58s
 
-※ recap: wrote the survey and left it uncommitted.
-❯
-EOF
+def answers(*ids):
+    return {"type": "user", "message": {"content": [
+        {"type": "tool_result", "tool_use_id": i} for i in ids]}}
 
-# The read window holds only the tail of a long session: the sentinel is in
-# it, but the bullet and the prompt that produced it have scrolled away.
-fixture scrolled done <<'EOF'
-  DONE curate-doc-chapters
 
-✻ Churned for 4m 58s
-❯
-EOF
+def turn_end():
+    return {"type": "system", "subtype": "turn_duration"}
 
-fixture reopened pending <<'EOF'
-❯ Index the docs as numbered chapters.
-⏺ Merged, worktree removed.
 
-  DONE curate-doc-chapters
-❯ push.
-⏺ Pushed to main.
-❯
-EOF
+CASES = [
+    ("a completed turn is done", rows(
+        prompt(), says("Landed and pushed."), turn_end()),
+     dict(is_empty=False, turn_closed=True, open_tools={}, asks_question=False)),
 
-# A /goal session that printed its sentinel, was sent back to work by the
-# judge, and then hit the usage limit. The limit is the last event, so the
-# stale sentinel must not read as done — the session waits on the clock.
-fixture limited blocked <<'EOF'
-❯ Rebuild the docs and print the sentinel when the goal clears.
-⏺ Halfway through the corpus.
+    ("a pane never prompted is empty", rows(
+        {"type": "ai-title", "aiTitle": "Fresh Session"}),
+     dict(is_empty=True)),
 
-  DONE curate-doc-chapters
+    ("a hook's own feedback does not count as a prompt", rows(
+        {"type": "user", "isMeta": True,
+         "message": {"content": [{"type": "text", "text": "stop hook"}]}}),
+     dict(is_empty=True)),
 
-⏺ Background command "Wait for renders" failed with exit code 1
-  ⎿  You've hit your session limit · resets 2:30am (Asia/Seoul)
-❯
-EOF
+    ("an unanswered tool call holds the pane", rows(
+        prompt(), says("Asking.", tools=["AskUserQuestion"])),
+     dict(turn_closed=False, open_tools={"t0": "AskUserQuestion"})),
 
-# The same session after a resume: the limit line is still on screen, but a
-# later prompt and a later bullet say the session is working again.
-fixture resumed pending <<'EOF'
-  ⎿  You've hit your session limit · resets 2:30am (Asia/Seoul)
-❯ Resume the goal.
-⏺ Continuing the corpus from the fourth view.
-❯
-EOF
+    ("an answered tool call does not", rows(
+        prompt(), says("Reading.", tools=["Read"]), answers("t0"),
+        says("Done."), turn_end()),
+     dict(turn_closed=True, open_tools={})),
 
-# A worker that finished and then filed: the round after the sentinel outran
-# the read window, so the screen holds later bullets and nothing else, which
-# reads pending. The transcript still carries the sentinel as the last word
-# after the last real prompt, and that is what the session actually did.
-fixture tailed done <<'EOF'
-⏺ Filed the pitfall to the project pool.
+    ("a turn reopened after its end is not closed", rows(
+        prompt(), says("Done."), turn_end(), prompt("one more thing")),
+     dict(turn_closed=False)),
 
-  Ran 2 shell commands
+    ("a turn ending in a question holds the pane", rows(
+        prompt(), says("Which one did you mean?"), turn_end()),
+     dict(turn_closed=True, asks_question=True)),
 
-⏺ Nothing else was open.
-✻ Churned for 6m 12s
-❯
-EOF
-transcript tailed <<'EOF'
-{"type":"user","message":{"role":"user","content":"Index the docs as numbered chapters."}}
-{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Merged, pushed, worktree removed.\n\nDONE curate-doc-chapters"}]}}
-{"type":"user","message":{"role":"user","content":[{"type":"tool_result","content":"ok"}]}}
-EOF
+    ("a full-width question mark counts too", rows(
+        prompt(), says("어느 쪽인가요？"), turn_end()),
+     dict(asks_question=True)),
 
-# The same screen, but a real prompt arrived after the sentinel: the session was
-# reopened and the old sentinel no longer answers for it. The transcript must
-# not overturn a pending screen here, or every reopened worker reads done.
-fixture tailed-reopened pending <<'EOF'
-⏺ Pushed to main.
-✻ Churned for 40s
-❯
-EOF
-transcript tailed-reopened <<'EOF'
-{"type":"user","message":{"role":"user","content":"Index the docs as numbered chapters."}}
-{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Merged.\n\nDONE curate-doc-chapters"}]}}
-{"type":"user","message":{"role":"user","content":"push."}}
-{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Pushed to main."}]}}
-EOF
+    ("a question in an earlier turn does not", rows(
+        prompt(), says("Which one?"), turn_end(),
+        prompt("the first"), says("Done."), turn_end()),
+     dict(asks_question=False)),
 
-# A worker that printed its sentinel and then left a background shell running:
-# the footer still counts it, and this machine's footer is the vim-mode one
-# herdr's own rule cannot match, so the screen is the only place the live work
-# shows. Closing this pane would kill a running command.
-fixture shelled working <<'EOF'
-⏺ Filed the pitfall to the project pool.
+    ("every working directory is collected", rows(
+        dict(prompt(), cwd="/a"), dict(says("ok"), cwd="/b"), turn_end()),
+     dict(cwds={"/a", "/b"})),
+]
 
-  DONE curate-doc-chapters
 
-  -- INSERT -- ⏵⏵ auto mode on · 1 shell
-EOF
+def check_state():
+    failures = []
+    for label, record, expected in CASES:
+        state = S.TranscriptState(record)
+        for field, want in expected.items():
+            got = getattr(state, field)
+            if got != want:
+                failures.append("%s: %s is %r, expected %r"
+                                % (label, field, got, want))
+    return failures
 
-# The same, waiting on background agents rather than a shell.
-fixture agented working <<'EOF'
-⏺ Handed the corpus to three writers.
 
-  DONE curate-doc-chapters
+def check_gate():
+    """The git gate holds a dirty repository and releases a clean one."""
+    failures = []
+    with tempfile.TemporaryDirectory() as tmp:
+        os.system("git -C %s init -q 2>/dev/null" % tmp)
+        S._REPO_CACHE.clear()
+        if S.unclean_repos([tmp]):
+            failures.append("git gate: an empty repository read unclean")
+        open(os.path.join(tmp, "work.txt"), "w").write("uncommitted\n")
+        S._REPO_CACHE.clear()
+        if not S.unclean_repos([tmp]):
+            failures.append("git gate: an uncommitted file read clean")
+    S._REPO_CACHE.clear()
+    return failures
 
-✻ Waiting for 3 background agents to finish
-❯
-EOF
 
-# The footer with no count is the ordinary one: a spent session still closes.
-fixture footer done <<'EOF'
-⏺ Merged, pushed, worktree removed.
+def check_closable():
+    """Only an empty hold list closes, whatever the verdict says."""
+    failures = []
+    if not S.closable({"verdict": "done", "holds": []}):
+        failures.append("closable: a done pane with no hold did not close")
+    if S.closable({"verdict": "done", "holds": ["self"]}):
+        failures.append("closable: a hold did not stop a done pane")
+    if S.closable({"verdict": "unlinked", "holds": []}):
+        failures.append("closable: an unlinked pane was closable")
+    return failures
 
-  DONE curate-doc-chapters
-❯
-  -- INSERT -- ⏵⏵ auto mode on
-EOF
 
-# The stub answers only what sweep-sessions asks: the agent roster, and one
-# pane read per agent. Every fixture is idle, so every one reaches the reader.
-{
-  echo '#!/bin/sh'
-  echo 'case "$1 $2" in'
-  echo '  "agent list") cat "'"$tmp"'/agents.json" ;;'
-  echo '  "pane read")  cat "'"$tmp"'/panes/$3.txt" ;;'
-  echo '  *) echo "stub herdr: unexpected: $*" >&2; exit 1 ;;'
-  echo 'esac'
-} > "$tmp/bin/herdr"
-chmod +x "$tmp/bin/herdr"
+def main():
+    failures = check_state() + check_gate() + check_closable()
+    total = len(CASES) + 5
+    for line in failures:
+        print("FAIL  %s" % line)
+    print("%d/%d checks passed" % (total - len(failures), total))
+    sys.exit(1 if failures else 0)
 
-# One agent per fixture, all named curate-doc-chapters so the sentinel matches.
-awk '{print $1}' "$tmp/cases" |
-  jq -R -s --arg cwd "$tmp/root/repo" '
-    {result: {agents: [split("\n")[] | select(. != "")
-      | {name: "curate-doc-chapters", pane_id: .,
-         cwd: ($cwd + "/" + .), agent_status: "idle"}]}}' \
-  > "$tmp/agents.json"
 
-got=$(PATH="$tmp/bin:$PATH" WORKSPACE_ROOT="$tmp/root" HERDR_ENV=1 HOME="$tmp" \
-  "$here/sweep-sessions" repo | jq -r '"\(.pane) \(.verdict)"')
-
-fail=0
-while read -r pane want; do
-  have=$(printf '%s\n' "$got" | awk -v p="$pane" '$1 == p {print $2}')
-  if [ "$have" = "$want" ]; then
-    printf 'ok   %-10s %s\n' "$pane" "$want"
-  else
-    printf 'FAIL %-10s want %s, got %s\n' "$pane" "$want" "${have:-<none>}"
-    fail=1
-  fi
-done < "$tmp/cases"
-exit $fail
+if __name__ == "__main__":
+    main()

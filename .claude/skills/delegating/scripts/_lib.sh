@@ -113,146 +113,24 @@ shell_verdict() {
              then "shell" else "shell-busy" end' 2>/dev/null || printf 'shell-busy\n'
 }
 
-# session_verdict <pane> <name> <status> -> empty | done | pending | unknown | <status>
+# session_verdict <pane> <name> <status> -> the pane's verdict, one word
 #
-# Whether a session is free to claim or retire. Status alone cannot say:
-# herdr reports a quiet pane as idle, and a pane goes quiet whenever the
-# session pauses mid-turn, so only working, blocked and unknown are trusted
-# as-is and reported unread. The rest is read off the screen by three markers.
-# The assistant bullet says the session produced output, a prompt line
-# carrying anything but a slash command says it was given work, and the
-# welcome banner says the session is fresh or freshly cleared.
+# Whether a session is free to claim or retire. herdr's status alone cannot
+# say: a pane reads idle whenever the session pauses mid-turn, so a claim
+# made on status clears work still running.
 #
-# Every verdict rests on a marker that is present, never on one that is
-# absent, because the screen is a lossy record: a pane repaints as it runs
-# and the transcript above the fold is gone from the emulator, not merely
-# unread. So empty means the banner is showing with nothing after it, and a
-# screen holding none of the three markers is unknown — the session may have
-# finished hours ago with its sentinel long scrolled away. The DONE sentinel
-# counts only when no later prompt line reopened the session, and an unnamed
-# session carries no sentinel to match. Splitting on a marker avoids assuming
-# its byte width, and a read that comes back with nothing is a failed read.
+# The judgement lives in one place, session_state.py in the clean skill, and
+# both skills call it -- reuse and retirement ask the same question of the
+# same evidence, and two classifiers that disagree hand a live pane to a new
+# task. It reads the session's own transcript, found through the session id
+# herdr holds for the pane, so nothing here depends on what the screen
+# happens to be showing.
 #
-# One marker outranks every other, including the sentinel: the footer's count
-# of background shells, and the line naming background agents still to
-# finish. Both outlive the turn that started them, so a pane can be quiet
-# with real work running under it. herdr has rules for both, but neither
-# fires on this machine's footer, so the screen is read for them here — a
-# session with live work is never spent, and never closable.
-#
-# A usage-limit stop reads as blocked, and it outranks an earlier sentinel:
-# a /goal session can print its sentinel, have the judge send it back to
-# work, and then hit the limit — a screen whose last event is the limit
-# message is a session waiting on the clock, whatever it printed before.
-# The limit line counts only when nothing came after it: a later prompt or
-# a later assistant bullet means the session already resumed.
-session_verdict() {
-  case $3 in
-    idle|done) ;;
-    *) printf '%s\n' "$3"; return ;;
-  esac
-  local v
-  v=$(herdr pane read "$1" --source recent-unwrapped --lines "${SESSION_READ_LINES:-200}" |
-    awk -v name="$2" '
-      BEGIN { sentinel = (name == "" ? "" : "DONE " name) }
-      { seen = NR }
-      NF { ne++; tail[ne] = $0 }                                 # non-empty lines
-      index($0, "\342\217\272") { output_at = NR }               # the assistant bullet
-      index($0, "\342\226\220\342\226\233") { banner = 1 }       # the welcome banner
-      index($0, "hit your session limit") { limit_at = NR }      # the usage-limit stop
-      sentinel != "" && index($0, sentinel) { done_at = NR }
-      {
-        if (index($0, "\342\235\257")) {                         # the prompt marker
-          n = split($0, part, "\342\235\257")
-          rest = part[n]; gsub(/[[:space:]]/, "", rest)
-          if (rest != "" && substr(rest, 1, 1) != "/") input_at = NR
-        }
-      }
-      END {
-        # The footer says a background shell or a background agent is still
-        # running, and it outlives the turn that started them. herdr scores
-        # such a pane idle here — its own rule cannot match this footer —
-        # so this is the only reader that sees them: a pane with live work
-        # is working, whatever else the screen holds.
-        for (i = ne; i > ne - 12 && i > 0; i--) {
-          if ((index(tail[i], "\342\217\265") || index(tail[i], "\342\217\270")) \
-              && tail[i] ~ /[[:space:]][1-9][0-9]*[[:space:]]+shells?[[:space:]]*$/) live = 1
-          if (index(tail[i], "background agents to finish")) live = 1
-        }
-        if (live)                                   print "working"
-        else if (!seen)                             print "unknown"
-        else if (limit_at > done_at && limit_at > input_at \
-                 && limit_at > output_at)           print "blocked"
-        else if (done_at > 0 && done_at > input_at) print "done"
-        else if (output_at || input_at)             print "pending"
-        else if (banner)                            print "empty"
-        else                                        print "unknown"
-      }')
-  # A pending screen is read again for the same reason an unknown one is: the
-  # window holds the tail of the session, and the sentinel sits above it. A
-  # worker that files after printing its sentinel leaves later bullets on
-  # screen, which scores pending, and only the transcript still holds the
-  # sentinel. The transcript's own rule is the stricter one — the sentinel
-  # must be an assistant row after the last real prompt — so a session that
-  # was genuinely reopened, or is quiet mid-turn on new work, still fails it.
-  if [ -n "$2" ] && { [ "$v" = unknown ] || [ "$v" = pending ]; }; then
-    if transcript_says_done "$1" "$2"; then v=done; fi
-  fi
-  printf '%s\n' "$v"
-}
+# A verdict this cannot establish comes back `unlinked`, which is free for
+# neither claiming nor closing -- the safe answer when the evidence is
+# missing rather than negative.
+CLASSIFIER=${CLASSIFIER:-$(dirname "${BASH_SOURCE[0]}")/../../clean/scripts/session_state.py}
 
-# transcript_says_done <pane> <name> -> exit 0 when the delegate's transcript
-# holds "DONE <name>" as assistant output after the last user message.
-#
-# The screen is a lossy record, but the session's jsonl transcript under
-# ~/.claude/projects/<encoded-cwd>/ is durable: a sentinel that repainted
-# away still sits there as an assistant row. Consulted whenever the screen
-# scores unknown or pending — the two verdicts a lost sentinel produces. The scoping matters twice over: only the pane's own cwd
-# directory is searched, because the orchestrator's transcript quotes the
-# sentinel inside the prompt it sent, and only assistant rows count, because
-# the delegate's own transcript quotes it in the user row that delivered the
-# prompt. The last-prompt comparison mirrors the screen rule
-# done_at > input_at: a prompt sent after the sentinel reopened the session,
-# so the old sentinel no longer answers for it. A user row is a prompt only
-# when it is real work: tool results, hook injections (isMeta), and command
-# echoes (<command-name>, <local-command-stdout>) do not reopen a session —
-# a delegate's Stop hook routinely appends a filing round after the
-# sentinel, and counting its feedback as a prompt would deny every verdict.
-transcript_says_done() {
-  local cwd dir f
-  cwd=$(herdr agent list |
-    jq -r --arg p "$1" \
-      'first(.result.agents[] | select(.pane_id == $p) | .cwd) // empty')
-  [ -n "$cwd" ] || return 1
-  dir="$HOME/.claude/projects/$(printf '%s' "$cwd" | sed 's,[/.],-,g')"
-  [ -d "$dir" ] || return 1
-  for f in "$dir"/*.jsonl; do
-    [ -e "$f" ] || break
-    grep -q "DONE $2" "$f" 2>/dev/null || continue
-    if jq -r --arg s "DONE $2" '
-         def usertext:
-           if (.message.content | type) == "string" then .message.content
-           else ([.message.content[]? | select(.type? == "text") | .text]
-                 | join(" "))
-           end;
-         select(.type == "user" or .type == "assistant")
-         | if .type == "assistant"
-           then "assistant\t\(
-             [.message.content[]? | .text? // empty] | join(" ")
-             | contains($s))"
-           else "user\t\(
-             (.isMeta != true)
-             and (usertext | length > 0)
-             and ((usertext
-                   | startswith("<command-name>")
-                     or startswith("<local-command-stdout>")) | not))"
-           end
-       ' "$f" 2>/dev/null |
-       awk -F'\t' '
-         $1 == "user" && $2 == "true"      { u = NR }
-         $1 == "assistant" && $2 == "true" { d = NR }
-         END { exit !(d && d > u) }'
-    then return 0; fi
-  done
-  return 1
+session_verdict() {
+  /usr/bin/python3 "$CLASSIFIER" verdict --pane "$1" 2>/dev/null || printf 'unknown\n'
 }

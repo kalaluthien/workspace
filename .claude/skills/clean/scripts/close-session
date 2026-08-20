@@ -1,36 +1,60 @@
-#!/usr/bin/env bash
-# Retire one delegated session whose output has been collected — the normal end
-# of a delegation (SKILL.md, "Retire one collected worker"). Allowed only for
-# sessions the delegating skill launched (a herdr agent name exists only where
-# a script started one); closing anything else needs --force and an explicit
-# user request.
-#
-# Closing discards the pane, so the output is read before this runs, not after.
-# The evidence behind the report is the worker's transcript under
-# ~/.claude/projects/, which answers to the worker's name in /resume.
-#
-# Usage: close-session <target> [--force]
-# Output: one JSON object -> {closed: <pane>}
-#
-# The pane helpers are one library shared with the delegating skill, whose
-# scripts read the same panes to decide reuse. It stays in one place; this
-# names the path.
-source "$(dirname "$0")/../../delegating/scripts/_lib.sh"
-require_herdr
+#!/usr/bin/python3
+"""Retire one session whose output has been collected.
 
-target=${1:?usage: close-session <target> [--force]}; shift
-force=false
-while [ $# -gt 0 ]; do
-  case $1 in
-    --force) force=true; shift ;;
-    *)       die "unknown option: $1" ;;
-  esac
-done
+    close-session <name|pane-id> [--force]
 
-pane=$(pane_of "$target")
-name=$(agent_row "$target" | jq -r '.name // empty')
-if [ -z "$name" ] && ! $force; then
-  die "'$target' is not a named session; refuse to close without --force"
-fi
-herdr pane close "$pane" >/dev/null
-jq -nc --arg p "$pane" '{closed: $p}'
+The normal end of one delegation (SKILL.md, "Retire one collected worker"),
+and now also the way to retire a session nobody named -- one started by hand
+or from the phone -- since a pane's own session record, not its agent name,
+is what says whether it finished.
+
+The gate is the classifier's: a pane closes when it carries no hold. Every
+hold is printed on a refusal, so the reason is never a guess. `--force`
+closes regardless and is for an explicit request from the owner, not for
+getting past a hold you would rather not read.
+
+Closing discards the pane, so the output is read before this runs, not after.
+The evidence behind the report is the session's transcript under
+~/.claude/projects/, which answers to the session in /resume.
+"""
+import argparse
+import json
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import session_state as S
+
+
+def main():
+    parser = argparse.ArgumentParser(add_help=True)
+    parser.add_argument("target", help="herdr agent name or pane id")
+    parser.add_argument("--force", action="store_true")
+    parser.add_argument("--quiet-min", type=float, default=S.DEFAULT_QUIET_MIN)
+    opts = parser.parse_args()
+
+    herdr = S.Herdr()
+    me = os.environ.get("HERDR_PANE_ID")
+    if not me:
+        sys.exit("refusing to close from outside a herdr pane: "
+                 "HERDR_PANE_ID is unset, so nothing excludes the caller.")
+
+    roster = herdr.roster()
+    pane = next((p for p in roster
+                 if opts.target in (p["pane_id"], p.get("name"))), None)
+    if pane is None:
+        sys.exit("no session named %r" % opts.target)
+
+    row = S.classify(herdr, pane, roster, S.title_index(), opts.quiet_min, me)
+    if not S.closable(row) and not opts.force:
+        row["closed"] = False
+        print(json.dumps(row, ensure_ascii=False))
+        sys.exit("held: %s" % ", ".join(row["holds"]))
+
+    herdr.close_pane(row["pane"])
+    row["closed"] = not herdr.pane(row["pane"])
+    print(json.dumps(row, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()

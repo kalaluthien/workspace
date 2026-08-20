@@ -7,63 +7,82 @@ disable-model-invocation: true
 # Clean
 
 Retiring a session is deterministic where delegating it is not: a classifier
-reads each pane, and only two of its verdicts may be closed. Nothing here
-judges whether a worker did its job. The delegating skill collects the output;
-this skill retires what the collection left standing. All scripts live in
-`scripts/` here, print JSON, and share the pane library with the delegating
-skill's own scripts (`../delegating/scripts/_lib.sh`), because both read the
-same screens.
+reads each pane's own session record, and closes only what carries no reason
+to stay. Nothing here judges whether a worker did its job. The delegating
+skill collects the output; this skill retires what the collection left
+standing. All scripts live in `scripts/` here and print JSON. The classifier
+itself is `scripts/session_state.py`, and the delegating skill calls it too --
+reuse and retirement ask one question of one body of evidence.
 
 Two rules hold over everything below.
 
 - **Collect before closing.** Closing discards the pane, and a report that
   scrolled past nobody is gone with it. The pane is not the evidence behind a
-  report either way: the worker's transcript under `~/.claude/projects/` is,
-  and it answers to the worker's name in `/resume`.
+  report either way: the session's transcript under `~/.claude/projects/` is,
+  and it answers to the session in `/resume`.
 - **Close a repository's work first.** A worker whose repository still holds
-  uncommitted changes or a live worktree is not spent, whatever its screen
-  says. Have it commit and remove the worktree, and wait for that to finish.
+  uncommitted changes or a live worktree is not spent. The classifier reads
+  this from the directories the session actually worked in, so the hold names
+  the repository -- have the worker commit and remove the worktree, and wait
+  for that to finish.
 
-## The verdicts
-`sweep-sessions` classifies a session from its screen, and `check-sessions`
-in the delegating skill reads the same classifier to decide reuse. Four
-outcomes, and only the first two are closable:
+## What a verdict rests on
+A pane carries its own session id (`agent_session`, written by the
+`herdr-session-link` hook), the session id names its transcript, and the
+transcript says whether the last turn completed. Nothing is read off the
+screen, so a session nobody named -- started by hand or from the phone -- is
+classified exactly like a delegated worker.
 
-| verdict | the pane holds | on `--close` |
-| --- | --- | --- |
-| `empty` | no work at all | retired |
-| `done` | a completion sentinel as its last word | retired |
-| `pending` | quiet, with no sentinel | reported |
-| the herdr status (`working`, `blocked`, `unknown`) | live work, a prompt to answer, or a screen with no evidence left on it | reported |
+| verdict | the pane holds |
+| --- | --- |
+| `done` | a session whose last turn completed |
+| `empty` | a session pane that was never prompted |
+| `unlinked` | no transcript could be tied to the pane |
+| `shell` / `shell-busy` | no agent: a bare shell, idle or running a command |
+| the herdr status (`working`, `blocked`, `unknown`) | live work, a dialog, or no evidence |
 
-A `pending` session is either waiting on an answer or finished without
-printing a sentinel, and a screen cannot tell those apart. The scripts make no
-judgement there: report the pending ones and let the user decide.
+The verdict alone never closes anything. Every row also carries `holds`, and
+a pane retires only when that list is empty. A hold is raised by: herdr
+reporting anything but idle, a detection rule matching `working` beneath the
+winning one, an unanswered tool call, a turn left open, a last turn that ends
+in a question, a repository the session touched still dirty or unpushed, a
+live worker pane named under this one, the sweeping pane itself, the focused
+pane, and a session quieter-than-`--quiet-min` minutes ago (default 30).
 
-## Retire one collected worker
-`scripts/close-session <name>` closes a single session whose output has been
-read — the normal end of one delegation. It closes only sessions the
-delegating skill launched, since a herdr agent name exists nowhere else;
-anything else needs `--force` and an explicit request from the user.
+`unlinked` is the answer when evidence is missing rather than negative, and
+it is never closable. Absent, ambiguous and stale evidence all land there:
+the failure mode is a pane that outlives its work, never work that dies with
+its pane.
+
+One thing no rule can see: a session that finished its turn by asking you
+something in plain prose owes you an answer and looks exactly like one that
+is finished. The question-mark hold catches most of them. It is a guess about
+language, not a guarantee -- raise `--quiet-min` when that matters.
 
 ## Sweep the workspace
-`scripts/sweep-sessions [<repo>] [--close] [--include-workspace] [--shells]
-[--lines N]` reads every pane under `~/workspace` and prints one verdict per
-session. Adding `--close` retires the `empty` and `done` ones and nothing
-else.
+`scripts/sweep-sessions [<repo>] [--close] [--include-workspace]
+[--quiet-min N] [--pane P]` reads every pane under `~/workspace` and prints
+one verdict per session. Adding `--close` retires the ones carrying no hold,
+re-reading each pane immediately beforehand so a session that woke up in the
+meantime survives.
 
 - Run it dry first whenever it covers sessions whose output nobody has
   collected yet.
 - Sessions in the container root itself (repo `workspace`) are reported but
-  never closed by a bare sweep — those are the orchestrators, and a clean-up
+  never closed by a bare sweep -- those are the orchestrators, and a clean-up
   asked about the entries must not retire the session that asked.
   `--include-workspace`, or naming the root as the sweep's target, is the
   explicit request that reaches them.
-- `--shells` widens the same sweep to panes holding no session. A bare shell
-  reads as `shell` when its foreground process group is the shell itself and
-  `shell-busy` while a command holds it, and only the idle ones close.
 - Empty tabs and workspaces need no step: herdr retires a tab when its last
   pane closes, and a workspace when its last tab does.
+
+## Retire one collected worker
+`scripts/close-session <name|pane-id>` closes a single session whose output
+has been read — the normal end of one delegation, and now also the way to
+retire a session nobody named, since the pane's session record rather than an
+agent name is what says it finished. It refuses a pane carrying any hold and
+prints them; `--force` overrides, and is for an explicit request from the
+user, not for getting past a hold you would rather not read.
 
 ## Settle the board row behind a session
 A session the board dispatched carries its service-ticket in the snapshot, and
@@ -86,7 +105,7 @@ The doors that write a row, and the vocabulary they take, are in
 `~/.claude/CLAUDE.md`, "Tickets".
 
 ## When a verdict looks wrong
-`scripts/verify-verdicts` runs the classifier against captured screens with a
-stub herdr, touching no real session. Run it whenever a session is classified
-wrongly: the agent's screen markers are the only evidence the classifier has,
-so a change to them breaks it silently.
+`scripts/verify-verdicts` runs the classifier against transcripts built to
+order — no herdr, no panes, nothing live. Run it whenever a session is
+classified wrongly, and add the case that was misread: a rule the suite does
+not pin is a rule the next edit can drop silently.
