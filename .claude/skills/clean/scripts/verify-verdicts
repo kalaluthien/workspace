@@ -165,9 +165,53 @@ def check_closable():
     return failures
 
 
+#: What one waiting caller must be told, per (verdict, holds) the sweep
+#: produced. The pairs a sweep and a wait read differently are the point of
+#: the table: `done` plus a live hold is a session still running.
+WAIT_CASES = [
+    ("a finished turn reads done",
+     dict(verdict="done", holds=[]), "done"),
+    ("a running session does not read done",
+     dict(verdict="done", holds=["status:working", "mid-turn"]), "working"),
+    ("a session mid-turn between polls is still working",
+     dict(verdict="done", holds=["mid-turn"]), "working"),
+    ("an unanswered tool call is working",
+     dict(verdict="done", holds=["awaiting:Read"]), "working"),
+    ("a pane holding a prompt is blocked",
+     dict(verdict="done", holds=["status:blocked", "awaiting:Bash"]),
+     "blocked"),
+    ("a turn ending in a question is blocked",
+     dict(verdict="done", holds=["asks-question"]), "blocked"),
+    ("a parent owing a worker its report is working",
+     dict(verdict="done", holds=["worker:build-x--sub-y"]), "working"),
+    ("a fresh pane running its first turn is not empty",
+     dict(verdict="empty", holds=["status:working"]), "working"),
+    ("an uncommitted repository does not hold the wait",
+     dict(verdict="done", holds=["unclean:board", "fresh:2m"]), "done"),
+    ("the pane the caller is looking at does not hold the wait",
+     dict(verdict="done", holds=["self", "focused"]), "done"),
+    ("no evidence stays no evidence",
+     dict(verdict="unlinked", holds=["unlinked"]), "unlinked"),
+    ("an unknown status is terminal, not another poll",
+     dict(verdict="done", holds=["status:unknown"]), "unknown"),
+]
+
+
+def check_wait():
+    """A caller reads one word, so the word has to carry the holds."""
+    failures = []
+    for label, row, want in WAIT_CASES:
+        got = S.verdict_of(row)
+        if got != want:
+            failures.append("%s: verdict_of is %r, expected %r"
+                            % (label, got, want))
+    return failures
+
+
 def main():
-    failures = check_state() + check_gate() + check_titles() + check_closable()
-    total = len(CASES) + 9
+    failures = (check_state() + check_gate() + check_titles()
+                + check_closable() + check_wait())
+    total = len(CASES) + len(WAIT_CASES) + 9
     for line in failures:
         print("FAIL  %s" % line)
     print("%d/%d checks passed" % (total - len(failures), total))

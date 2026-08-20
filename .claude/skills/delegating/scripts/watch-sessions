@@ -8,21 +8,21 @@
 # Usage: watch-sessions <target>... [--interval S] [--stall N]
 # Output: one JSON object per session -> {name, pane, verdict}
 #
-# A session is reported at `done` (its sentinel), `blocked` (it is holding a
-# prompt for the user), `gone` (its pane closed), and — after --stall quiet
-# polls — at `pending` (output but no sentinel: it stopped early and needs a
-# re-request), `unknown` (a screen holding no evidence at all), or `empty`
-# (a fresh or freshly cleared pane). Only a working session keeps the watch
-# waiting.
+# A session is reported at `done` (its last turn completed), `blocked` (it is
+# holding a prompt or a question for the user), `gone` (its pane closed),
+# and -- after --stall quiet polls -- at `unlinked` or `unknown` (no evidence
+# to read) or `empty` (a pane nobody has prompted). Only a `working` session
+# keeps the watch waiting, and `working` is what the classifier answers while
+# herdr calls the pane busy or its turn is still open.
 #
-# The stalled verdicts wait for --stall consecutive polls because a session
-# pausing mid-turn reads exactly like one that stopped early; the other three
-# are unambiguous on the first poll and fire at once. A no-evidence verdict
-# must be terminal: absence is the steady state of a finished subject, so a
-# watch that maps `unlinked` to keep-waiting waits forever. session_verdict
-# reads the session's own transcript, so a verdict no longer fades with the
-# screen -- what it cannot establish comes back `unlinked`, and that is a
-# report of what was observed, not a reason to poll again.
+# The no-evidence verdicts wait for --stall consecutive polls, because the
+# link to a session's transcript can be a moment behind the pane; the other
+# three are unambiguous on the first poll and fire at once. They are still
+# terminal when the polls run out: absence is the steady state of a finished
+# subject, so a watch that maps `unlinked` to keep-waiting waits forever.
+# session_verdict reads the session's own transcript rather than the screen,
+# and the classifier folds its holds into the word -- without that fold a
+# session mid-turn answers `done` and every watch exits on its first poll.
 source "$(dirname "$0")/_lib.sh"
 require_herdr
 

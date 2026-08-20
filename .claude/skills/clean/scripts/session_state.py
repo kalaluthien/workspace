@@ -21,6 +21,9 @@ work, never work that dies with its pane.
     session_state.py close [--repo R] [--all] [--quiet-min N] [--pane P ...]
     session_state.py verdict --pane P
 
+A verdict folds the holds back into one word, so a pane still working reads
+`working` and never `done`; `holds` keeps every reason for the sweep.
+
 `list` prints one JSON object per pane. `close` retires the closable ones
 after re-reading each pane, and prints what it did.
 """
@@ -408,7 +411,14 @@ def repo_label(pane):
 
 
 def classify(herdr, pane, roster, titles, quiet_min, me, explicit=False):
-    """One pane's verdict and every reason it is being held.
+    """One pane's row: the folded verdict, and every reason it is held."""
+    row = _classify(herdr, pane, roster, titles, quiet_min, me, explicit)
+    row["verdict"] = verdict_of(row)
+    return row
+
+
+def _classify(herdr, pane, roster, titles, quiet_min, me, explicit=False):
+    """The verdict the evidence reads as, before the holds fold into it.
 
     `holds` is the whole safety argument: a pane closes only when the list
     is empty, so any evidence that cannot be read lands here as a reason
@@ -552,6 +562,49 @@ def classify(herdr, pane, roster, titles, quiet_min, me, explicit=False):
 
 def closable(row):
     return row["verdict"] in ("empty", "done") and not row["holds"]
+
+
+#: Transcript-read holds that mean the session is still working: an exact
+#: word, then the prefixes of the holds that carry a name after a colon.
+LIVE_HOLDS = ("mid-turn",)
+LIVE_PREFIXES = ("awaiting:", "worker:", "rule:")
+
+
+def verdict_of(row):
+    """One word for a row, once its holds have had their say.
+
+    The transcript answers what the last turn did, which is not the same
+    question as whether the session is still going: a pane in the middle of a
+    turn has a completed turn behind it, so reading the transcript alone
+    calls it `done` and leaves the liveness in `holds`. That split is
+    survivable for a sweep, which reads both, and wrong for every caller that
+    reads the word alone -- a watch exits on its first poll, and a reuse
+    claim lands on work still running.
+
+    So the two are folded back into one word here, and `holds` keeps every
+    reason unchanged for the sweep. herdr's own status is read first because
+    it is the live signal; the transcript answers only where the status says
+    idle. A pane whose word changes here always carried a hold, so nothing
+    that was closable stops being closable.
+    """
+    verdict = row.get("verdict")
+    if verdict in ("shell", "shell-busy", "unlinked"):
+        return verdict
+    holds = row.get("holds") or []
+    if "status:blocked" in holds:
+        return "blocked"
+    if "status:working" in holds:
+        return "working"
+    if "status:unknown" in holds:
+        # No evidence either way, and a no-evidence verdict has to be
+        # terminal for the caller rather than another reason to poll.
+        return "unknown"
+    if "asks-question" in holds:
+        return "blocked"
+    for held in holds:
+        if held in LIVE_HOLDS or held.startswith(LIVE_PREFIXES):
+            return "working"
+    return verdict
 
 
 # ------------------------------------------------------------------------ main

@@ -126,9 +126,11 @@ shell_verdict() {
 # herdr holds for the pane, so nothing here depends on what the screen
 # happens to be showing.
 #
-# A verdict this cannot establish comes back `unlinked`, which is free for
-# neither claiming nor closing -- the safe answer when the evidence is
-# missing rather than negative.
+# The word carries the holds: a pane herdr calls busy, or one whose turn is
+# still open, answers `working` rather than the `done` its last completed
+# turn would otherwise read as. A verdict this cannot establish comes back
+# `unlinked`, which is free for neither claiming nor closing -- the safe
+# answer when the evidence is missing rather than negative.
 CLASSIFIER=${CLASSIFIER:-$(dirname "${BASH_SOURCE[0]}")/../../clean/scripts/session_state.py}
 
 session_verdict() {
