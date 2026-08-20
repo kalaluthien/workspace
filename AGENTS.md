@@ -9,18 +9,22 @@ this file and these. A change here is committed to the root repository:
 | directory | holds | read first |
 | --- | --- | --- |
 | `.claude/` | conditional rules, skills, output styles, and the `CLAUDE.md` that imports this file | this file |
-| `docs/` | workspace-level specs and views, over both planes, plus the machine contract every `docs/` reader parses | `docs/README.md` |
+| `docs/` | workspace-level views (`.html`), over both planes, plus the machine contract every `docs/` reader parses | `docs/README.md` |
 | `hooks/` | this repository's own git hooks, chained after the shared guard by `.git/local-hooks/pre-commit` | `hooks/pre-commit` |
 | `scripts/` | workspace-level herdr tooling (`herdr-survey`, `herdr-update`), `check-docs` and its test | script headers |
+| `spec/` | workspace-level specifications (`.md`), over both planes, and the spec template every entry resolves | `spec/README.md` |
 
-A document request whose topic belongs to no project entry lands in `docs/`,
-as a spec (`.md`) or a view (`.html`) — never in a project entry it does not
-fit, and never in chat alone. The document system's rules live in the
-`writing` skill, `.claude/skills/writing/` (`SKILL.md` with `references/`,
-`scripts/`, and `evals/` beside it); a document about one project entry
-still belongs in that entry's own document store, which follows the same
-system; view writing runs through the `writing` skill, which forks its own
-context and returns one message.
+A request whose topic belongs to no project entry lands at the root — never
+in a project entry it does not fit, and never in chat alone. Which directory
+follows from the kind: a normative statement is a spec and lands in `spec/`,
+a page drawn for a reader is a view and lands in `docs/`. A specification is
+not a document, so the two are kept apart and neither inherits the other's
+rules. The document system's rules live in the `writing` skill,
+`.claude/skills/writing/` (`SKILL.md` with `references/`, `scripts/`, and
+`evals/` beside it); a document about one project entry still belongs in
+that entry's own document store, which follows the same system; view writing
+runs through the `writing` skill, which forks its own context and returns
+one message.
 
 The workspace is a control plane over **agents** — the entries above and the
 sessions that work them — and over **services**, the long-running things those

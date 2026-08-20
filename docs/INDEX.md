@@ -1,19 +1,13 @@
 # Index
 
 Every document in `docs/`, as the chapter list. A chapter is a `##`
-heading and the documents that belong to it in reading order; the
-Specifications chapter also carries a `Template:` line. Update in the
+heading and the documents that belong to it in reading order. Update in the
 same commit that adds, renames, or retires a document. The system's
 rules: the `writing` skill (`~/workspace/.claude/skills/writing/SKILL.md`);
 the machine contract: `README.md`.
 
-## Specifications
-
-Template: `templates/spec.md`
-
-- [`agent-document-system.md`](agent-document-system.md) — which file holds
-  the document system's rules, the two arrangements that lost and why, and
-  what the choice still owes.
+Specifications are not documents and are not listed here. They live in
+`~/workspace/spec/`, which carries its own rules in `spec/README.md`.
 
 ## Explanations
 

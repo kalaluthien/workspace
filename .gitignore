@@ -9,6 +9,7 @@
 !/docs/
 !/hooks/
 !/scripts/
+!/spec/
 
 # Machine-local Claude state never enters git.
 .claude/settings.local.json

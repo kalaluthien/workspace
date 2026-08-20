@@ -1,22 +1,28 @@
 # docs/ — the workspace document store
 
-This directory holds the workspace's own specs (`.md`) and views
-(`.html`), over both planes (`agent-` and `service-` filename prefixes),
-catalogued in `INDEX.md`. The document system that governs this and every
-entry's `docs/` — doctypes, components, style, naming, and the
-writing pipeline — is defined once in the `writing` skill's own files:
+This directory holds the workspace's own views (`.html`), over both planes
+(`agent-` and `service-` filename prefixes), catalogued in `INDEX.md`. The
+document system that governs this and every entry's `docs/` — doctypes,
+components, style, naming, and the writing pipeline — is defined once in the
+`writing` skill's own files:
 `~/workspace/.claude/skills/writing/SKILL.md`, with `references/` and
 `scripts/` beside it (the decision and its losing
-alternatives: `agent-document-system.md`). This
+alternatives: `~/workspace/spec/agent-document-system.md`). This
 file keeps only the two-kinds table and the machine contract below, which
 `scripts/check-docs` and the board service parse at this path.
 
-## Two kinds, split by extension
+## Two kinds, in two directories
 
-| kind | extension | authority | written by | read by |
-|---|---|---|---|---|
-| **specification** | `.md` | normative — when spec and artifact disagree, one of them is wrong | the main or project agent | agents |
-| **view** | `.html` | derived — pinned to a commit, expected to go stale | the `writing` skill | the owner |
+A specification is not a document. It is written in natural language, and
+that is all the two have in common: a spec states what must be true and is
+answerable when the artifact disagrees, while a document is drawn for a
+reader and is expected to go stale. They live apart so that neither
+inherits the other's rules, and this contract governs only the second.
+
+| kind | lives in | extension | authority | written by | read by |
+|---|---|---|---|---|---|
+| **specification** | `~/workspace/spec/` | `.md` | normative — when spec and artifact disagree, one of them is wrong | the main or project agent | agents |
+| **view** | `~/workspace/docs/` | `.html` | derived — pinned to a commit, expected to go stale | the `writing` skill | the owner |
 
 ## The docs contract
 
@@ -72,7 +78,6 @@ mtime is a checkout timestamp, not a written time.
   },
 
   "doctypes": [
-    { "name": "spec", "chapter": "Specifications" },
     { "name": "explanation", "chapter": "Explanations" },
     { "name": "guide", "chapter": "Guides" },
     { "name": "proposal", "chapter": "Proposals" }
@@ -83,9 +88,9 @@ mtime is a checkout timestamp, not a written time.
 }
 ```
 
-`spec` is the `.md` kind: it holds a chapter in every `INDEX.md` and is
-never a view, so a reader that lists views only catalogues the chapter and
-serves nothing under it. `unlisted_chapter` names where a reader files a
+`spec` was a fourth doctype here while specifications shared this directory.
+They moved to `~/workspace/spec/` on 2026-08-20, so no chapter names them and
+no reader of this contract serves them. `unlisted_chapter` names where a reader files a
 document its `INDEX.md` does not list; it is declared so every reader
 agrees on the word, and each reader owns whether it degrades that way at
 all.

@@ -28,7 +28,7 @@ CONTRACT = os.path.join(os.path.dirname(HERE), "docs", "README.md")
 
 INDEX = """# Docs
 
-## Specifications
+## Explanations
 
 - [good.html](good.html) — a view that satisfies the contract
 - [other.html](other.html) — a second one, so the directory is never empty
@@ -37,7 +37,7 @@ INDEX = """# Docs
 VIEW = """<!doctype html>
 <html><head><title>%s</title></head><body>
 <dl class="provenance">
-  <dt>Doctype</dt><dd>spec</dd>
+  <dt>Doctype</dt><dd>explanation</dd>
   <dt>Updated</dt><dd>%s</dd>
 </dl>
 </body></html>
