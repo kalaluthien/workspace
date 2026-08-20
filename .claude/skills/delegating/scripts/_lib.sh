@@ -169,7 +169,14 @@ session_verdict() {
         else if (banner)                            print "empty"
         else                                        print "unknown"
       }')
-  if [ "$v" = unknown ] && [ -n "$2" ]; then
+  # A pending screen is read again for the same reason an unknown one is: the
+  # window holds the tail of the session, and the sentinel sits above it. A
+  # worker that files after printing its sentinel leaves later bullets on
+  # screen, which scores pending, and only the transcript still holds the
+  # sentinel. The transcript's own rule is the stricter one — the sentinel
+  # must be an assistant row after the last real prompt — so a session that
+  # was genuinely reopened, or is quiet mid-turn on new work, still fails it.
+  if [ -n "$2" ] && { [ "$v" = unknown ] || [ "$v" = pending ]; }; then
     if transcript_says_done "$1" "$2"; then v=done; fi
   fi
   printf '%s\n' "$v"
@@ -180,8 +187,8 @@ session_verdict() {
 #
 # The screen is a lossy record, but the session's jsonl transcript under
 # ~/.claude/projects/<encoded-cwd>/ is durable: a sentinel that repainted
-# away still sits there as an assistant row. Consulted only when the screen
-# scores unknown. The scoping matters twice over: only the pane's own cwd
+# away still sits there as an assistant row. Consulted whenever the screen
+# scores unknown or pending — the two verdicts a lost sentinel produces. The scoping matters twice over: only the pane's own cwd
 # directory is searched, because the orchestrator's transcript quotes the
 # sentinel inside the prompt it sent, and only assistant rows count, because
 # the delegate's own transcript quotes it in the user row that delivered the

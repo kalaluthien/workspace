@@ -22,6 +22,16 @@ fixture() {
   cat > "$tmp/panes/$1.txt"
 }
 
+# transcript <pane> <<jsonl. The durable record behind one fixture, keyed on
+# that pane's own cwd, so it answers for that fixture and no other. Written
+# only where the screen alone cannot say what the session did.
+transcript() {
+  local dir
+  dir="$tmp/.claude/projects/$(printf '%s' "$tmp/root/repo/$1" | sed 's,[/.],-,g')"
+  mkdir -p "$dir"
+  cat > "$dir/session.jsonl"
+}
+
 fixture blank unknown </dev/null
 
 fixture fresh empty <<'EOF'
@@ -107,6 +117,40 @@ fixture resumed pending <<'EOF'
 ❯
 EOF
 
+# A worker that finished and then filed: the round after the sentinel outran
+# the read window, so the screen holds later bullets and nothing else, which
+# reads pending. The transcript still carries the sentinel as the last word
+# after the last real prompt, and that is what the session actually did.
+fixture tailed done <<'EOF'
+⏺ Filed the pitfall to the project pool.
+
+  Ran 2 shell commands
+
+⏺ Nothing else was open.
+✻ Churned for 6m 12s
+❯
+EOF
+transcript tailed <<'EOF'
+{"type":"user","message":{"role":"user","content":"Index the docs as numbered chapters."}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Merged, pushed, worktree removed.\n\nDONE curate-doc-chapters"}]}}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","content":"ok"}]}}
+EOF
+
+# The same screen, but a real prompt arrived after the sentinel: the session was
+# reopened and the old sentinel no longer answers for it. The transcript must
+# not overturn a pending screen here, or every reopened worker reads done.
+fixture tailed-reopened pending <<'EOF'
+⏺ Pushed to main.
+✻ Churned for 40s
+❯
+EOF
+transcript tailed-reopened <<'EOF'
+{"type":"user","message":{"role":"user","content":"Index the docs as numbered chapters."}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Merged.\n\nDONE curate-doc-chapters"}]}}
+{"type":"user","message":{"role":"user","content":"push."}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Pushed to main."}]}}
+EOF
+
 # The stub answers only what sweep-sessions asks: the agent roster, and one
 # pane read per agent. Every fixture is idle, so every one reaches the reader.
 {
@@ -123,10 +167,11 @@ chmod +x "$tmp/bin/herdr"
 awk '{print $1}' "$tmp/cases" |
   jq -R -s --arg cwd "$tmp/root/repo" '
     {result: {agents: [split("\n")[] | select(. != "")
-      | {name: "curate-doc-chapters", pane_id: ., cwd: $cwd, agent_status: "idle"}]}}' \
+      | {name: "curate-doc-chapters", pane_id: .,
+         cwd: ($cwd + "/" + .), agent_status: "idle"}]}}' \
   > "$tmp/agents.json"
 
-got=$(PATH="$tmp/bin:$PATH" WORKSPACE_ROOT="$tmp/root" HERDR_ENV=1 \
+got=$(PATH="$tmp/bin:$PATH" WORKSPACE_ROOT="$tmp/root" HERDR_ENV=1 HOME="$tmp" \
   "$here/sweep-sessions" repo | jq -r '"\(.pane) \(.verdict)"')
 
 fail=0
