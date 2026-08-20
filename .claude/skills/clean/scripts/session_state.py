@@ -40,7 +40,7 @@ from datetime import datetime, timezone
 
 WORKSPACE_ROOT = os.path.expanduser("~/workspace")
 PROJECTS = os.path.expanduser("~/.claude/projects")
-DEFAULT_QUIET_MIN = 30
+DEFAULT_QUIET_MIN = 2
 
 # A pane is closable only from these two herdr states. Every other state --
 # working, blocked, unknown -- is live work, a dialog, or no evidence at all.
@@ -78,7 +78,7 @@ class Herdr:
         return reply.get("result") or {}
 
     def roster(self):
-        """Every pane, with its agent row merged in and focus resolved.
+        """Every pane, with its agent row merged in.
 
         The snapshot publishes panes and agents as two arrays: the pane row
         carries cwd, revision and the display label, the agent row carries
@@ -87,12 +87,10 @@ class Herdr:
         """
         snap = self.rpc("session.snapshot").get("snapshot") or {}
         agents = {a["pane_id"]: a for a in snap.get("agents") or []}
-        focused = snap.get("focused_pane_id")
         rows = []
         for pane in snap.get("panes") or []:
             row = dict(pane)
             row["name"] = (agents.get(pane["pane_id"]) or {}).get("name")
-            row["is_focused"] = pane["pane_id"] == focused
             rows.append(row)
         return rows
 
@@ -410,24 +408,19 @@ def repo_label(pane):
     return None
 
 
-def classify(herdr, pane, roster, titles, quiet_min, me, explicit=False):
+def classify(herdr, pane, roster, titles, quiet_min, me):
     """One pane's row: the folded verdict, and every reason it is held."""
-    row = _classify(herdr, pane, roster, titles, quiet_min, me, explicit)
+    row = _classify(herdr, pane, roster, titles, quiet_min, me)
     row["verdict"] = verdict_of(row)
     return row
 
 
-def _classify(herdr, pane, roster, titles, quiet_min, me, explicit=False):
+def _classify(herdr, pane, roster, titles, quiet_min, me):
     """The verdict the evidence reads as, before the holds fold into it.
 
     `holds` is the whole safety argument: a pane closes only when the list
     is empty, so any evidence that cannot be read lands here as a reason
     rather than being resolved by a guess.
-
-    `explicit` marks a pane the caller named by id rather than one a sweep
-    happened across. It drops only the focus hold, which exists to keep a
-    broad sweep away from the pane the owner is looking at -- naming that
-    pane is the owner saying so.
     """
     pane_id = pane["pane_id"]
     out = {
@@ -455,8 +448,6 @@ def _classify(herdr, pane, roster, titles, quiet_min, me, explicit=False):
 
     if pane_id == me:
         hold("self")
-    if pane.get("is_focused") and not explicit:
-        hold("focused")
 
     status = pane.get("agent_status")
     if status not in IDLE_STATUSES:
@@ -621,8 +612,7 @@ def gather(herdr, args, me, titles=None):
             continue
         if args.pane and pane["pane_id"] not in args.pane:
             continue
-        rows.append(classify(herdr, pane, roster, titles, args.quiet_min, me,
-                             explicit=bool(args.pane)))
+        rows.append(classify(herdr, pane, roster, titles, args.quiet_min, me))
     return rows
 
 
@@ -648,9 +638,8 @@ def do_close(herdr, args, me):
             results.append(row)
             continue
         fresh["name"] = row["name"]
-        fresh["is_focused"] = False
         recheck = classify(herdr, fresh, herdr.roster(), titles,
-                           args.quiet_min, me, explicit=bool(args.pane))
+                           args.quiet_min, me)
         if not closable(recheck):
             # It woke up, or grew a hold, between the sweep and now. The
             # re-classification is the guard, not the pane revision: that

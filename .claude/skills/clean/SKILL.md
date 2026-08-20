@@ -46,8 +46,8 @@ a pane retires only when that list is empty. A hold is raised by: herdr
 reporting anything but idle, a detection rule matching `working` beneath the
 winning one, an unanswered tool call, a turn left open, a last turn that ends
 in a question, a repository the session touched still dirty or unpushed, a
-live worker pane named under this one, the sweeping pane itself, the focused
-pane, and a session quieter-than-`--quiet-min` minutes ago (default 30).
+live worker pane named under this one, the sweeping pane itself, and a
+session quieter-than-`--quiet-min` minutes ago (default 2).
 
 `unlinked` is the answer when evidence is missing rather than negative, and
 it is never closable. Absent, ambiguous and stale evidence all land there:
@@ -72,10 +72,10 @@ meantime survives.
 
 - Run it dry first whenever it covers sessions whose output nobody has
   collected yet.
-- The container root (repo `workspace`) is swept like any entry. The session
-  running the sweep is held by `self` and `focused`, so the one that asked
-  survives; every other spent orchestrator retires with the workers it drove
-  (owner, 2026-08-21).
+- The container root (repo `workspace`) is swept like any entry, and the pane
+  the owner happens to be looking at is a target like any other. Only `self`
+  keeps the sweeping session itself alive; every other spent orchestrator
+  retires with the workers it drove (owner, 2026-08-21).
 - Empty tabs and workspaces need no step: herdr retires a tab when its last
   pane closes, and a workspace when its last tab does.
 

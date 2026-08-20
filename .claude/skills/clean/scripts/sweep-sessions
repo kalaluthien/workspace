@@ -18,9 +18,10 @@ Verdicts:
   shell-busy  a pane with no agent, a command running
   <status>  herdr's own state when it is not idle: working, blocked, unknown
 
-Panes at the container root are swept like any other repository's. The
-session running the sweep survives on its own `self` and `focused` holds, so
-an orchestrator that finished its work retires with the workers it drove.
+Panes at the container root are swept like any other repository's, and so is
+the pane the owner is looking at. Only the sweeping session's own `self` hold
+keeps it alive, so an orchestrator that finished its work retires with the
+workers it drove.
 """
 import argparse
 import json
