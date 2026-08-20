@@ -6,7 +6,7 @@ proposal additions, and the exits.
 - [Three doctypes](#three-doctypes)
 - [The page opening](#the-page-opening)
 - [Title and file name](#title-and-file-name)
-- [Proposal mode](#proposal-mode) — [section order](#section-order)
+- [Proposal mode](#proposal-mode) — [section order](#section-order), [Domain](#domain-only-when-the-proposal-moves-the-words), [a losing option](#how-a-losing-option-is-written)
 - [Requests this skill does not serve](#requests-this-skill-does-not-serve)
 - [What the run never writes](#what-the-run-never-writes)
 
@@ -73,49 +73,104 @@ entry's file follows that entry's own naming, read from its `docs/INDEX.md`.
 
 ## Proposal mode
 
+Two cultures have written proposals against a standing template for over a
+decade: Python's PEPs and Swift Evolution. What they enforce is which slots
+must be filled, and what a slot must say when the honest answer is "nothing".
+They enforce no sentence rules at all — `plain-writing.md` is already stricter
+than either. The full survey is `notes/wiki/proposal-document-conventions.md`.
+
 ### Section order
 
 A proposal runs its sections in one fixed order. The reader meets the change
-first, then the words it uses, then the facts, then the argument, and the
-decisions last.
+first, then the facts, then the argument, then the limits, and the decisions
+last.
 
 | # | section | what it holds |
 |---|---|---|
 | 1 | the change, named | one plain sentence stating what is proposed |
-| 2 | Domain | every term of art, what it is and what it is not |
-| 3 | the problem, AS-IS | today's facts, each backed by a file |
-| 4 | the options, TO-BE | the candidates, and what each gives up |
-| 5 | the recommendation, TO-BE | the one option taken, and why it wins |
-| 6 | the decisions | rows the proposal settled on its own |
+| 2 | the problem, AS-IS | today's facts, each backed by a file |
+| 3 | the options, TO-BE | the candidates, each named, and what each gives up |
+| 4 | the recommendation, TO-BE | the one option taken, and why it wins |
+| 5 | what this does not do | the exclusions, one line each |
+| 6 | what it costs | the impact answers, including every "nothing" |
+| 7 | the decisions | rows the proposal settled on its own |
 
-Sections 1, 3, 4, and 5 take names from the subject, not from this table.
-Rule C in `draft-rules.md` holds: a section name is a bare noun phrase, so
-the first section is named after the change and never "Answer", "Summary", or
-"Proposal".
+Sections 1 to 4 take names from the subject, not from this table. Rule C in
+`draft-rules.md` holds: a section name is a bare noun phrase, so the first
+section is named after the change and never "Answer", "Summary", or
+"Proposal". Sections 5 and 6 may keep the names above.
+
+**Options come before the recommendation, and that order is settled.** Both
+outside cultures put the proposed solution first and file the losers in an
+appendix, because a PEP or a Swift proposal is advocacy: its author already
+decided and is arguing for one thing. A page in this repository is read by an
+owner who has not decided yet, so the options they are choosing between come
+before the one this page picks. Take the record shape from those cultures and
+leave the stance.
 
 **The first section states the change in one sentence a reader can repeat.**
 It sits inside that section, under its heading, and never above the first
-heading, which the page opening rule keeps clear. A reader who stops after
-that sentence can still say what the proposal wants.
+heading, which the page opening rule keeps clear. Hold it to 50 words, and
+write it to be read away from the page — in a ticket, in a chat message, in a
+list of open proposals. Repeating a fact the page states again later is
+correct here, not redundant. A reader who stops after that sentence can still
+say what the proposal wants.
 
-**Section 2 is Domain.** It defines every term of art the proposal
-manipulates: what each one is, and what each one is not. A proposal that
-moves `spec`, `code`, `test`, and `eval` around says what each of those four
-is, and what it is not, before any AS-IS fact. The negative half is not
-optional, and it is what a reader uses to check whether the proposal means
-the same words they do. On a proposal this section carries the page's
-negative space, so a proposal owes no separate negative-space section.
+**Section 5 is what this does not do.** One bulleted list, one exclusion per
+line, each naming a thing a reader could reasonably expect and would otherwise
+guess about. It carries the page's negative space, so a proposal owes no
+separate negative-space section. Write each line as a bare exclusion with the
+boundary drawn where it is genuinely fuzzy — "this does not change how a card
+is coloured, though which chip a card carries is in scope". No line of it
+argues, and none of it says the proposal *will* do the thing later; an
+affirmative future sentence reads as something the reader is being asked to
+approve.
 
-Each definition carries one example and one counter-example, both from files
-the run read, per rule M in `draft-rules.md`. A term defined in words alone is
-where two readers agree on a sentence and mean different files.
+**Section 6 is what it costs, and every field is answered even when the answer
+is nothing.** This is the one convention worth importing whole. A reader has
+to tell *the writer considered this and there is no cost* from *the writer did
+not think about it*, and an omitted section cannot carry that difference. A
+one-line denial can, and it costs one sentence.
 
-**The terms of one kind are drawn as typed records, never as a bullet each.**
-Four statements per term — what it is, one instance, one non-instance, and
-whatever the proposal moves it by — pack into one unreadable paragraph when a
-bullet carries them. The record gives each statement its own field, and the
-shared field set lets a reader read the second term by position. The component
-is in `components.md`, its markup in `page-html.md`.
+| field | what it holds |
+|---|---|
+| `who relearns` | what a person who knows today's system has to unlearn |
+| `what migrates` | what already-stored records or files need doing to them |
+| `what undoing costs` | what reversing this costs once it has shipped |
+
+"No record changes shape." is a complete and correct answer to the second
+field. Leaving it out is not.
+
+**The decisions come last.** A decision list placed before the argument asks
+the reader to accept rulings on a change nobody has explained yet, and it
+reads as a page of verdicts. Each decision names its consequence and points
+at the section that argues it. Six decisions after a recommendation are six
+things to veto; the same six before it are six things to distrust.
+
+### Domain, only when the proposal moves the words
+
+A Domain section defines every term of art the proposal manipulates: what each
+one is, and what each one is not. It is **not** a standing section, and a
+proposal that opens with one is usually wrong. Neither outside culture has
+such a section at all.
+
+Write one only when the change *is* a change to the vocabulary — a rename, a
+record being split or merged, two words a reader currently uses for one thing.
+There the definitions are the argument. Everywhere else, define each term at
+its first use, in the sentence that needs it, with its one example beside it
+per rule M.
+
+The test is one question: would deleting the Domain section leave a sentence
+the reader cannot parse? If not, the section is an inventory of parts, and an
+inventory in front of the argument is the reliable way to lose a reader before
+they reach the question.
+
+When a Domain section is owed, the terms of one kind are drawn as typed
+records, never as a bullet each. Four statements per term pack into one
+unreadable paragraph when a bullet carries them. The record gives each
+statement its own field, and the shared field set lets a reader read the
+second term by position. The component is in `components.md`, its markup in
+`page-html.md`.
 
 | field | what it holds |
 |---|---|
@@ -127,26 +182,50 @@ is in `components.md`, its markup in `page-html.md`.
 Add a field the proposal's own argument turns on, such as `verdict` for a
 stage that gates or informs, and give it to every member of the kind.
 
-**The decisions come last.** A decision list placed before the argument asks
-the reader to accept rulings on a change nobody has explained yet, and it
-reads as a page of verdicts. Each decision names its consequence and points
-at the section that argues it. Six decisions after a recommendation are six
-things to veto; the same six before it are six things to distrust.
+### How a losing option is written
 
-### Three additions on top of every other rule
-
-1. **Two halves.** AS-IS states the problem, and a file backs every claim in
-   it. TO-BE states the change, and it is the one half allowed to describe
-   what does not exist.
-2. **The halves are marked in the section names.** An AS-IS section names the
-   system as it runs today. A TO-BE section names the change it proposes. A
-   reader must never guess which half a figure belongs to.
-3. **Rationale sits beside the change, never after it.** Each proposed change
-   carries the AS-IS fact it answers. A change with no fact above it is a
-   preference.
+The strongest convention in either outside corpus, and one no template asks
+for: a losing option is its own named entry with its reason underneath, never
+a paragraph in a list of also-rans. The shape is fixed — **name the option,
+say what it would have bought, then say what it cost**. Do not write "rejected
+because X"; write the two halves and let the verdict follow them.
 
 A losing option stays in the document forever. The reason it lost is the only
 thing standing between it and being proposed again.
+
+When a proposal is revised and its own earlier version is what changed, that
+earlier version becomes an entry in the options section with its own kill
+reason. The page then carries its history instead of losing it in a diff.
+
+### Four more rules the two cultures earn
+
+1. **One idea per proposal.** A page that argues two changes gets both
+   rejected on the weaker one. When a page will not fit, split it by document
+   role — the facts in one, the argument in another — and never by feature.
+2. **Rationale sits beside the change, never after it.** Each proposed change
+   carries the AS-IS fact it answers. A change with no fact above it is a
+   preference. Both cultures have tried and abandoned a separate rationale
+   section, which is the same finding from the other side.
+3. **Two halves, marked in the section names.** AS-IS states the problem, and
+   a file backs every claim in it. TO-BE states the change, and it is the one
+   half allowed to describe what does not exist. A reader must never guess
+   which half a figure belongs to.
+4. **No unevidenced claim of support.** Do not write that a person, a ticket,
+   or another document backs the change without citing where they say so.
+
+### Where the drawing goes
+
+The house style is figure-first, and the outside cultures place their examples
+on the *why* side: show how a reader gets a similar effect today and what is
+wrong with it, before the change is named. Follow that. The AS-IS section
+carries the anatomy figure and the worked example; the TO-BE section carries
+the comparison of candidates.
+
+These conventions come from plain-text documents read top to bottom, and the
+parts that assume that do not survive a page. Do not number sections by hand,
+do not write "the section above", do not keep a change history inside a file
+git already versions, and do not carry a footnote list — a citation is inline,
+beside the claim it backs.
 
 ## Requests this skill does not serve
 

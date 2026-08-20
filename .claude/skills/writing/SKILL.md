@@ -89,8 +89,8 @@ An explanation and a proposal each hold negative space: what does not start
 the subject, and what the subject does not change. Nothing on the page may
 let a reader infer a trigger or an effect the code does not have. Rule L
 never trims it. An explanation gives it its own section. A proposal carries
-it in the Domain section its section order already requires, and a guide
-walks one procedure and owes none.
+it in the "what this does not do" section its section order already requires,
+and a guide walks one procedure and owes none.
 
 A proposal takes its whole section order from `references/doctypes.md`, which
 fixes what comes first and what comes last.

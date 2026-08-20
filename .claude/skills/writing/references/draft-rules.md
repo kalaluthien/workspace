@@ -167,8 +167,8 @@ it learns nothing.
   run that reads and reports and writes nothing.
 
 Two instances beat one where a term has an edge: show what the term covers,
-then show the nearest thing it does not. A definition in a proposal's Domain
-section carries both, per `doctypes.md`.
+then show the nearest thing it does not. Where a proposal owes a Domain
+section at all, each definition in it carries both, per `doctypes.md`.
 
 ## N · The figure leads, the prose follows
 

@@ -53,11 +53,19 @@ A request that must not fire and still reaches the skill ends the run: return
    title and the path the document already had, and a derived path that holds
    a different subject ended the run instead.
 5. The subject is split into 4 to 7 sections. An explanation gives the
-   negative space its own section, and a proposal carries it in Domain.
-6. A proposal runs the six sections in the fixed order: the change in one
-   plain sentence, Domain with what each term is and is not, the AS-IS
-   problem, the options, the recommendation, and the decisions last. No
-   decision or veto row appears before the recommendation.
+   negative space its own section, and a proposal carries it in "what this
+   does not do".
+6. A proposal runs its sections in the fixed order: the change in one plain
+   sentence of at most 50 words, the AS-IS problem, the options, the
+   recommendation, what this does not do, what it costs, and the decisions
+   last. No decision or veto row appears before the recommendation.
+6a. A proposal carries a Domain section only when the change is a change to
+   the vocabulary itself. On any other subject a Domain section is a defect,
+   and the terms are defined at first use instead.
+6b. Every field of "what it costs" is answered, and a field with no cost says
+   so in one sentence rather than being left out.
+6c. Every losing option is its own named entry stating what it would have
+   bought and what it cost. No entry reads "rejected because X".
 
 **Figures**
 
@@ -77,8 +85,8 @@ A request that must not fire and still reaches the skill ends the run: return
     carries at most two connective paragraphs beyond the caption, the legend,
     and the keyed items.
 13. Every definition, rule, and mechanism shows one concrete instance from a
-    file the run read, and every Domain entry in a proposal shows an example
-    and a counter-example.
+    file the run read, and where a proposal owes a Domain section, every entry
+    in it shows an example and a counter-example.
 14. Every stated count is a count chip, every state, status, mode, and
     doctype inside a sentence is a value chip, every token the reader would
     run or open stays a code span, and the one transition no code performs

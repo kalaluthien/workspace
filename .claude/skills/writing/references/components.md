@@ -147,9 +147,9 @@ forces one set across kinds.
 This is the one place a repeated label set is right, and `page-html.md` keeps
 the shape out of tables. A definition is not a comparison, so the labels are
 what the reader navigates by rather than a column they were denied. Use it for
-a proposal's Domain section, where `doctypes.md` already demands a definition,
-an example, and a counter-example per term. Do not use it for options, whose
-component is keyed option panels.
+a proposal's Domain section on the runs that owe one — `doctypes.md` makes it
+conditional, and demands a definition, an example, and a counter-example per
+term. Do not use it for options, whose component is keyed option panels.
 
 ## Keyed option panels
 
