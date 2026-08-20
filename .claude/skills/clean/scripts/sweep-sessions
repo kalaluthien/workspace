@@ -1,10 +1,19 @@
 #!/usr/bin/python3
 """Report every session pane under ~/workspace, and optionally retire it.
 
+The board rows behind those panes are swept in the same pass: a row still
+marked `working` whose session is gone is released back to `open`, so the
+board stops waiting on a session that no longer exists.
+
     sweep-sessions [<repo>] [--close] [--quiet-min N]
 
 One JSON object per pane: {repo, pane, name, title, status, session, link,
-quiet_min, verdict, holds, closable} -- plus `closed` under --close.
+quiet_min, verdict, holds, closable} -- plus `closed` under --close. Then one
+per board row needing attention: {ticket, title, action, reason}, where the
+action is `release` (nobody holds it), `held` (tagged #need-you, the owner's
+to end) or `unreachable` (the board did not answer). A released row is not a
+finished one: closing it says the work shipped, which only a reader of the
+session's report can say.
 
 `holds` is the safety argument in the open: a pane retires only when that
 list is empty, so every reason one survives is printed beside it. Read the
@@ -29,6 +38,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import board_tickets as B
 import session_state as S
 
 
@@ -59,6 +69,14 @@ def main():
             row["closable"] = S.closable(row)
 
     for row in rows:
+        print(json.dumps(row, ensure_ascii=False))
+
+    # A pane the sweep just closed is not live, whatever the roster still says.
+    live = {row["session"] for row in rows
+            if row["session"] and not row.get("closed")}
+    for row in B.sweep(live, opts.close, "sweep-sessions",
+                       os.environ.get("CLAUDE_CODE_SESSION_ID"),
+                       os.environ.get("CLAUDE_SESSION_NAME")):
         print(json.dumps(row, ensure_ascii=False))
 
 

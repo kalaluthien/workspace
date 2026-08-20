@@ -88,27 +88,35 @@ prints them; `--force` overrides, and is for an explicit request from the
 user, not for getting past a hold you would rather not read.
 
 ## Settle the board row behind a session
-A session the board dispatched carries its service-ticket in the snapshot, and
-that ticket's rows are what the user sees. Read `GET /api/snapshot` on
-`localhost:8300`: `sessions[]` names each pane's `service_ticket_id`, and
-`board.groups[].backlog_tickets[]` carries every row with its state and the
-sessions that held it. Settle the row before the pane goes, because a closed
-pane leaves nothing to ask.
+A pane and the board row behind it go stale together, so the sweep reads both
+in one pass. After its pane rows it prints one row per board ticket needing
+attention -- `{ticket, title, action, reason}` -- and under `--close` it acts:
 
-- A worker can ship the work, print its sentinel, and still leave its row
-  `working`. Close the row yourself then — the report you have just read is the
-  verification, and re-asking a session costs a round-trip for one line.
-- Never close a row tagged `#need-you`. The tag holds the row's next
-  transition, and only the owner ends it.
-- A row left `working` and untagged after its session is gone reads as a
-  session still running, and the board waits on it forever. Close it, or hand
-  it back by setting it `open` and tagging it `#need-you`.
+| action | the row is | the sweep |
+| --- | --- | --- |
+| `release` | `working`, and no live session holds it | sets it back to `open` |
+| `held` | `working` and tagged `#need-you` | leaves it, and says so |
+| `unreachable` | not readable: the board did not answer | leaves everything |
+
+Releasing is the whole of what a script may decide. It says nobody is working
+the row, which the missing session already proves. Closing says the work
+shipped, which only a reader of that session's report knows -- so read the
+report, then close the row yourself with the `DELETE` door. A worker often
+ships the work and still leaves its row `working`.
+
+Liveness comes from the panes *and* from `sessions[]` in the snapshot, because
+board dispatches sessions that never take a pane. Read the rows themselves at
+`GET /api/snapshot` on `localhost:8300`, under `board.groups[].tickets[]`.
 
 The doors that write a row, and the vocabulary they take, are in
-`~/.claude/CLAUDE.md`, "Tickets".
+`~/.claude/CLAUDE.md`, "Tickets". One of them is not a door: the `working`
+marker is taken through `/claim`, and a `PATCH .../head` asking for it is
+refused with a 422. Releasing back to `open` is a plain head patch, and every
+field it omits survives (probed 2026-08-21).
 
 ## When a verdict looks wrong
 `scripts/verify-verdicts` runs the classifier against transcripts built to
-order — no herdr, no panes, nothing live. Run it whenever a session is
+order, and the board half against ticket records built the same way — no
+herdr, no panes, nothing live. Run it whenever a session is
 classified wrongly, and add the case that was misread: a rule the suite does
 not pin is a rule the next edit can drop silently.

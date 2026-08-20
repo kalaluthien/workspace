@@ -1,6 +1,10 @@
 #!/usr/bin/python3
 """Check the classifier against transcripts built to order. No herdr, no panes.
 
+The board half is checked here too, against ticket records built the same
+way: which rows a sweep is responsible for is a decision, so it is pinned
+like every other one.
+
 Every case is a synthetic session record, so a rule can be broken in the
 source and watched to fail here -- which is the only way a guard earns
 trust. The screen-fixture suite this replaces is gone with the screen
@@ -14,6 +18,7 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import board_tickets as B
 import session_state as S
 
 STAMP = "2026-08-20T%02d:00:00.000Z"
@@ -208,10 +213,40 @@ def check_wait():
     return failures
 
 
+def ticket(state="working", sessions=(), tags=("code",)):
+    return {"id": "p:1", "title": "a row", "state": state,
+            "tags": list(tags),
+            "sessions": [{"id": s, "name": "n-" + s} for s in sessions]}
+
+
+def check_tickets():
+    """A row is the sweep's only when its own session is gone."""
+    failures = []
+
+    def want(label, row, live, action):
+        got = (B.action(row, live) or {}).get("action")
+        if got != action:
+            failures.append("%s: action is %r, expected %r"
+                            % (label, got, action))
+
+    want("a row nobody holds is released", ticket(), set(), "release")
+    want("a row its own session still holds is left alone",
+         ticket(sessions=["s1"]), {"s1"}, None)
+    want("another session's pane does not hold this row",
+         ticket(sessions=["s1"]), {"s2"}, "release")
+    want("a holder board knows by name alone is still a holder",
+         ticket(sessions=["s1"]), {"n-s1"}, None)
+    want("an open row is not the sweep's business",
+         ticket(state="open"), set(), None)
+    want("a #need-you row is held, never released",
+         ticket(tags=["code", "need-you"]), set(), "held")
+    return failures
+
+
 def main():
     failures = (check_state() + check_gate() + check_titles()
-                + check_closable() + check_wait())
-    total = len(CASES) + len(WAIT_CASES) + 9
+                + check_closable() + check_wait() + check_tickets())
+    total = len(CASES) + len(WAIT_CASES) + 9 + 6
     for line in failures:
         print("FAIL  %s" % line)
     print("%d/%d checks passed" % (total - len(failures), total))
