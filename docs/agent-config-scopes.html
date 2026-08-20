@@ -150,7 +150,7 @@
             <ul>
               <li>the entry table</li>
               <li>the output style</li>
-              <li>the <code>delegating</code> skill</li>
+              <li>the four skills</li>
             </ul></dd>
         </dl>
       </div>
@@ -244,10 +244,11 @@
             <li>The absence is <mark>routing, not omission</mark>.</li>
           </ul>
         </li>
-        <li><span class="badge">3</span> <strong>One kind has no format.</strong>
-          <mark>The agent kind cites no written definition</mark>.
+        <li><span class="badge">3</span> <strong>Two kinds have no format.</strong>
+          <mark>The agent and output-style kinds cite no written
+          definition</mark>.
           <ul>
-            <li>The other five kinds each cite one.</li>
+            <li>The other four kinds each cite one.</li>
             <li>An author copies one of the agent kind's two worked
               examples.</li>
           </ul>
@@ -268,7 +269,7 @@
         <tr class="grp"><td colspan="2"><span class="badge">2</span> Workspace — <code>~/workspace/.claude/</code></td></tr>
         <tr><td>instruction</td><td><code>CLAUDE.md</code></td></tr>
         <tr><td>rule</td><td><code>services.md</code></td></tr>
-        <tr><td>skill</td><td><code>delegating/</code></td></tr>
+        <tr><td>skill</td><td><code>clean/</code>, <code>delegating/</code>, <code>verify/</code>, <code>writing/</code></td></tr>
         <tr><td>agent</td><td>none</td></tr>
         <tr><td>output style</td><td><code>simplified-technical.md</code></td></tr>
         <tr><td>memory pool</td><td>15 files</td></tr>
@@ -345,6 +346,28 @@ kalaluthien.github.io/.claude/       (no such directory)
         pool path under <code>~/.claude/projects/</code> encodes the working
         directory with <code>/</code> replaced by <code>-</code>, so list the
         parent and match by suffix rather than typing the encoding by hand.</p>
+    </details>
+
+    <details>
+      <summary>The re-walk on 2026-08-21: the workspace scope now carries four skills, and two kinds cite no format (evidence)</summary>
+      <p>Walked at <code>96f6d67</code>. Only the two counts below were
+        re-checked; the rest of this page still rests on the 2026-08-11 walk
+        above, which keeps its own reading.</p>
+<pre>== ~/workspace/.claude/skills
+clean  delegating  verify  writing
+
+== format definitions cited
+instruction  "Claude Code" item 1
+rule         setup-claude-sessions
+skill        rules/skill-authoring.md
+memory pool  the "Filing" table + the pool contract
+agent        (none)
+output style (none)</pre>
+      <p>The output-style kind was the second one with no format all along —
+        this page's own "Where each kind's format is defined" list already read
+        <code>none</code> for it, so the count in the box was the half that was
+        wrong. Both mentions of the output style in the instruction files cite
+        the style; neither defines the kind's shape.</p>
     </details>
 
     <h2 id="reach">Reach</h2>
