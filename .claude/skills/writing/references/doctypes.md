@@ -4,7 +4,7 @@ Read at step 0. Fixes the doctype, the provenance fields, the title, the
 proposal additions, and the exits.
 
 - [Three doctypes](#three-doctypes)
-- [The page opening](#the-page-opening)
+- [The page opening](#the-page-opening) — [the machine copy](#the-machine-copy)
 - [Title and file name](#title-and-file-name)
 - [Proposal mode](#proposal-mode) — [section order](#section-order), [Domain](#domain-only-when-the-proposal-moves-the-words), [a losing option](#how-a-losing-option-is-written)
 - [Requests this skill does not serve](#requests-this-skill-does-not-serve)
@@ -58,6 +58,33 @@ carry the same words, and a machine reads the title from the head.
   carry the field over from the document being rewritten.
 - No `Commit` field. A commit a reader needs sits on the citation it pins, so
   a page standing on two repositories pins each one where it is used.
+
+### The machine copy
+
+The block below is the machine copy of the fields above. An entry's docs
+checker parses it to decide what a view of each doctype must carry, so a
+change to the fields is made here, in the same commit as the prose it
+follows. It replaces the per-doctype template files this skill retired: an
+entry that resolves a template path instead finds nothing and refuses every
+view it is handed.
+
+Required fields only. A view carrying more than the block names is left
+alone, because a page that pins a commit or a build in its provenance is
+answering its own reader, and the block cannot know which.
+
+```json contract=doctype
+{
+  "contract": "doctype",
+  "version": 1,
+  "updated": "2026-08-20",
+
+  "doctypes": {
+    "explanation": { "fields": ["Doctype", "Question", "Updated"] },
+    "guide":       { "fields": ["Doctype", "Goal", "Updated"] },
+    "proposal":    { "fields": ["Doctype", "Status", "Question", "Updated"] }
+  }
+}
+```
 
 ## Title and file name
 
