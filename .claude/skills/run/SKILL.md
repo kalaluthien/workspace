@@ -1,7 +1,6 @@
 ---
 name: run
 description: Show the workspace as it stands — every repository's git state and every live session's verdict, read out in one pass. Read-only.
-model-invocable: false
 disable-model-invocation: true
 ---
 

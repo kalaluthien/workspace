@@ -1,7 +1,6 @@
 ---
 name: verify
 description: Run the workspace root repository's own checks — the docs contract, the checker's test, the session classifier, the figure rules — and report pass or fail for each.
-model-invocable: false
 disable-model-invocation: true
 ---
 

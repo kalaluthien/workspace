@@ -1,7 +1,6 @@
 ---
 name: clean-sessions
 description: Sweep every pane and shell under ~/workspace, retire the spent ones, and settle the board rows they held. The front door to the cleaning-sessions skill.
-model-invocable: false
 disable-model-invocation: true
 ---
 
