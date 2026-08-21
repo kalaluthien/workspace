@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orchestration model</title>
+<style>
+  :root { --ink:#111; --mute:#555; --hair:#e4e4e4; --wash:#f4f4f4; }
+  html { font-size: 16px; }
+  body { max-width: 42rem; margin: 0 auto; padding: 4rem 1.5rem 8rem;
+         background: #ffffff; color: var(--ink);
+         font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+         line-height: 1.55; overflow-wrap: break-word; }
+  h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 .9rem; font-weight: 700; letter-spacing: -.01em; }
+  h2 { font-size: 1.25rem; margin: 3rem 0 .5rem; font-weight: 700; }
+  h3 { font-size: 1rem; margin: 2rem 0 .3rem; font-weight: 700; }
+  h4 { font-size: .95rem; margin: 0 0 .4rem; font-weight: 700; }
+  p, li { margin: .6rem 0; }
+  ul, ol { padding-left: 1.2rem; }
+  ol.steps { padding-left: 1.6rem; }
+  ol.steps > li { margin: 1.3rem 0; }
+  ol.steps > li::marker { font-weight: 700; }
+  ol.keys { list-style: none; padding-left: 0; margin: 1rem 0; }
+  ol.keys > li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .6rem; margin: .8rem 0; }
+  ol.keys > li > p, ol.keys > li > div { min-width: 0; }
+  ol.keys > li > p, ol.keys > li > div > p { margin: 0; }
+  ol.keys ul { margin: .3rem 0 0; padding-left: 1.05rem; }
+  ol.keys ul li { margin: .2rem 0; }
+  .k { display: inline-flex; align-items: center; justify-content: center; width: 1.45rem; height: 1.45rem;
+    border: 1px solid var(--ink); border-radius: 50%; font-size: .72rem; font-weight: 700; }
+  a { color: #14459b; text-decoration-color: #9bb0d8; }
+  code, pre, .provenance dd, .src { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
+  pre { overflow-x: auto; background: var(--wash); padding: 1rem; line-height: 1.45; margin: 1.4rem 0; }
+  pre.wrap { white-space: pre-wrap; }
+  .src { color: var(--mute); }
+  table { border-collapse: collapse; width: 100%; margin: 1.4rem 0; font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; padding: .45rem .8rem .45rem 0; border-bottom: 1px solid var(--hair); }
+  th { font-weight: 700; }
+  tr.grp td { background: var(--wash); font-weight: 700; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; }
+  @media (max-width: 42rem) {
+    table { font-size: .85rem; }
+    th, td { padding-right: .5rem; }
+  }
+  .provenance { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem;
+    margin: 0 0 2.4rem; font-size: .85rem; color: var(--mute); }
+  .provenance dt { font-variant: small-caps; letter-spacing: .04em; }
+  .provenance dd { margin: 0; }
+  figure { margin: 2.2rem 0; }
+  figure svg { display: block; width: 100%; height: auto; }
+  figure pre { margin: 0; }
+  figure.pan { overflow-x: auto; }
+  figcaption { margin-top: .7rem; font-size: .85rem; color: var(--mute); line-height: 1.5; }
+  .figure-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1.2rem; margin: 2.2rem 0; }
+  .figure-row figure { margin: 0; }
+  table.filemap td { border-bottom: none; padding: .12rem .8rem .12rem 0; }
+  table.filemap td:first-child { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85em; white-space: pre; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin: 1.4rem 0; }
+  .do, .dont { border: 2px solid var(--ink); padding: .8rem 1rem; }
+  .dont { border-style: dashed; }
+  .do h4::before { content: "\2713\00a0"; }
+  .dont h4::before { content: "\2715\00a0"; }
+  .recs { display: grid; gap: .9rem; margin: 1.4rem 0; }
+  .rec { border: 1px solid var(--ink); }
+  .rec-n { margin: 0; padding: .35rem .75rem; background: var(--wash);
+    border-bottom: 1px solid var(--ink); font-weight: 700; font-size: .92rem; }
+  .rec-t { font-weight: 400; color: var(--mute); font-size: .78rem; }
+  .rec dl { display: grid; grid-template-columns: max-content 1fr; gap: .25rem .8rem;
+    margin: 0; padding: .55rem .75rem .65rem; font-size: .9rem; }
+  .rec dt { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .74rem;
+    color: var(--mute); padding-top: .22rem; white-space: nowrap; }
+  .rec dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .rec dd ul { margin: .1rem 0 0; padding-left: 1.05rem; }
+  .rec dd li { margin: .15rem 0; }
+  .ct { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem;
+    border: 1px solid var(--ink); border-radius: 3px; padding: 1px 4px; white-space: nowrap; }
+  .hum { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem;
+    border: 1px solid var(--ink); border-radius: 11px; padding: 1px 8px; }
+  .chip { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem;
+    background: var(--wash); border-radius: 3px; padding: 1px 5px; }
+  .callout { display: grid; grid-template-columns: 1.5rem 1fr; gap: .7rem; align-items: start;
+    background: var(--wash); border-left: 3px solid var(--hair); padding: .8rem 1rem; margin: 1.4rem 0; }
+  .callout .g { font-size: 1.05rem; line-height: 1.35; }
+  .callout p { margin: 0; font-size: .92rem; }
+  .callout strong { font-weight: 700; }
+  details { border: 1px solid var(--hair); border-radius: 3px; padding: .45rem .9rem;
+    margin: 1.2rem 0; font-size: .92rem; }
+  details summary { cursor: pointer; font-weight: 600; font-size: .92rem; list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: "\25B8\00a0\00a0"; color: var(--mute); }
+  details[open] summary::before { content: "\25BE\00a0\00a0"; }
+  details[open] summary { margin-bottom: .5rem; }
+  @media (max-width: 42rem) { .pair { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<article>
+
+<h1>Orchestration model</h1>
+<dl class="provenance">
+  <dt>Doctype</dt>  <dd>explanation</dd>
+  <dt>Question</dt> <dd>How do the workspace's orchestration layer and board's ticket store talk to each other?</dd>
+  <dt>Updated</dt>  <dd>2026-08-21</dd>
+</dl>
+
+<h2>Workspace-to-board channels</h2>
+
+<figure class="pan" id="fig-channels">
+<svg viewBox="0 0 520 285" style="min-width:520px" role="img" aria-labelledby="f1t">
+  <title id="f1t">Two boxes joined by three one-way channels and one shared string</title>
+  <defs>
+    <marker id="arrow-channels" viewBox="0 0 8 8" refX="7" refY="4"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="40" width="180" height="130" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  <text x="100" y="70" text-anchor="middle" font-size="12" font-weight="bold">Workspace</text>
+  <g font-size="10" font-family="ui-monospace, Menlo, monospace" opacity=".65">
+    <text x="100" y="95" text-anchor="middle">orchestrator session</text>
+    <text x="100" y="113" text-anchor="middle">worker sessions</text>
+    <text x="100" y="131" text-anchor="middle">delegating, clean</text>
+  </g>
+
+  <rect x="330" y="40" width="180" height="130" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  <text x="420" y="70" text-anchor="middle" font-size="12" font-weight="bold">board</text>
+  <g font-size="10" font-family="ui-monospace, Menlo, monospace" opacity=".65">
+    <text x="420" y="95" text-anchor="middle">server :8300</text>
+    <text x="420" y="113" text-anchor="middle">ticket store</text>
+    <text x="420" y="131" text-anchor="middle">bridge :8301</text>
+  </g>
+
+  <line x1="190" y1="75" x2="330" y2="75" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-channels)"/>
+  <text x="272" y="68" text-anchor="middle" font-size="10">HTTP write</text>
+  <circle cx="212" cy="75" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+  <text x="212" y="75" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">1</text>
+
+  <line x1="190" y1="112" x2="330" y2="112" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-channels)"/>
+  <text x="272" y="105" text-anchor="middle" font-size="10">HTTP read</text>
+  <circle cx="212" cy="112" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+  <text x="212" y="112" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">2</text>
+
+  <line x1="330" y1="150" x2="190" y2="150" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-channels)"/>
+  <text x="248" y="143" text-anchor="middle" font-size="10">spawn</text>
+  <circle cx="308" cy="150" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+  <text x="308" y="150" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">3</text>
+
+  <rect x="180" y="210" width="160" height="60" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  <text x="260" y="236" text-anchor="middle" font-size="11" font-weight="bold">claimed_by</text>
+  <text x="260" y="254" text-anchor="middle" font-size="10" font-family="ui-monospace, Menlo, monospace" opacity=".65">= the pane name</text>
+  <text x="260" y="196" text-anchor="middle" font-size="10">read by both sides</text>
+  <line x1="215" y1="210" x2="112" y2="174" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-channels)"/>
+  <line x1="305" y1="210" x2="408" y2="174" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-channels)"/>
+  <circle cx="188" cy="218" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+  <text x="188" y="218" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">4</text>
+</svg>
+<figcaption>The two sides share no file, no database handle, and no function
+call. Board's server runs inside a container, and the bridge runs on the host
+as the LaunchAgent <code>local.board.bridge</code>.</figcaption>
+<ol class="keys">
+  <li><span class="k">1</span><p><strong>HTTP write</strong> — the first channel, workspace to board. An
+    agent session changes a ticket by calling a door, such as
+    <code>PATCH /api/backlog-tickets/{id}/head</code>. The session tells board that the row moved.</p></li>
+  <li><span class="k">2</span><p><strong>HTTP read</strong> — the same first channel, used the other way.
+    A session asks <code>GET /api/snapshot</code> what every row currently says. Both marks are plain
+    HTTP at <code>http://localhost:8300</code>.</p></li>
+  <li><span class="k">3</span><p><strong>spawn</strong> — the second channel, board to workspace. Board cannot call
+    an agent. To make work happen it starts a new <code>claude</code> program in a terminal
+    pane. A <em>pane</em> is one terminal window a session runs in. The container cannot start
+    a terminal program, so the bridge on the host does it.
+    <span class="src">board/src/board/bridge/spawner.py:400-429 @ c166ae3</span></p></li>
+  <li><span class="k">4</span><p><strong>claimed_by</strong> — the third channel, one shared string
+    rather than a message. The pane's name is
+    written into the ticket row's <code>claimed_by</code> column. That string is the only thing
+    saying that this row and that running program belong together. Both sides read it.
+    <span class="src">board/src/board/bridge/herdr.py:222-236 @ c166ae3</span></p></li>
+</ol>
+</figure>
+
+<p>Board never edits a file to change a ticket. An agent session never writes a
+<code>backlog.md</code>. Board never reads a pane's screen, so a session reports by writing
+the row and never by printing. The <span class="ct">3&times; channel</span> above are the
+whole joint, and the three sections below take one channel each.</p>
+
+<h2>Ticket store doors</h2>
+
+<p>A <em>door</em> is one HTTP endpoint on board's server. There are
+<span class="ct">6&times; door</span> in total: five write and one read. Every
+door answers at <code>http://localhost:8300</code>. A live probe of
+<code>/api/health</code> on 2026-08-21 answered <code>{"ok":true,"version":77}</code>.</p>
+
+<table>
+  <thead><tr><th>door</th><th>what it means</th><th>called by</th></tr></thead>
+  <tbody>
+    <tr class="grp"><td colspan="3">Write</td></tr>
+    <tr><td><code>POST /api/backlog-tickets</code></td>
+        <td>file a new piece of work</td>
+        <td>any session; <code>?validate=1</code> checks and writes nothing</td></tr>
+    <tr><td><code>PATCH /api/backlog-tickets/{id}/head</code></td>
+        <td>change the marker, tags, labels, title</td>
+        <td>a session releasing a row back to <span class="chip">open</span>; board's own repair pass</td></tr>
+    <tr><td><code>PATCH /api/backlog-tickets/{id}/body</code></td>
+        <td>replace the body text</td>
+        <td>a session refining a row</td></tr>
+    <tr><td><code>POST /api/backlog-tickets/{id}/claim</code></td>
+        <td>take the <span class="chip">working</span> marker; refused if somebody holds it</td>
+        <td>the owner's tap, and a session taking a row</td></tr>
+    <tr><td><code>DELETE /api/backlog-tickets/{id}</code></td>
+        <td>close: the row is marked <span class="chip">done</span> and kept for ever</td>
+        <td>the session that shipped the work</td></tr>
+    <tr class="grp"><td colspan="3">Read</td></tr>
+    <tr><td><code>GET /api/snapshot</code></td>
+        <td>read every pool's rows and every live session</td>
+        <td>the <code>/clean</code> sweep, and a session with no row named</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <span class="g" aria-hidden="true">⚠️</span>
+  <p><strong>The head door refuses the working marker.</strong>
+  <code>PATCH .../head</code> carrying <code>{"state":"working"}</code> answers 422 with the
+  word <code>claim_first</code>. Take that marker through <code>/claim</code> instead.
+  <span class="src">board/src/board/server/tickets.py:281 @ c166ae3</span></p>
+</div>
+
+<p>The refusal has a reason the code states. The working marker carries a second
+field, the holder, and the head door cannot write it. A caller who reached the
+marker there would leave a row saying it is being worked with nobody working it:
+<q>The claimed marker is refused for the same reason and a stronger one. It is the
+one marker that carries a second field — the holder — and this door has no way to
+write it.</q>
+<span class="src">board/src/board/server/tickets.py:263-278 @ c166ae3</span></p>
+
+<p>The settled marker has the mirror rule. There is no finished column on the
+board, and <span class="chip">done</span> is reached only by deletion:
+<q>Closing is deletion — there is no done marker and no group of finished tickets —
+and the append-only log is the history the unversioned pool files never had, so the
+row's own words survive it.</q>
+<span class="src">board/src/board/server/app.py:1051-1053 @ c166ae3</span></p>
+
+<p>The dry run below files nothing. It runs every check the real door runs, then
+discards the row. It was probed on 2026-08-19.
+<span class="src">~/.claude/CLAUDE.md, "Tickets"</span></p>
+
+<pre>curl -s -X POST \
+  'http://localhost:8300/api/backlog-tickets?validate=1' \
+  -H 'Content-Type: application/json' \
+  -d '{"project":"workspace",
+       "title":"Probe the filing door.",
+       "labels":["PROBE"],
+       "tags":["docs"],
+       "fields":{"what":"…","why":"…","how":"…"}}'</pre>
+
+<p>Every write carries three self-identifying fields. <code>actor</code> is the label
+the store's event log records the write under. <code>session_id</code> and
+<code>session_name</code> link the row to the session's transcript. None of the three is
+ever refused, so a session that omits them is not blocked. It is only unattributable.
+<span class="src">board/src/board/bridge/prompt.py:101-108 @ c166ae3</span></p>
+
+<h2>Session launch by board</h2>
+
+<figure class="pan" id="fig-launch">
+<svg viewBox="0 0 600 395" style="min-width:600px" role="img" aria-labelledby="f2t">
+  <title id="f2t">One Start tap, from the claim on the row to the session the bridge verifies</title>
+  <defs>
+    <marker id="arrow-launch" viewBox="0 0 8 8" refX="7" refY="4"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="16" width="160" height="34" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  <text x="100" y="37" text-anchor="middle" font-size="11" font-weight="bold">server :8300</text>
+  <rect x="230" y="16" width="160" height="34" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  <text x="310" y="37" text-anchor="middle" font-size="11" font-weight="bold">bridge :8301</text>
+  <rect x="430" y="16" width="160" height="34" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  <text x="510" y="37" text-anchor="middle" font-size="11" font-weight="bold">claude pane</text>
+
+  <g stroke="#767676" stroke-width="1" stroke-dasharray="4 4">
+    <line x1="100" y1="50" x2="100" y2="380"/>
+    <line x1="310" y1="50" x2="310" y2="380"/>
+    <line x1="510" y1="50" x2="510" y2="380"/>
+  </g>
+
+  <line x1="8" y1="85" x2="100" y2="85" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-launch)"/>
+  <text x="54" y="77" text-anchor="middle" font-size="10">Start tap</text>
+
+  <path d="M100,105 H130 V121 H100" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-launch)"/>
+  <g font-size="10">
+    <text x="140" y="105">mint the pane name</text>
+    <text x="140" y="119">write claimed_by</text>
+  </g>
+  <circle cx="74" cy="113" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+  <text x="74" y="113" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">1</text>
+
+  <line x1="100" y1="155" x2="310" y2="155" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-launch)"/>
+  <text x="215" y="147" text-anchor="middle" font-size="10">POST /spawn</text>
+  <circle cx="122" cy="155" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+  <text x="122" y="155" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">2</text>
+
+  <path d="M310,190 H340 V206 H310" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-launch)"/>
+  <g font-size="10">
+    <text x="350" y="190">look the kind up</text>
+    <text x="350" y="204">in one route table</text>
+  </g>
+  <circle cx="288" cy="198" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+  <text x="288" y="198" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">3</text>
+
+  <path d="M310,240 H340 V256 H310" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-launch)"/>
+  <g font-size="10">
+    <text x="350" y="240">herdr opens a tab</text>
+    <text x="350" y="254">prompt goes to a file</text>
+  </g>
+
+  <line x1="310" y1="292" x2="510" y2="292" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-launch)"/>
+  <text x="415" y="284" text-anchor="middle" font-size="10">start claude</text>
+  <circle cx="332" cy="292" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+  <text x="332" y="292" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">4</text>
+
+  <line x1="510" y1="330" x2="310" y2="330" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-launch)"/>
+  <text x="400" y="322" text-anchor="middle" font-size="10">status leaves idle</text>
+  <circle cx="488" cy="330" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+  <text x="488" y="330" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">5</text>
+
+  <line x1="310" y1="365" x2="100" y2="365" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-launch)"/>
+  <text x="205" y="357" text-anchor="middle" font-size="10">the session exists</text>
+</svg>
+<figcaption>One dispatch, from the tap to the session. The claim on the row is
+written before any session exists, so a second tapper meets the claim rather than a
+second pane. <em>herdr</em> is the terminal program the bridge shells out to; it owns
+the tabs and the panes.</figcaption>
+<ol class="keys">
+  <li><span class="k">1</span><div>
+    <p><strong>Mint the name and claim the row</strong> — server. The owner taps
+    <span class="hum">Start</span> on a row. The server builds a pane name of the form
+    <code>work-&lt;project&gt;-&lt;n&gt;-&lt;hex4&gt;</code> and writes it into
+    <code>claimed_by</code> before anything is spawned.
+    <span class="src">board/src/board/bridge/herdr.py:169 @ c166ae3</span></p>
+    <p>The order is the whole guard: <q>The caller wrote it into the row's
+    <code>claimed_by</code> before asking for a session, so a second taker meets the claim.</q>
+    <span class="src">board/src/board/bridge/spawner.py:16-20 @ c166ae3</span></p></div></li>
+  <li><span class="k">2</span><p><strong>Ask the bridge</strong> — server to bridge. The server
+    posts <code>/spawn</code> with five fields: <code>session_name</code>, <code>repo</code>,
+    <code>prompt</code>, <code>kind</code>, <code>target</code>. The name travels rather than
+    being minted at the bridge, because the claim and the pane must be one string.
+    <span class="src">board/src/board/server/bridge_client.py:73-101 @ c166ae3</span></p></li>
+  <li><span class="k">3</span><div>
+    <p><strong>Route by kind</strong> — bridge. One table decides the model, the effort, and the
+    directory. It holds three tiers.
+    <span class="src">board/src/board/bridge/routing.py:128-169 @ c166ae3</span></p>
+    <ul>
+      <li><em>mechanical</em> — Sonnet at medium effort. It rewords one ticket and decides nothing.</li>
+      <li><em>orchestrated</em> — Opus at high effort, opened in the workspace root. It starts real work.</li>
+      <li><em>operational</em> — Opus at medium effort. It re-runs a project's own procedure.</li>
+    </ul>
+    <p>A row's <code>#easy</code> or <code>#hard</code> tag moves the effort and never the model.
+    The reason is written in the code: <q>a difficulty tag is a guess made in one line at
+    writing time, so it may move the effort and never the model.</q>
+    <span class="src">board/src/board/bridge/routing.py:119-121 @ c166ae3</span></p></div></li>
+  <li><span class="k">4</span><p><strong>Start claude</strong> — bridge to pane. The bridge asks herdr
+    for a tab, writes the prompt to a file, and starts <code>claude</code> on it. The exact
+    argument list is below.
+    <span class="src">board/src/board/bridge/spawner.py:418-429 @ c166ae3</span></p></li>
+  <li><span class="k">5</span><p><strong>Watch the agent leave idle</strong> — bridge. The bridge polls
+    for up to 15 seconds. An agent leaving <span class="chip">idle</span> is the only observable
+    proof that the prompt landed. Nothing is typed into the pane.
+    <span class="src">board/src/board/bridge/spawner.py:60-68 @ c166ae3</span></p></li>
+</ol>
+</figure>
+
+<p>This is the argument list the bridge builds at step 4. The prompt argument sits
+ahead of <code>--allowedTools</code>, whose value list is variadic and would otherwise
+swallow it as one more tool name.</p>
+
+<pre>argv = [
+    "--session-id", launch.session_id,
+    "--model", route.tier.model,
+    "--effort", effort,
+    launch_prompt,
+    "--allowedTools", *settings.allowed_tools, *route.tier.extra_tools,
+]</pre>
+
+<p>The prompt is a file rather than the argument itself, and the reason is a pair of
+limits. Typed text goes through the pane's line discipline, which discards a line past
+1024 bytes and reports nothing. A launch argument goes through herdr, which refuses any
+argument holding a Unicode control character, and a forty-line template's own line breaks
+are exactly that. So the launch argument is one short line naming the file:
+<span class="src">board/src/board/bridge/delivery.py:1-25 @ c166ae3</span></p>
+
+<pre>"Prompt ({title}): read {path} in full: it is your prompt, and nothing "
+"else has been sent to you. Then carry out the work it states."</pre>
+
+<h3>The dispatched orchestrator's prompt</h3>
+
+<p>Below is the whole prompt a dispatched orchestrator receives. It was rendered from
+<code>board.bridge.prompt.start_prompt</code> on 2026-08-21 for the row this page was
+written under.</p>
+
+<figure id="fig-prompt">
+<pre class="wrap">[1] /delegating [2] These tickets live in the board's ticket store and in no file. Each row below opens with its ticket id. Read, change and close one through the doors at http://127.0.0.1:8300/openapi.json — each door, the fields it takes, and the vocabulary those fields accept. Read it before your first call. [3] On every call that writes, name yourself: send `actor` and `session_name` set to `work-workspace-23-4f1a`, and `session_id` set to the value of your `CLAUDE_CODE_SESSION_ID` environment variable — body fields on a POST or a PATCH, query parameters on the DELETE. `actor` is the label the store's event log records the write under; the other two are what link the row to your session. None of the three is ever refused. Never edit a file to change a ticket, and never write a `backlog.md`: the pool has none, and one written here would split its work across two homes. [4] Name every session you launch inside this pane's namespace — work-workspace-23-4f1a--&lt;role&gt;-&lt;task&gt; — so cancelling this work reaches them. [5] workspace:23 Draw the board-workspace orchestration model as a view.</pre>
+<figcaption>One rendered start prompt, transcribed whole. The bracketed numerals are
+added here and are not in the text the session receives. The whole prompt is one line,
+because the invocation is one line.</figcaption>
+<ol class="keys">
+  <li><span class="k">1</span><p><strong>The slash command</strong> — the whole prompt is one
+    <code>/delegating</code> line, and the skill owns everything after it.</p></li>
+  <li><span class="k">2</span><p><strong>Where the tickets are</strong> — the store, not a file, and
+    the address of the doors that change them.</p></li>
+  <li><span class="k">3</span><p><strong>Self-identification</strong> — the three fields from the doors
+    section, addressed to this one session by its pane name.</p></li>
+  <li><span class="k">4</span><p><strong>The namespace clause</strong> — the shape every worker this
+    session launches must be named in. It leads the rows on purpose: every row can be read back
+    off the snapshot, and this clause cannot.
+    <span class="src">board/src/board/bridge/prompt.py:634-641 @ c166ae3</span></p></li>
+  <li><span class="k">5</span><p><strong>The row</strong> — its id first, then its title. A batch is the
+    same line over several rows.</p></li>
+</ol>
+</figure>
+
+<p>A batch start renders the same head, then names every row it claimed:</p>
+
+<pre class="wrap">… Work exactly these 2 tickets, in this order, and no others: (1) board:53 Delete the five explanation views. (2) board:54 Write the overview view.</pre>
+
+<p>Board does not tell the session how to do the work. It hands over the doors and the
+row's own words: <q>Moving a ticket to <em>working</em> means "start this work", so the session
+is not told how to do it — it is handed the doors its tickets answer at and their own text,
+and the skill named on that line owns everything after.</q>
+<span class="src">board/src/board/bridge/prompt.py:592-598 @ c166ae3</span></p>
+
+<h2>Session names</h2>
+
+<figure id="fig-name">
+<pre>work-workspace-23-4f1a--build-diagram
+└──┬─┘└────┬───┘└┬┘└─┬─┘  └─────┬────┘
+   │       │     │   │          └── role and task
+   │       │     │   └── nonce
+   │       │     └── row number
+   │       └── project
+   └── prefix</pre>
+<figcaption>One worker session's name. Everything before the double dash is the
+holder, and the store's <code>claimed_by</code> column holds exactly that string.</figcaption>
+</figure>
+
+<p>The double dash is the boundary. <code>head_of()</code> returns the part in front of it,
+and its own docstring states the role: <q>This is the whole join. The store's
+<code>claimed_by</code> holds exactly this string for the row being worked, so the sweep,
+the liveness readout and cancel all read one value rather than three derivations of one.</q>
+<span class="src">board/src/board/bridge/herdr.py:222-236 @ c166ae3</span></p>
+
+<p>A worker the orchestrator launches keeps the same holder in front of its own name.
+That is what makes a worker reachable from outside its own session, because cancel reaches
+every pane in the namespace. Until the workers were named this way, a cancelled batch left
+them running (2026-08-06).
+<span class="src">board/src/board/bridge/spawner.py:550-555 @ c166ae3</span></p>
+
+<p>One string answers <span class="ct">3&times; question</span>: which panes board owes,
+whether a working row has a live session, and what cancel interrupts.
+<span class="src">board/src/board/bridge/spawner.py:16-20 @ c166ae3</span></p>
+
+<h3>Sessions board never opened</h3>
+
+<p>Not every agent session comes from a tap. The workspace's <code>delegating</code> skill
+launches its own workers straight through herdr, with no board involvement:</p>
+
+<pre>herdr agent start "$name" --kind claude --pane "$pane" --timeout 90000 \
+  -- --model "$model" --effort "$effort" --name "$name"</pre>
+
+<p><span class="src">~/workspace/.claude/skills/delegating/scripts/launch-session:102-105 @ abd1dd6</span></p>
+
+<p>Two differences from board's argument list matter. Board passes
+<code>--session-id</code>, because board generates the id itself. That id is what finds the
+session's transcript later. Board also passes the prompt as a launch argument.
+<code>launch-session</code> passes <code>--name</code> instead, then sends the prompt with
+<code>herdr pane send-text</code> followed by <code>herdr pane send-keys Enter</code>.
+<span class="src">~/workspace/.claude/skills/delegating/scripts/send-prompt:55-57 @ abd1dd6</span></p>
+
+<table>
+  <thead><tr><th>script</th><th>what it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>check-sessions</code></td><td>report who is alive in one repository</td></tr>
+    <tr><td><code>send-prompt</code></td><td>hand a worker its task, with a <code>DONE &lt;name&gt;</code> sentinel appended</td></tr>
+    <tr><td><code>watch-sessions</code></td><td>wait for several workers without burning a turn</td></tr>
+    <tr><td><code>close-session</code></td><td>retire one worker whose output was collected</td></tr>
+    <tr><td><code>sweep-sessions</code></td><td>retire every stale pane, and release the rows behind them</td></tr>
+  </tbody>
+</table>
+
+<h2>Scenarios by first move</h2>
+
+<figure class="pan" id="fig-scenarios">
+<svg viewBox="0 0 600 280" style="min-width:600px" role="img" aria-labelledby="f4t">
+  <title id="f4t">Seven ways the two sides meet, divided by who moved first</title>
+  <defs>
+    <marker id="arrow-scenarios" viewBox="0 0 8 8" refX="7" refY="4"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <rect x="200" y="12" width="200" height="40" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  <text x="300" y="37" text-anchor="middle" font-size="11" font-weight="bold">Who moved first?</text>
+
+  <path d="M300,52 V76 H100 V98" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-scenarios)"/>
+  <path d="M300,52 V98" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-scenarios)"/>
+  <path d="M300,52 V76 H500 V98" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-scenarios)"/>
+
+  <rect x="10" y="100" width="180" height="40" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  <text x="100" y="125" text-anchor="middle" font-size="10.5" font-weight="bold">Owner taps board</text>
+  <rect x="210" y="100" width="180" height="40" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  <text x="300" y="125" text-anchor="middle" font-size="10.5" font-weight="bold">Session acts</text>
+  <rect x="410" y="100" width="180" height="40" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  <text x="500" y="125" text-anchor="middle" font-size="10.5" font-weight="bold">Nobody acts</text>
+
+  <g fill="none" stroke="currentColor" stroke-width="1">
+    <path d="M100,140 V152 H26 V254"/>
+    <path d="M26,170 H36"/><path d="M26,198 H36"/><path d="M26,226 H36"/><path d="M26,254 H36"/>
+    <path d="M300,140 V152 H226 V198"/>
+    <path d="M226,170 H236"/><path d="M226,198 H236"/>
+    <path d="M500,140 V152 H426 V170"/>
+    <path d="M426,170 H436"/>
+  </g>
+
+  <g font-size="10">
+    <circle cx="48" cy="170" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+    <text x="48" y="170" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">1</text>
+    <text x="64" y="170" dy=".35em">Start on one row</text>
+    <circle cx="48" cy="198" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+    <text x="48" y="198" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">2</text>
+    <text x="64" y="198" dy=".35em">Start on a group</text>
+    <circle cx="48" cy="226" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+    <text x="48" y="226" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">6</text>
+    <text x="64" y="226" dy=".35em">Cancel</text>
+    <circle cx="48" cy="254" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+    <text x="48" y="254" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">7</text>
+    <text x="64" y="254" dy=".35em">Deploy or Review</text>
+
+    <circle cx="248" cy="170" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+    <text x="248" y="170" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">3</text>
+    <text x="264" y="170" dy=".35em">Files its own row</text>
+    <circle cx="248" cy="198" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+    <text x="248" y="198" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">4</text>
+    <text x="264" y="198" dy=".35em">Hands the row back</text>
+
+    <circle cx="448" cy="170" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+    <text x="448" y="170" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">5</text>
+    <text x="464" y="170" dy=".35em">The session died</text>
+  </g>
+</svg>
+<figcaption>Every meeting between the two sides, divided by who moved first. The
+three branches do not overlap, and nothing falls outside them.</figcaption>
+<ol class="keys">
+  <li><span class="k">1</span><p><strong>Start on one row</strong> — the owner taps
+    <span class="hum">Start</span>. The server claims the row, spawns the session, and the session
+    works it. The session closes the row with <code>DELETE</code>. The card leaves the board.</p></li>
+  <li><span class="k">2</span><p><strong>Start on a group</strong> — one session, several rows,
+    claimed as a frozen set at the tap. The session works exactly those rows and closes each as its own
+    work ships. A row the session added itself is <q>held by nothing and counted by nobody</q>
+    (2026-08-12, owner).
+    <span class="src">board/src/board/bridge/prompt.py:605-611 @ c166ae3</span></p></li>
+  <li><span class="k">3</span><p><strong>Files its own row</strong> — the owner types a request in a
+    chat session and taps nothing. The session files the row with <code>POST</code>, works it, and
+    closes it. The spawn channel is unused: no spawn, no claim, no pane name.</p></li>
+  <li><span class="k">4</span><div>
+    <p><strong>Hands the row back</strong> — the session meets a decision it may not make. It writes a
+    proposal into that project's <code>docs/</code>, files a new <span class="chip">#need-you</span>
+    row, and returns its own row to <span class="chip">open</span> with the same tag. The tag holds
+    the row's next move, so only the owner can end it.</p>
+    <p>The mirror case is the owner tapping <span class="hum">Start</span> on such a row. The tap is
+    the confirmation. A tap can confirm and can never choose, so a row waiting on a choice makes the
+    session ask with <code>AskUserQuestion</code>.
+    <span class="src">board/src/board/bridge/prompt.py:525-531 @ c166ae3</span></p></div></li>
+  <li><span class="k">5</span><p><strong>The session died</strong> — the row still reads
+    <span class="chip">working</span> and no session holds it. Two repair loops answer this, and the
+    next section draws them.</p></li>
+  <li><span class="k">6</span><p><strong>Cancel</strong> — <code>POST /api/sessions/{pane}/stop</code>
+    reaches the pane and, through the namespace, every worker under it. Nothing is closed: the
+    interrupt stops the work now, and the panes go on a later sweep.
+    <span class="src">board/src/board/server/app.py:1310-1314 @ c166ae3</span></p></li>
+  <li><span class="k">7</span><p><strong>Deploy or Review</strong> — a <em>run</em>. Board spawns a
+    session and then stops watching. Nothing claims it, its name sits outside the <code>work-</code>
+    namespace, and its pane is never swept. This is the exception that proves the join: no claim means
+    no join, and no join means no repair and no cleanup. Closing that pane is the owner's work.
+    <span class="src">board/src/board/bridge/spawner.py:20-24 @ c166ae3</span></p></li>
+</ol>
+</figure>
+
+<details>
+<summary>The confirmation clause tells the session to judge which kind of answer the row was waiting for</summary>
+<pre class="wrap">— The owner tapped Start on this row themselves, so the tap is theirs. A tap can confirm, and it cannot decide: this board offers no way to express a choice, so never read it as picking one. Read the row and the proposal it points to, and judge what #need-you was waiting for. If it was a confirmation — the proposal states one recommendation and only acceptance was owed — the tap is that acceptance, exactly as written; anything they wanted changed is already in the row's own text above. Record the acceptance in that proposal document, then carry out the work the row asks for. If it was a decision — a choice among options, or an input only the owner can give — the tap does not carry it: ask the owner with the AskUserQuestion tool, offering the proposal's own options with its recommendation first.</pre>
+<p><span class="src">board/src/board/bridge/prompt.py:556-581 @ c166ae3</span></p>
+</details>
+
+<h2>Repair loops, board and workspace</h2>
+
+<figure class="pan" id="fig-repair">
+<svg viewBox="0 0 600 300" style="min-width:600px" role="img" aria-labelledby="f5t">
+  <title id="f5t">Three repairs, each from the evidence it reads to the write it makes</title>
+  <defs>
+    <marker id="arrow-repair" viewBox="0 0 8 8" refX="7" refY="4"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <g font-size="10.5" font-weight="bold">
+    <text x="92" y="28" text-anchor="middle">what it reads</text>
+    <text x="300" y="28" text-anchor="middle">what repairs</text>
+    <text x="508" y="28" text-anchor="middle">what it writes</text>
+  </g>
+
+  <g fill="none" stroke="currentColor" stroke-width="1.4">
+    <rect x="10" y="45" width="165" height="66"/>
+    <rect x="215" y="45" width="170" height="66"/>
+    <rect x="425" y="45" width="165" height="66"/>
+    <rect x="10" y="131" width="165" height="66"/>
+    <rect x="215" y="131" width="170" height="66"/>
+    <rect x="425" y="131" width="165" height="66"/>
+    <rect x="10" y="217" width="165" height="66"/>
+    <rect x="215" y="217" width="170" height="66"/>
+    <rect x="425" y="217" width="165" height="66"/>
+  </g>
+
+  <g stroke="currentColor" stroke-width="1.4" marker-end="url(#arrow-repair)">
+    <line x1="175" y1="78" x2="213" y2="78"/><line x1="385" y1="78" x2="423" y2="78"/>
+    <line x1="175" y1="164" x2="213" y2="164"/><line x1="385" y1="164" x2="423" y2="164"/>
+    <line x1="175" y1="250" x2="213" y2="250"/><line x1="385" y1="250" x2="423" y2="250"/>
+  </g>
+
+  <g font-size="10" font-weight="bold" text-anchor="middle">
+    <text x="92" y="71">every claimed_by</text>
+    <text x="300" y="71">board's bridge</text>
+    <text x="508" y="71">closes the pane</text>
+    <text x="92" y="157">the live session list</text>
+    <text x="300" y="157">board's server</text>
+    <text x="508" y="157">hands the row back</text>
+    <text x="92" y="243">GET /api/snapshot</text>
+    <text x="300" y="243">the /clean sweep</text>
+    <text x="508" y="243">hands the row back</text>
+  </g>
+  <g font-size="10" font-family="ui-monospace, Menlo, monospace" text-anchor="middle" opacity=".65">
+    <text x="92" y="89">on a live row</text>
+    <text x="300" y="89">sweep_orphans</text>
+    <text x="508" y="89">no claim names</text>
+    <text x="92" y="175">2 readings, 2 min</text>
+    <text x="300" y="175">reconcile.py</text>
+    <text x="508" y="175">to open</text>
+    <text x="92" y="261">panes and sessions</text>
+    <text x="300" y="261">board_tickets.py</text>
+    <text x="508" y="261">to open</text>
+  </g>
+
+  <g>
+    <circle cx="223" cy="53" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+    <text x="223" y="53" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">1</text>
+    <circle cx="223" cy="139" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+    <text x="223" y="139" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">2</text>
+    <circle cx="223" cy="225" r="11" fill="#ffffff" stroke="currentColor" stroke-width="1.2"/>
+    <text x="223" y="225" dy=".35em" text-anchor="middle" font-size="11" font-weight="bold">3</text>
+  </g>
+</svg>
+<figcaption>The two sides repair in opposite directions. Board reconciles panes
+against rows; the workspace reconciles rows against panes.</figcaption>
+<ol class="keys">
+  <li><span class="k">1</span><div>
+    <p><strong>Board closes an orphan pane</strong> — <code>Spawner.sweep_orphans</code>. Every poll,
+    the server hands the bridge every <code>claimed_by</code> string it still holds on a live row. The
+    bridge closes every <code>work-*</code> pane none of them names.</p>
+    <p>This needs no memory. A restart forgets which panes the bridge opened, and the pane's own name
+    is the claim: <q>What a restart cannot lose is the pane's own name, and the name is the claim.</q>
+    <span class="src">board/src/board/bridge/spawner.py:534-560 @ c166ae3</span></p></div></li>
+  <li><span class="k">2</span><div>
+    <p><strong>Board hands a row back</strong> — <code>server/reconcile.py</code>. A row whose session
+    has gone returns to <span class="chip">open</span>. Two constants gate it.
+    <code>HOLDER_GONE_READINGS = 2</code>, because one missed reading is noise: a session between
+    panes, or a list read mid-launch. The window is two minutes from the row's last write, because
+    the claim is written before the session exists, so a fresh claim legitimately answers to nobody
+    for as long as the launch takes.
+    <span class="src">board/src/board/server/reconcile.py:66-82 @ c166ae3</span></p>
+    <p>One guard matters more than either number. Passing <code>sessions=None</code> says no reading
+    was taken, and then no session-dependent repair is planned at all: <q>a poll where the bridge
+    answered nothing looks exactly like a poll where every session has gone.</q>
+    <span class="src">board/src/board/server/reconcile.py:29-33 @ c166ae3</span></p></div></li>
+  <li><span class="k">3</span><div>
+    <p><strong>The workspace hands a row back</strong> — <code>clean/scripts/board_tickets.py</code>.
+    The <code>/clean</code> sweep reads <code>GET /api/snapshot</code>. For every
+    <span class="chip">working</span> row whose holder is in neither the live pane list nor the
+    snapshot's own <code>sessions[]</code>, it sets the row back to <span class="chip">open</span>.
+    Liveness is read from both, because board dispatches sessions that never take a pane.
+    <span class="src">~/workspace/.claude/skills/clean/scripts/board_tickets.py:36-60 @ abd1dd6</span></p>
+    <p>The module states its own boundary: <q>It never closes a row. Closing says the work shipped,
+    which only a reader of the session's report can know; releasing says nobody is working it, which
+    the empty pane already proves.</q>
+    <span class="src">~/workspace/.claude/skills/clean/scripts/board_tickets.py:9-11 @ abd1dd6</span></p></div></li>
+</ol>
+</figure>
+
+<p>The sweep reports one of <span class="ct">3&times; outcome</span> per row.</p>
+
+<table>
+  <thead><tr><th>outcome</th><th>what it means</th><th>what the sweep does</th></tr></thead>
+  <tbody>
+    <tr><td><code>release</code></td><td>no session holds the row</td><td>sets it to <span class="chip">open</span></td></tr>
+    <tr><td><code>held</code></td><td>the row carries <span class="chip">#need-you</span></td><td>leaves it alone</td></tr>
+    <tr><td><code>unreachable</code></td><td>board did not answer</td><td>reports the address and stops</td></tr>
+  </tbody>
+</table>
+
+<h2>Deliberate absences</h2>
+
+<ul>
+  <li>No shared database. Neither side opens the other's store.</li>
+  <li>No file anywhere holds a ticket. Every pool moved into the store on 2026-08-19, and a
+    <code>backlog.md</code> written back draws no card on any surface.</li>
+  <li>Board never reads a pane's screen, so a session's only report channel is the row.</li>
+  <li>Board never decides how the work is done. It hands over the doors and the row's own words.</li>
+  <li>A run has no claim, so nothing reconciles it and nothing sweeps its pane.</li>
+</ul>
+
+<h2>Open gaps</h2>
+
+<ol class="steps">
+  <li>The <code>delegating</code> skill documents an old pane prefix. Its own file still names the
+    namespace <code>st-&lt;id&gt;--&lt;role&gt;-&lt;task&gt;</code>, while the live prompt hands
+    <code>work-workspace-23-4f1a--&lt;role&gt;-&lt;task&gt;</code> and
+    <code>head_of</code> calls <code>st-</code> <q>a pane from an earlier prefix</q>. A session that
+    follows the skill file rather than its own prompt names workers outside the namespace, where
+    cancel cannot reach them.
+    <span class="src">~/workspace/.claude/skills/delegating/SKILL.md:214 @ abd1dd6;
+    board/src/board/bridge/herdr.py:227 @ c166ae3</span></li>
+  <li>Nothing checks the workspace's claims about board. The doors, payload keys, and pane prefixes
+    quoted in <code>~/.claude/CLAUDE.md</code> and in the <code>delegating</code> skill are verified
+    by no program. Board ticket <code>workspace:22</code>.</li>
+  <li>The roles are not formalized. A <code>controller</code>, <code>worker</code>, and
+    <code>reviewer</code> split, and a single source for model and effort, are still an open design.
+    Board ticket <code>workspace:9</code>. This page describes the system as it runs, not as it is
+    planned.</li>
+  <li>The <code>delegating</code> skill's claim step names a door that refuses it. The skill tells a
+    session to claim a row with <code>PATCH /api/backlog-tickets/&lt;id&gt;/head</code> carrying
+    <code>{"state":"working"}</code>, which <code>check_state</code> answers with
+    <code>claim_first</code>. Board ticket <code>workspace:33</code>.
+    <span class="src">~/workspace/.claude/skills/delegating/SKILL.md:144-145, 198 @ abd1dd6</span></li>
+</ol>
+
+</article>
+</body>
+</html>

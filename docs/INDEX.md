@@ -22,6 +22,11 @@ Specifications are not documents and are not listed here. They live in
 - [`agent-hooks.html`](agent-hooks.html) — the hooks that fire around a
   working session, split by the layer that owns them: four Claude Code
   hooks in one settings file, and the git guard every repository runs.
+- [`agent-orchestration-model.html`](agent-orchestration-model.html) — how
+  the workspace's orchestration layer and board's ticket store talk: the
+  three one-way channels between them, the six ticket doors, the launch that
+  spawns a session, the pane name that joins a row to a pane, seven meeting
+  scenarios, and the two repair loops.
 - [`agent-writing.html`](agent-writing.html) — how the `writing` skill
   turns a five-field brief into one delivered view: the fork contract,
   the run steps from doctype to open, and the render check that can
