@@ -142,9 +142,12 @@ One row arrives as its own title and body; a batch arrives as a numbered run,
 calls to the store are part of the service-ticket, not bookkeeping:
 
 1. Claim the row before anything else:
-   `PATCH /api/backlog-tickets/<id>/head` with `{"state":"working"}`. The tap
-   that spawned this session promised "working", and until the state moves the
-   board shows a promise the store denies.
+   `POST /api/backlog-tickets/<id>/claim` with `{"by":"<this session's name>"}`.
+   The tap that spawned this session promised "working", and until the state
+   moves the board shows a promise the store denies. The marker door refuses
+   this write — `PATCH .../head` with `{"state":"working"}` answers
+   `claim_first` and names the claim door — because the working marker and its
+   holder are one fact, and `by` is what the claim records.
 2. End the row on completion, per the Filing rules in `~/.claude/CLAUDE.md`,
    in exactly one of three ways. The work shipped and nothing waits on the
    owner: `DELETE /api/backlog-tickets/<id>`, after lifting any owed remainder
@@ -195,7 +198,7 @@ froze that set at the tap and claims exactly it, so a row you add is a row
 nobody claimed and nobody measures — worked beside whatever already held it,
 and still running when the board calls the batch finished. A row filed after
 the tap is not the batch's; it takes a second tap. Claim every named row
-before anything else, one `PATCH .../head` call each: until the states move the
+before anything else, one `POST .../claim` call each: until the states move the
 board shows a promise the store denies, and the rows are already held against a
 second tap.
 
