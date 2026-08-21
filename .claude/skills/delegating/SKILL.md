@@ -139,6 +139,31 @@ back; that file says which panes may close and how the board row settles.
    delegation: it sweeps every pane, retires the spent ones, and leaves the
    rest for the user to judge.
 
+## Board's doors
+Everything a session does to a ticket is one call to the board server at
+`localhost:8300`, and this file names none of its routes. Read the server's
+`/openapi.json` once and work from that: it lists every door, what each request
+carries, and every refusal by name. A route copied into a document drifts the
+day the service changes it, and the server is the one description that cannot.
+
+Five things are ever done to a row, and that listing names the door for each:
+file one into a pool; take it, which is the claim and is what moves it to
+*working*; change its head — marker, tags, labels, title; change its body,
+which is replaced whole; and close it. Filing has a dry run that checks
+everything and writes nothing — use it when a field's bounds are in doubt. What
+the grammar allows is board's own spec
+(`~/workspace/board/docs/data-ticket-contract.md`), and a refusal is typed and
+names what it rejected: fix that and call again rather than guessing at a
+second shape.
+
+Name yourself on every call — your `CLAUDE_CODE_SESSION_ID`, your session name,
+and the actor label. Board links the row to your session, and that link is what
+answers who worked a row once it is closed. All three are optional and leaving
+them out is never refused, which is why it has to be a habit rather than a
+check.
+
+A row is read from the server's snapshot, which carries every pool's cards.
+
 ## Board-dispatched service-tickets
 The board's start action spawns a session whose whole prompt is one
 `/delegating` line. It opens with where the backlog-tickets live and which
@@ -151,17 +176,16 @@ One row arrives as its own title and body; a batch arrives as a numbered run,
 `(1) … (2) …`, in the page's own order, which is the user's priority. Two
 calls to the store are part of the service-ticket, not bookkeeping:
 
-1. Claim the row before anything else:
-   `POST /api/backlog-tickets/<id>/claim` with `{"by":"<this session's name>"}`.
-   The tap that spawned this session promised "working", and until the state
-   moves the board shows a promise the store denies. The marker door refuses
-   this write — `PATCH .../head` with `{"state":"working"}` answers
-   `claim_first` and names the claim door — because the working marker and its
-   holder are one fact, and `by` is what the claim records.
+1. Claim the row before anything else, naming this session as the taker. The
+   tap that spawned this session promised "working", and until the state moves
+   the board shows a promise the store denies. It is the claim door and not the
+   head door: the head door refuses the working marker and says so by name,
+   because that marker and its holder are one fact, and only the claim records
+   a holder.
 2. End the row on completion, per the Filing rules in `~/.claude/CLAUDE.md`,
    in exactly one of three ways. The work shipped and nothing waits on the
-   owner: `DELETE /api/backlog-tickets/<id>`, after lifting any owed remainder
-   into its own `#need-you` row. The work is finished but the close waits on
+   owner: close it, after lifting any owed remainder into its own `#need-you`
+   row. The work is finished but the close waits on
    the owner's review: leave the state `working` and tag the row `#need-you`.
    The work is unfinished and waits on the owner's input: set the state back to
    `open` and tag the row `#need-you`. The tag holds the row's next automatic
@@ -169,8 +193,8 @@ calls to the store are part of the service-ticket, not bookkeeping:
    the row `working` and no such tag leaves a card that reads as running
    forever.
 
-`done` is reachable only through `DELETE`. The head door refuses it
-(`check_state`), so a row's settled state never has two places it could live.
+`done` is reachable only through the close door. The head door refuses it, so a
+row's settled state never has two places it could live.
 A close keeps the row for good and the board stops drawing it, so a closed row
 is a permanent record rather than a deletion.
 
@@ -215,7 +239,7 @@ second tap.
 With no row named after the doors at all — a line typed by hand, never one the
 board sends — the service-ticket is the whole pool: every row whose state is
 `open` and which carries no tag waiting on the owner, read from
-`GET /api/snapshot`, in the order it lists them.
+the server's snapshot, in the order it lists them.
 
 Then run them as separate service-tickets, and close each row as its own work
 ships — not the batch at the end. Fan out only where the changes cannot meet;
