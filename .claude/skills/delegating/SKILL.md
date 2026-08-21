@@ -149,7 +149,10 @@ day the service changes it, and the server is the one description that cannot.
 Five things are ever done to a row, and that listing names the door for each:
 file one into a pool; take it, which is the claim and is what moves it to
 *working*; change its head — marker, tags, labels, title; change its body,
-which is replaced whole; and close it. Filing has a dry run that checks
+which is replaced whole; and close it. A row you are about to work is filed
+already taken: the filing accepts a holder, so filing and claiming are one call
+and the row is never briefly unheld. Taking a row that already exists is still
+the claim. Filing has a dry run that checks
 everything and writes nothing — use it when a field's bounds are in doubt. What
 the grammar allows is board's own spec
 (`~/workspace/board/docs/data-ticket-contract.md`), and a refusal is typed and

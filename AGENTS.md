@@ -54,8 +54,9 @@ orchestration request: load the `/delegating` skill.
 A job the owner typed straight into a session gets a row too — the board is the
 one record of what these repositories are worked on, and an ask that never
 became a ticket leaves nothing behind. File it into the pool of the entry the
-work lands in, and claim it while you hold it. The doors and the ticket grammar
-are in `~/.claude/CLAUDE.md`, "Tickets".
+work lands in, and file it already taken — one call both files the row and puts
+your name on it, so a row of yours is never briefly unheld. The doors and the
+ticket grammar are in `~/.claude/CLAUDE.md`, "Tickets".
 
 File before the first write that outlives the session — a commit, a document, a
 deploy, a worker you send — and never after it. Judging a job short enough to
