@@ -45,11 +45,7 @@ def main():
     if pane is None:
         sys.exit("no session named %r" % opts.target)
 
-    # Naming one pane is an explicit request, so the focus hold -- which
-    # keeps a broad sweep off the pane the owner is looking at -- does not
-    # apply here.
-    row = S.classify(herdr, pane, roster, S.title_index(), opts.quiet_min, me,
-                     explicit=True)
+    row = S.classify(herdr, pane, roster, S.title_index(), opts.quiet_min, me)
     if not S.closable(row) and not opts.force:
         row["closed"] = False
         print(json.dumps(row, ensure_ascii=False))
