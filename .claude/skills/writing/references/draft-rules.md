@@ -197,7 +197,9 @@ selects them.
 - **A value chip** on every state name, status, mode, and doctype that sits
   inside a sentence. The test is one question: could the reader run, open, or
   paste this? A path, a command, an identifier, and a field name are things a
-  reader copies, so they stay code spans. A value drawn from a set the page
+  reader copies, so they stay code spans. A command stays one only while it
+  fits the source line: wrapped inside a span it pastes as two broken
+  commands, so one that does not fit takes a block of its own. A value drawn from a set the page
   names elsewhere is a thing a reader scans for, so it takes the chip:
   `<span class="chip">Open</span>`, not `<code>Open</code>`.
 - **A human badge** on the one transition no code performs. A page with no
