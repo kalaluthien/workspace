@@ -8,7 +8,10 @@ board stops waiting on a session that no longer exists.
     sweep-sessions [<repo>] [--close] [--quiet-min N]
 
 One JSON object per pane: {repo, pane, name, title, status, session, link,
-quiet_min, verdict, holds, closable} -- plus `closed` under --close. Then one
+quiet_min, last_active, verdict, holds, closable}, where `quiet_min` is the
+minutes since the session's last record and `last_active` is the wall-clock
+reading it was taken against -- quote that one when the list is read later
+than it was taken -- plus `closed` under --close. Then one
 per board row needing attention: {ticket, title, action, reason}, where the
 action is `release` (nobody holds it), `held` (tagged #need-you, the owner's
 to end) or `unreachable` (the board did not answer). A released row is not a

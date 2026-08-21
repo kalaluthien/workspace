@@ -164,6 +164,14 @@ def parse_ts(value):
         return None
 
 
+def local_clock(ts):
+    """One timestamp as the wall clock the reader's machine shows, or None."""
+    if ts is None:
+        return None
+    return ts.astimezone().strftime("%H:%M")
+
+
+
 def assistant_text(row):
     content = (row.get("message") or {}).get("content")
     if isinstance(content, str):
@@ -432,6 +440,7 @@ def _classify(herdr, pane, roster, titles, quiet_min, me):
         "session": None,
         "link": None,
         "quiet_min": None,
+        "last_active": None,
         "holds": [],
         "verdict": None,
         "revision": pane.get("revision"),
@@ -526,6 +535,10 @@ def _classify(herdr, pane, roster, titles, quiet_min, me):
     out["superseded"] = len(scanned) - 1
     out["quiet_min"] = (None if state.quiet_minutes() is None
                         else round(state.quiet_minutes(), 1))
+    # The elapsed minutes age the moment they are printed, so the reading
+    # they were taken against is printed beside them. A list read ten minutes
+    # later then still says when each session actually stopped.
+    out["last_active"] = local_clock(state.last_ts)
 
     if state.is_empty:
         out["verdict"] = "empty"

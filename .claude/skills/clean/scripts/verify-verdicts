@@ -219,6 +219,19 @@ def ticket(state="working", sessions=(), tags=("code",)):
             "sessions": [{"id": s, "name": "n-" + s} for s in sessions]}
 
 
+def check_clock():
+    """The elapsed minutes need an anchor a later reader can still trust."""
+    failures = []
+    if S.local_clock(None) is not None:
+        failures.append("clock: a session with no timestamp got a reading")
+    stamp = S.parse_ts(STAMP % 13)
+    want = stamp.astimezone().strftime("%H:%M")
+    if S.local_clock(stamp) != want:
+        failures.append("clock: %r is not the local reading %r"
+                        % (S.local_clock(stamp), want))
+    return failures
+
+
 def check_tickets():
     """A row is the sweep's only when its own session is gone."""
     failures = []
@@ -245,8 +258,9 @@ def check_tickets():
 
 def main():
     failures = (check_state() + check_gate() + check_titles()
-                + check_closable() + check_wait() + check_tickets())
-    total = len(CASES) + len(WAIT_CASES) + 9 + 6
+                + check_closable() + check_wait() + check_tickets()
+                + check_clock())
+    total = len(CASES) + len(WAIT_CASES) + 9 + 6 + 2
     for line in failures:
         print("FAIL  %s" % line)
     print("%d/%d checks passed" % (total - len(failures), total))
