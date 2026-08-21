@@ -50,6 +50,18 @@ to work in an entry lives in the entry:
 A request that spans entries (research + implementation, multi-repo work) is an
 orchestration request: load the `/delegating` skill.
 
+# Ad-hoc work
+A job the owner typed straight into a session gets a row too — the board is the
+one record of what these repositories are worked on, and an ask that never
+became a ticket leaves nothing behind. File it into the pool of the entry the
+work lands in: at the start when the job is long enough that a lost session
+would lose it, at the end when it is short. The doors and the ticket grammar
+are in `~/.claude/CLAUDE.md`, "Tickets".
+
+Leave the row open. A closed ticket draws no card anywhere, so one filed and
+closed in the same breath is a record nobody reads; the open row is what puts
+the finished job in front of the owner, who closes it from the phone.
+
 # Technical knowledge
 `notes/` is the one cache for technical survey knowledge. `wiki/index.md` lists
 every page with a one-line summary, `wiki/*.md` are the timeless concept pages,
