@@ -219,6 +219,47 @@ def ticket(state="working", sessions=(), tags=("code",)):
             "sessions": [{"id": s, "name": "n-" + s} for s in sessions]}
 
 
+class FakeHerdr:
+    """Just enough herdr for the paths a link decision walks."""
+
+    def __init__(self, argv):
+        self.argv = argv
+
+    def process_info(self, pane_id):
+        return {"shell_pid": 1, "foreground_process_group_id": 1,
+                "foreground_processes": [{"pid": 2, "argv": self.argv}]}
+
+    def working_rules(self, pane_id):
+        return []
+
+    def pane_started(self, pane_id):
+        return None
+
+
+def check_dispatch():
+    """A pane whose prompt was a launch argument has not gone unasked."""
+    failures = []
+    unknown = "00000000-0000-4000-8000-000000000000"
+    pane = {"pane_id": "w1:p1", "agent": "claude", "agent_status": "idle",
+            "name": "st-board-9--build-x", "cwd": S.WORKSPACE_ROOT,
+            "foreground_cwd": S.WORKSPACE_ROOT,
+            "agent_session": {"kind": "id", "value": unknown}}
+    argv = ["claude", "--session-id", unknown, "-p", "do the row"]
+    row = S.classify(FakeHerdr(argv), pane, [pane], {}, 30, "w1:pX")
+    if "unspoken" not in row["holds"]:
+        failures.append("dispatch: a session named on the command line with "
+                        "no transcript was not held (%r)" % row["holds"])
+    if S.closable(row):
+        failures.append("dispatch: an unspoken dispatch was closable")
+
+    hooked = dict(pane, agent_session={"kind": "id", "value": unknown})
+    row = S.classify(FakeHerdr(["claude"]), hooked, [hooked], {}, 30, "w1:pX")
+    if "unspoken" in row["holds"]:
+        failures.append("dispatch: a pane nobody prompted was held as a "
+                        "dispatch (%r)" % row["holds"])
+    return failures
+
+
 def check_clock():
     """The elapsed minutes need an anchor a later reader can still trust."""
     failures = []
@@ -259,8 +300,8 @@ def check_tickets():
 def main():
     failures = (check_state() + check_gate() + check_titles()
                 + check_closable() + check_wait() + check_tickets()
-                + check_clock())
-    total = len(CASES) + len(WAIT_CASES) + 9 + 6 + 2
+                + check_clock() + check_dispatch())
+    total = len(CASES) + len(WAIT_CASES) + 9 + 6 + 2 + 3
     for line in failures:
         print("FAIL  %s" % line)
     print("%d/%d checks passed" % (total - len(failures), total))

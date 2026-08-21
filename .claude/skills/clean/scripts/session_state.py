@@ -509,6 +509,15 @@ def _classify(herdr, pane, roster, titles, quiet_min, me):
         if sources and sources[0] in ("hook", "argv"):
             out["session"] = sessions[0]
             out["verdict"] = "empty"
+            if from_argv:
+                # A launcher that names the session on the command line hands
+                # it the prompt there too, so "nobody has asked it anything"
+                # is false: the pane is a dispatch whose first turn has not
+                # reached disk yet. Read `from_argv` rather than the source
+                # list, because the hook stamps the same id and wins the
+                # dedupe -- a dispatch usually carries both. The quiet clock
+                # cannot cover this: there is no timestamp to measure.
+                hold("unspoken")
             return out
         hold("unlinked")
         out["verdict"] = "unlinked"
