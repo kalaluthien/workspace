@@ -76,6 +76,16 @@ back; that file says which panes may close and how the board row settles.
    with, and a claim does not switch them — so a task in another role, or one
    much wider than the pane's effort, is a new worker, however free the pane
    looks. A worker launched in this step arrives clean and correctly named.
+   Two checks on the row before a prompt goes anywhere, because the board is
+   what the owner watches the work on (`~/workspace/AGENTS.md`, "Ad-hoc work"):
+   - **Timing.** The row exists before the worker does. A job that arrived by
+     tap already has one; a job the owner typed into a session does not, so
+     file it here rather than when the work lands — a row that appears after
+     the work is a record nobody watched.
+   - **Availability.** Read the row before taking it. A row already `working`
+     means somebody is on this job, and a row covering a neighbouring piece of
+     it is not this job's row. Claim the right one under the worker's own
+     name, so the card says who is answering for it.
 4. `scripts/send-prompt <name> [--worktree]` — the script appends what the
    worker cannot see: sibling-session collision warnings, the worktree
    convention, and a `DONE <name>` completion sentinel. A task shaped as a
