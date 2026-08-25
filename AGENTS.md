@@ -4,11 +4,12 @@ which git repository a change lands in, so identify it before any git command.
 
 **Workspace-owned directories** belong to the container root — itself a
 whitelist git repository whose `.gitignore` ignores `/*` and re-admits only
-this file and these. A change here is committed to the root repository:
+this file, the `CLAUDE.md` beside it that imports it, and these. A change
+here is committed to the root repository:
 
 | directory | holds | read first |
 | --- | --- | --- |
-| `.claude/` | conditional rules, skills, output styles, and the `CLAUDE.md` that imports this file | this file |
+| `.claude/` | conditional rules, skills, and output styles | this file |
 | `docs/` | workspace-level views (`.html`), over both planes, plus the machine contract every `docs/` reader parses | `docs/README.md` |
 | `hooks/` | this repository's own git hooks, chained after the shared guard by `.git/local-hooks/pre-commit` | `hooks/pre-commit` |
 | `scripts/` | workspace-level herdr tooling (`herdr-survey`, `herdr-update`), `check-docs` and its test | script headers |
