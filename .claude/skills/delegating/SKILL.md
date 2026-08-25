@@ -166,6 +166,15 @@ them out is never refused, which is why it has to be a habit rather than a
 check.
 
 A row is read from the server's snapshot, which carries every pool's cards.
+Every pool's tickets are in that store and nothing else — there is no pool
+`backlog.md` anywhere, and nothing may write one. When a task finishes, read
+the owning pool's rows and close or update whatever it settled; nothing else
+retires a row.
+
+A `#need-you` row holds its own next transition, because the step it waits on
+is the owner's. Never start an open one and never close a working one on your
+own initiative. A prompt saying the owner confirmed the row carries their
+decision, so it starts the row and drops the tag.
 
 ## Board-dispatched service-tickets
 The board's start action spawns a session whose whole prompt is one
@@ -185,7 +194,7 @@ calls to the store are part of the service-ticket, not bookkeeping:
    head door: the head door refuses the working marker and says so by name,
    because that marker and its holder are one fact, and only the claim records
    a holder.
-2. End the row on completion, per the Filing rules in `~/.claude/CLAUDE.md`,
+2. End the row on completion, per "Board's doors" above,
    in exactly one of three ways. The work shipped and nothing waits on the
    owner: close it, after lifting any owed remainder into its own `#need-you`
    row. The work is finished but the close waits on
@@ -209,7 +218,7 @@ project's own docs and per the workspace document system — named options,
 their trade-offs, one recommendation — and commit it. Then file a new
 `#need-you` backlog-ticket in the same pool naming the decision, with a
 sentence or two on why it blocks the work and a pointer to the proposal —
-through the board's filing door (`~/.claude/CLAUDE.md`, Filing, "Tickets").
+through the board's filing door ("Board's doors" above).
 Hand your own row back the third way above — unfinished, waiting on the
 owner's input — and name the blocking row in its body, so a re-tap meets the
 decision instead of the same ambiguity.

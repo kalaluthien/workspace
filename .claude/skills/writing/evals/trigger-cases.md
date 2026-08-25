@@ -28,7 +28,7 @@ repository this workspace holds.
 | camera 릴리스 노트 md로 써줘 · write the camera release notes as markdown | A Markdown document. The working agent writes it. |
 | docs 계약 스펙 업데이트해줘 · update the docs contract spec | A `.md` specification, which is normative. This skill never authors one. |
 | herdr 세션 이름 규칙 바꿔줘 · change the herdr session naming rule | A change to the system. Perform the change, do not document it. |
-| 이거 어떻게 하는 게 나을지 제안해줘 · suggest what would be better | No artifact was asked for. The propose signal in `~/.claude/CLAUDE.md` answers it in chat. |
+| 이거 어떻게 하는 게 나을지 제안해줘 · suggest what would be better | No artifact was asked for. `~/.claude/CLAUDE.md` "Deciding" answers it in chat, as named options with one recommendation. |
 
 Two neighbours split on one word. A request to **find** a cause is a
 diagnosis and goes to the `debugger`. A request to lay out a change whose

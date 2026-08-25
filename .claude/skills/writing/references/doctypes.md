@@ -269,7 +269,7 @@ beside the claim it backs.
 | 결과 리포트 써서 reports/ 에 올려줘 · put the result report under reports/ | a Markdown report under a repository convention | the working agent writes it |
 | 이 스펙 문서 업데이트해줘 · update this spec | a `.md` specification | the working agent writes it |
 | 알림 채널 바꿔줘 · change the notification channel | a change to the system | perform the change, do not document it |
-| 이거 어떻게 하는 게 나을지 제안해줘 · suggest what would be better | no artifact was asked for | chat, per the propose signal in `~/.claude/CLAUDE.md` |
+| 이거 어떻게 하는 게 나을지 제안해줘 · suggest what would be better | no artifact was asked for | chat: named options with trade-offs and one recommendation, per `~/.claude/CLAUDE.md` "Deciding" |
 
 When the brief is one of these, write no HTML. Return
 `STATUS: INSUFFICIENT-INPUT` and name the route.

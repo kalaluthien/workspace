@@ -108,8 +108,8 @@ Liveness comes from the panes *and* from `sessions[]` in the snapshot, because
 board dispatches sessions that never take a pane. Read the rows themselves at
 `GET /api/snapshot` on `localhost:8300`, under `board.groups[].tickets[]`.
 
-The doors that write a row, and the vocabulary they take, are in
-`~/.claude/CLAUDE.md`, "Tickets". One of them is not a door: the `working`
+The doors that write a row, and the vocabulary they take, are in the
+`delegating` skill, "Board's doors". One of them is not a door: the `working`
 marker is taken through `/claim`, and a `PATCH .../head` asking for it is
 refused with a 422. Releasing back to `open` is a plain head patch, and every
 field it omits survives (probed 2026-08-21).
